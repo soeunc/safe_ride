@@ -1,15 +1,67 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
-<head>
-  <meta charset="UTF-8">
-  <title>마이프로필</title>
+<html
+        lang="en" xmlns:sec="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
+>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <head>
+    <meta charset="UTF-8">
+    <title>마이프로필</title>
 </head>
 <body>
 <h1>My Profile</h1>
 <h3>반갑습니다, <span sec:authentication="name"></span>님!</h3>
-<form action="/safe-ride/logout">
-  <input type="submit" value="로그아웃">
-</form>
-<a href="/safe-ride">홈으로</a>
+<!--라이딩 기록-->
+
+<!--프로필 수정-->
+    <form action="/safe-ride/myprofile/update" method="post">
+        <div>
+          <label for="password">비밀번호</label>
+          <input id="password" name="password" type="password" placeholder="비밀번호 재설정">
+        </div>
+        <div>
+            <label for="passwordCk">비밀번호</label>
+            <input id="passwordCk" name="passwordCk" type="password" placeholder="비밀번호 재설정 확인">
+        </div>
+        <div>
+          <label for="email">이메일</label>
+          <input id="email" name="email" type="text" th:value="${member.email}">
+        </div>
+        <div>
+          <label for="nickName">닉네임</label>
+          <input id="nickName" name="nickName" type="text" th:value="${member.nickname}">
+        </div>
+        <div>
+          <label for="phoneNumber">전화번호</label>
+          <input id="phoneNumber" name="phoneNumber" type="number" th:value="${member.getPhoneNumber()}">
+        </div>
+        <div>
+          <label for="birthday">생년월일</label>
+          <input id="birthday" name="birthday" type="number" th:value="${member.getBirthday()}">
+        </div>
+        <div>
+            <input type="submit" value="수정하기">
+        </div>
+    </form>
+    <form action="/safe-ride/logout">
+      <input type="submit" value="로그아웃">
+    </form>
+
+    <a href="/safe-ride">홈으로</a>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous">
+    </script>
+    <script th:inline="javascript">
+        window.onload = function () {
+            //alert
+            const alertMsg = [[${msg}]];
+
+            if (alertMsg){
+                alert(alertMsg);
+            }
+        }
+    </script>
 </body>
 </html>
