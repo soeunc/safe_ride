@@ -34,7 +34,6 @@ public class MemberController {
         @RequestBody
         LoginDto dto
     ){
-        log.info("test");
         if (!manager.userExists(dto.username)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
