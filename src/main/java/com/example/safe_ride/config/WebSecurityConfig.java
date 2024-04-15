@@ -37,7 +37,12 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         "/safe-ride",//메인페이지
                                         "/safe-ride/login",//로그인
-                                        "/safe-ride/join"//회원가입
+                                        "/safe-ride/join",//회원가입
+                                        //템플릿 관련
+                                        "/css/**",
+                                        "/js/**",
+                                        "/fonts/**",
+                                        "/img/**"
                                 )
                                 // 이 경로에 도달할 수 있는 사람에 대한 설정(모두)
                                 .permitAll()
