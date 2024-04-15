@@ -2,15 +2,13 @@ package com.example.safe_ride.member.entity;
 
 import com.example.safe_ride.myPage.entity.Badge;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Getter
+@Setter
 @Entity
 @Builder
 @Slf4j
