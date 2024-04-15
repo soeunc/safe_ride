@@ -1,10 +1,15 @@
 package com.example.safe_ride.config;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +17,9 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
+import java.io.IOException;
 
 
 @Configuration
@@ -56,9 +64,25 @@ public class WebSecurityConfig {
                                 // 어떤 경로(URL)로 요청을 보내면
                                 // 로그인 페이지가 나오는지
                                 .loginPage("/safe-ride/login")
-                                // 아무 설정 없이 로그인에 성공한 뒤
-                                // 이동할 URL
+                                //로그인에 성공한 뒤 이동할 URL
                                 .defaultSuccessUrl("/safe-ride")
+                                .loginProcessingUrl(
+                                        "/safe-ride/login"
+                                )
+                                .successHandler(
+                                        new AuthenticationSuccessHandler() {
+                                            @Override
+                                            public void onAuthenticationSuccess(
+                                                    HttpServletRequest request,
+                                                    HttpServletResponse response,
+                                                    Authentication authentication
+                                            ) throws IOException, ServletException {
+                                                System.out.println("authentication: "+authentication.getName());
+                                                //인증성공시
+                                                response.sendRedirect("/safe-ride");
+                                            }
+                                        }
+                                )
                                 // 실패시 이동할 URL
                                 .failureUrl("/safe-ride/login?fail")
                                 .permitAll()
