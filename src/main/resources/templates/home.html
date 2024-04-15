@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:sec="http://www.w3.org/1999/xhtml"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>메인화면</title>
+</head>
+<body>
+메인화면입니다.[[${userId}]]님
+<div sec:authorize="isAnonymous()">
+    <a href="/safe-ride/login">로그인</a>
+    <a href="/safe-ride/join">회원가입</a>
+</div>
+<div sec:authorize="isAuthenticated()">
+    <h3>반갑습니다, <span sec:authentication="name"></span>님!</h3>
+    <form action="/safe-ride/logout" method="post">
+        <input type="submit" value="로그아웃">
+    </form>
+    <a href="/safe-ride/myprofile">마이프로필</a>
+</div>
+
+</body>
+</html>
