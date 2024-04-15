@@ -20,5 +20,8 @@ public class LocationInfor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String location;
+    private String sido;
+    private String sigungu;
+    private String eubmyundong;
+    private String addressCode;
 }
