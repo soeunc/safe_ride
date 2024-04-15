@@ -52,7 +52,12 @@
 
 **박주윤**
 
-  
+- 커뮤니티 게시판, 매칭 기능 구현
+- 목표 달성률: 20%
+- 1. 게시글 생성할 때 광역자치구와 그에 해당하는 도시를 선택하여 게시글을 생성하는 기능 구현
+  2. 게시글 상세 조회, 전체 조회 기능 구현 
+  3. 게시글 생성하면 현재 시간을 바탕으로 생성 시간 데이터 베이스 저장 완료
+  4. 현재 프론트 부분은 아직 신경 쓰지않고 기능만 구현 중
 
 **이영규**
 
@@ -103,3 +108,7 @@
 
 GitHub Repository URL: [https://github.com/soeunc/safe_ride](https://github.com/soeunc/safe_ride)
 ![image](assets/weekly1.png)
+- ERD
+![image](assets/ERD.png)
+- 화면 기획
+![image](assets/화면기획.png)
