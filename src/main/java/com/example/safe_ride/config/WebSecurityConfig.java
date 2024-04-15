@@ -64,11 +64,13 @@ public class WebSecurityConfig {
                                 // 어떤 경로(URL)로 요청을 보내면
                                 // 로그인 페이지가 나오는지
                                 .loginPage("/safe-ride/login")
-                                //로그인에 성공한 뒤 이동할 URL
+                                //로그인에 성공한 뒤 이동할 디폴트 URL
                                 .defaultSuccessUrl("/safe-ride")
+                                //로그인 진행 url
                                 .loginProcessingUrl(
                                         "/safe-ride/login"
                                 )
+                                //로그인 성공했을 때 작업
                                 .successHandler(
                                         new AuthenticationSuccessHandler() {
                                             @Override
@@ -77,7 +79,7 @@ public class WebSecurityConfig {
                                                     HttpServletResponse response,
                                                     Authentication authentication
                                             ) throws IOException, ServletException {
-                                                System.out.println("authentication: "+authentication.getName());
+                                                //System.out.println("authentication: "+authentication.getName());
                                                 //인증성공시
                                                 response.sendRedirect("/safe-ride");
                                             }
