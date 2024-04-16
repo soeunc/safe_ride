@@ -1,4 +1,4 @@
-package com.example.safe_ride.member;
+package com.example.safe_ride.member.dto;
 
 import com.example.safe_ride.member.entity.Authority;
 import com.example.safe_ride.member.entity.Member;

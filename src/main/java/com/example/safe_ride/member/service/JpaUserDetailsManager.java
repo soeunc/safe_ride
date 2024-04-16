@@ -1,5 +1,7 @@
-package com.example.safe_ride.member;
+package com.example.safe_ride.member.service;
 
+import com.example.safe_ride.member.entity.CustomMemberDetails;
+import com.example.safe_ride.member.repo.MemberRepo;
 import com.example.safe_ride.member.entity.Authority;
 import com.example.safe_ride.member.entity.Member;
 import lombok.RequiredArgsConstructor;

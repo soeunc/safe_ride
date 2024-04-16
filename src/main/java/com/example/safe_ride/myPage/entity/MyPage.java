@@ -2,13 +2,11 @@ package com.example.safe_ride.myPage.entity;
 
 import com.example.safe_ride.matching.entity.Manner;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Getter
+@Setter
 @Entity
 @Builder
 @Slf4j

@@ -1,8 +1,13 @@
-package com.example.safe_ride.member;
+package com.example.safe_ride.member.controller;
 
 import com.example.safe_ride.facade.AuthenticationFacade;
+import com.example.safe_ride.member.dto.JoinDto;
+import com.example.safe_ride.member.dto.MemberDto;
+import com.example.safe_ride.member.entity.CustomMemberDetails;
+import com.example.safe_ride.member.dto.LoginDto;
+import com.example.safe_ride.member.dto.UpdateDto;
 import com.example.safe_ride.member.entity.Authority;
-import com.example.safe_ride.member.entity.Member;
+import com.example.safe_ride.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,8 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.io.IOException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @Controller
@@ -25,7 +29,7 @@ public class MemberController {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationFacade authFacade;
     private final MemberService memberService;
-    String msg = "";
+    private static String msg = "";
     //메인화면
     @GetMapping
     public String home(
@@ -45,14 +49,14 @@ public class MemberController {
         @RequestBody
         LoginDto dto
     ){
-        if (!manager.userExists(dto.username)) {
+        if (!manager.userExists(dto.getUsername())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        UserDetails userDetails = manager.loadUserByUsername(dto.username);
+        UserDetails userDetails = manager.loadUserByUsername(dto.getUsername());
         log.info("username: {}", userDetails.getUsername());
         log.info("password: {}", userDetails.getPassword());
 
-        if (!passwordEncoder.matches(dto.password, userDetails.getPassword())) {
+        if (!passwordEncoder.matches(dto.getPassword(), userDetails.getPassword())) {
             log.error("비밀번호가 일치하지 않습니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
@@ -60,7 +64,11 @@ public class MemberController {
     }
     //로그아웃
     @PostMapping("/logout")
-    public String logout() {
+    public String logout(
+            RedirectAttributes redirectAttributes
+    ) {
+        msg = "로그아웃 되었습니다 ^^.";
+        redirectAttributes.addFlashAttribute("msg", msg);
         return "redirect:/safe-ride";
     }
     // 회원가입 화면
@@ -71,59 +79,15 @@ public class MemberController {
     //회원가입
     @PostMapping("/join")
     public String signUp(
-            @RequestParam("userId")
-            String userId,
-            @RequestParam("password")
-            String password,
-            @RequestParam("passwordCk")
-            String passwordCk,
-            @RequestParam("email")
-            String email,
-            @RequestParam("nickname")
-            String nickname,
-            @RequestParam("phoneNumber")
-            String phoneNumber,
-            @RequestParam("birthday")
-            String birthday
+            JoinDto dto,
+            RedirectAttributes redirectAttributes
     ){
-        if (password.equals(passwordCk)){
-            manager.createUser(CustomMemberDetails.builder()
-                    .userId(userId)
-                    .password(passwordEncoder.encode(password))
-                    .email(email)
-                    .nickname(nickname)
-                    .phoneNumber(phoneNumber)
-                    .birthday(birthday)
-                    .authority(Authority.ROLE_INACTIVE_USER)
-                    .build()
-            );
+        if (dto.getPassword().equals(dto.getPasswordCk())){
+            memberService.join(dto);
         }
-        return "redirect:/login";
+        msg = "회원가입 되었습니다 ^^.";
+        redirectAttributes.addFlashAttribute("msg", msg);
+        return "redirect:/safe-ride/login";
     }
-    //마이페이지
-    @GetMapping("/myprofile")
-    public String myprofile(
-            Model model
-    ){
-        //사용자 개인정보 가져오기
-        model.addAttribute(
-                "member",
-                memberService.readMember(authFacade.getAuth().getName())
-        );
-        return "member/myprofile";
-    }
-    //마이페이지 수정
-    @PostMapping("/myprofile/update")
-    public String updateProfile(
-//            @RequestBody
-            UpdateDto dto,
-            Model model
-    ) {
-        memberService.updateMember(authFacade.getAuth().getName(), dto);
 
-        msg = "수정되었습니다.^^";
-
-        model.addAttribute("msg", msg);
-        return "redirect:/safe-ride/myprofile";
-    }
 }
