@@ -2,18 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>자전거 대여소 정보</title>
+  <title>자전거 대여소 정보(테스트 페이지)</title>
 </head>
 <body>
-// 주소 폼 데이터 입력
-<form action="/public-bicycle" method="post">
-  <input type="text" name="sido" placeholder="시도">
-  <input type="text" name="sigungu" placeholder="시군구">
-  <input type="text" name="eupmyundong" placeholder="읍면동">
-  <button type="submit">검색</button>
-</form>
 
-// 폼 데이터 제출 후 정보 출력
+<!-- 대여소 정보 출력 -->
 <h1>자전거 대여소 정보</h1>
 <div th:if="${results1}">
   <ul>
@@ -28,5 +21,11 @@
   </ul>
 </div>
 
+<!--<h1>실시간 자전거 대여/반납 정보</h1>-->
+<!--<div th:if="${results3}">-->
+<!--  <ul>-->
+<!--    <li th:each="result : ${results3}" th:text="${result}"></li>-->
+<!--  </ul>-->
+<!--</div>-->
 </body>
 </html>
