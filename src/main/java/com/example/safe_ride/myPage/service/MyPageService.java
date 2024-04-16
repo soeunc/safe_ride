@@ -18,16 +18,24 @@ import java.util.Optional;
 public class MyPageService {
     private final MyPageRepo myPageRepo;
     //라이딩 정보 가져오기
+    @Transactional
     public MyPageDto readRidingRecord(Long memberId){
         Optional<MyPage> optionalMyPage = myPageRepo.findByMemberId(memberId);
         MyPageDto myPageDto = new MyPageDto();
+        MyPage myPage = new MyPage();
+        //마이페이지 값이 존재한다면
         if (optionalMyPage.isPresent()){
-            MyPage myPage = optionalMyPage.get();
-            myPageDto = MyPageDto.fromEntity(myPage);
-        } else {
+            myPage = optionalMyPage.get();
+        } 
+        //존재하지 않는다면
+        else {
+            //새로 생성
             createRecord(memberId);
-            readRidingRecord(memberId);
+            //다시불러오기
+            optionalMyPage = myPageRepo.findByMemberId(memberId);
+            myPage = optionalMyPage.get();
         }
+        myPageDto = MyPageDto.fromEntity(myPage);
         return myPageDto;
     }
     //오늘 주행기록 입력
