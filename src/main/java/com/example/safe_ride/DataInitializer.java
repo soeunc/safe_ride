@@ -1,8 +1,8 @@
 package com.example.safe_ride;
 
-import com.example.safe_ride.locationInfor.entity.LocationInfor;
-import com.example.safe_ride.locationInfor.service.CsvDataReader;
-import com.example.safe_ride.locationInfor.service.DatabaseLoader;
+import com.example.safe_ride.locationInfo.entity.LocationInfo;
+import com.example.safe_ride.locationInfo.service.CsvDataReader;
+import com.example.safe_ride.locationInfo.service.DatabaseLoader;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -30,9 +30,9 @@ public class DataInitializer {
             try (Connection conn = DriverManager.getConnection(url);
                  Statement stmt = conn.createStatement()) {
                 // 테이블 데이터 삭제
-                stmt.execute("DELETE FROM location_infor");
+                stmt.execute("DELETE FROM location_info");
                 // 데이터 로딩 로직
-                List<LocationInfor> addresses = new CsvDataReader().readCsvData("src/main/resources/address.csv");
+                List<LocationInfo> addresses = new CsvDataReader().readCsvData("src/main/resources/address.csv");
                 databaseLoader.insertData(addresses);
                 System.out.println("Data has been loaded!");
             }

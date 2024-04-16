@@ -1,6 +1,6 @@
-package com.example.safe_ride.locationInfor.service;
+package com.example.safe_ride.locationInfo.service;
 
-import com.example.safe_ride.locationInfor.entity.LocationInfor;
+import com.example.safe_ride.locationInfo.entity.LocationInfo;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -17,26 +17,26 @@ public class DatabaseLoader {
     public void createTableIfNotExist() {
         try (Connection conn = DriverManager.getConnection(URL);
              Statement stmt = conn.createStatement()) {
-            stmt.execute("CREATE TABLE IF NOT EXISTS location_infor (" +
+            stmt.execute("CREATE TABLE IF NOT EXISTS location_info (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "sido TEXT," +
                     "sigungu TEXT," +
-                    "eubmyundong TEXT," +
+                    "eupmyundong TEXT," +
                     "address_code TEXT);");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void insertData(List<LocationInfor> addresses) {
+    public void insertData(List<LocationInfo> addresses) {
         try (Connection conn = DriverManager.getConnection(URL);
-             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO location_infor (sido, sigungu, eubmyundong, address_code) VALUES (?, ?, ?, ?)")) {
+             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO location_info (sido, sigungu, eupmyundong, address_code) VALUES (?, ?, ?, ?)")) {
             conn.setAutoCommit(false);  // 자동 커밋 비활성화
             int affectedRows = 0;
-            for (LocationInfor address : addresses) {
+            for (LocationInfo address : addresses) {
                 pstmt.setString(1, address.getSido());
                 pstmt.setString(2, address.getSigungu());
-                pstmt.setString(3, address.getEubmyundong());
+                pstmt.setString(3, address.getEupmyundong());
                 pstmt.setString(4, address.getAddressCode());
                 pstmt.executeUpdate();
                 affectedRows ++;
