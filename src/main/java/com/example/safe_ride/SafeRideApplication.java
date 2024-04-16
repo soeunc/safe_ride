@@ -1,6 +1,6 @@
 package com.example.safe_ride;
 
-import com.example.safe_ride.locationInfor.service.DatabaseLoader;
+import com.example.safe_ride.locationInfo.service.DatabaseLoader;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
