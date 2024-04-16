@@ -101,30 +101,5 @@ public class MemberController {
         }
         return "redirect:/login";
     }
-    //마이페이지
-    @GetMapping("/myprofile")
-    public String myprofile(
-            Model model
-    ){
-        //사용자 개인정보 가져오기
-        model.addAttribute(
-                "member",
-                memberService.readMember(authFacade.getAuth().getName())
-        );
-        return "member/myprofile";
-    }
-    //마이페이지 수정
-    @PostMapping("/myprofile/update")
-    public String updateProfile(
-//            @RequestBody
-            UpdateDto dto,
-            Model model
-    ) {
-        memberService.updateMember(authFacade.getAuth().getName(), dto);
 
-        msg = "수정되었습니다.^^";
-
-        model.addAttribute("msg", msg);
-        return "redirect:/safe-ride/myprofile";
-    }
 }
