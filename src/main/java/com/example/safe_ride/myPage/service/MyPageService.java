@@ -1,5 +1,7 @@
 package com.example.safe_ride.myPage.service;
 
+import com.example.safe_ride.matching.entity.Manner;
+import com.example.safe_ride.matching.entity.Matching;
 import com.example.safe_ride.myPage.dto.MyPageDto;
 import com.example.safe_ride.myPage.entity.MyPage;
 import com.example.safe_ride.myPage.repo.MyPageRepo;
@@ -9,16 +11,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class MyPageService {
     private final MyPageRepo myPageRepo;
     //라이딩 정보 가져오기
     public MyPageDto readRidingRecord(Long memberId){
-        MyPage myPage = myPageRepo.findByMemberId(memberId).orElseThrow(
-                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이딩 정보를 찾을 수 없습니다.")
-        );
-        return MyPageDto.fromEntity(myPage);
+        Optional<MyPage> optionalMyPage = myPageRepo.findByMemberId(memberId);
+        MyPageDto myPageDto = new MyPageDto();
+        if (optionalMyPage.isPresent()){
+            MyPage myPage = optionalMyPage.get();
+            myPageDto = MyPageDto.fromEntity(myPage);
+        } else {
+            createRecord(memberId);
+            readRidingRecord(memberId);
+        }
+        return myPageDto;
     }
     //오늘 주행기록 입력
     @Transactional
@@ -31,4 +41,19 @@ public class MyPageService {
         myPage.setWeeklyRecord(myPage.getWeeklyRecord() + todayRecord);
         myPage.setTodayRecord(myPage.getTodayRecord() + todayRecord);
     }
+    //빈 주행기록 생성
+    //마이페이지 방문 시 주행기록이 없는 신규유저 대상 목적
+    @Transactional
+    public void createRecord(Long memberId){
+        MyPage myPage = MyPage.builder()
+                .memberId(memberId)
+                .record(0)
+                .weeklyRecord(0)
+                .todayRecord(0)
+                .manner(null)
+                .build();
+
+        myPageRepo.save(myPage);
+    }
+
 }

@@ -68,39 +68,13 @@
                         <th scope="col">리뷰 받은 사람 ID</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <!--Matching-->
-                        <th scope="col" th:text="사용자1"></th>
-                        <th scope="col" th:text="별다섯개"></th>
-                        <th scope="col" th:text="재밌었습니다"></th>
-                        <th scope="col" th:text="사용자1"></th>
-                        <th scope="col" th:text="사용자2"></th>
-                    </tr>
-                    <tr>
-                        <!--Matching-->
-                        <th scope="col" th:text="사용자1"></th>
-                        <th scope="col" th:text="별다섯개"></th>
-                        <th scope="col" th:text="재밌었습니다"></th>
-                        <th scope="col" th:text="사용자1"></th>
-                        <th scope="col" th:text="사용자2"></th>
-                    </tr>
-                    <tr>
-                        <!--Matching-->
-                        <th scope="col" th:text="사용자1"></th>
-                        <th scope="col" th:text="별다섯개"></th>
-                        <th scope="col" th:text="재밌었습니다"></th>
-                        <th scope="col" th:text="사용자1"></th>
-                        <th scope="col" th:text="사용자2"></th>
-                    </tr>
-                    <tr>
-                        <!--Matching-->
-                        <th scope="col" th:text="사용자1"></th>
-                        <th scope="col" th:text="별다섯개"></th>
-                        <th scope="col" th:text="재밌었습니다"></th>
-                        <th scope="col" th:text="사용자1"></th>
-                        <th scope="col" th:text="사용자2"></th>
-                    </tr>
+                    <tbody th:if="${ridingRecord.getManner().id == null}">
+                        <tr>
+                            <!--Matching-->
+                            <th scope="col" th:text="데이터없음"></th>
+                        </tr>
+                    </tbody>
+                    <tbody th:unless="${ridingRecord.getManner().id == null}">
                     <tr>
                         <!--Matching-->
                         <th scope="col" th:text="사용자1"></th>
