@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class RGeoResponseDto {
-    private String BjdCode;
+    private String bjDongCode;
 }
