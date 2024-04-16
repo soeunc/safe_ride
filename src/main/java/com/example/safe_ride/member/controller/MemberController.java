@@ -1,8 +1,11 @@
-package com.example.safe_ride.member;
+package com.example.safe_ride.member.controller;
 
 import com.example.safe_ride.facade.AuthenticationFacade;
+import com.example.safe_ride.member.entity.CustomMemberDetails;
+import com.example.safe_ride.member.dto.LoginDto;
+import com.example.safe_ride.member.dto.UpdateDto;
 import com.example.safe_ride.member.entity.Authority;
-import com.example.safe_ride.member.entity.Member;
+import com.example.safe_ride.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,8 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.io.IOException;
 
 @Slf4j
 @Controller
@@ -45,14 +46,14 @@ public class MemberController {
         @RequestBody
         LoginDto dto
     ){
-        if (!manager.userExists(dto.username)) {
+        if (!manager.userExists(dto.getUsername())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        UserDetails userDetails = manager.loadUserByUsername(dto.username);
+        UserDetails userDetails = manager.loadUserByUsername(dto.getUsername());
         log.info("username: {}", userDetails.getUsername());
         log.info("password: {}", userDetails.getPassword());
 
-        if (!passwordEncoder.matches(dto.password, userDetails.getPassword())) {
+        if (!passwordEncoder.matches(dto.getPassword(), userDetails.getPassword())) {
             log.error("비밀번호가 일치하지 않습니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }

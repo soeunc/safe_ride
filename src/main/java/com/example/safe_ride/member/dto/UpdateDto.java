@@ -1,4 +1,4 @@
-package com.example.safe_ride.member;
+package com.example.safe_ride.member.dto;
 
 
 import lombok.*;
