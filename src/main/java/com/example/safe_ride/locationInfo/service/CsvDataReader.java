@@ -1,6 +1,6 @@
-package com.example.safe_ride.locationInfor.service;
+package com.example.safe_ride.locationInfo.service;
 
-import com.example.safe_ride.locationInfor.entity.LocationInfor;
+import com.example.safe_ride.locationInfo.entity.LocationInfo;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -11,18 +11,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CsvDataReader {
-    public List<LocationInfor> readCsvData(String filePath) {
-        List<LocationInfor> addresses = new ArrayList<>();
+    public List<LocationInfo> readCsvData(String filePath) {
+        List<LocationInfo> addresses = new ArrayList<>();
         try (Reader reader = new FileReader(filePath);
              CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
             for (CSVRecord csvRecord : csvParser) {
                 Long id = Long.valueOf(csvRecord.get("id"));
-                String sido = csvRecord.get("시도명");
-                String sigungu = csvRecord.get("시군구명");
-                String eubmyundong = csvRecord.get("읍면동명");
-                String addressCode = csvRecord.get("행정동코드");
+                String sido = csvRecord.get("sido");
+                String sigungu = csvRecord.get("sigungu");
+                String eupmyundong = csvRecord.get("eupmyundong");
+                String addressCode = csvRecord.get("addressCode");
 
-                addresses.add(new LocationInfor(id, sido, sigungu, eubmyundong, addressCode));
+                addresses.add(new LocationInfo(id, sido, sigungu, eupmyundong, addressCode));
             }
         } catch (Exception e) {
             e.printStackTrace();

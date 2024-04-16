@@ -1,4 +1,4 @@
-package com.example.safe_ride.locationInfor.entity;
+package com.example.safe_ride.locationInfo.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,12 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocationInfor {
+public class LocationInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String sido;
     private String sigungu;
-    private String eubmyundong;
+    private String eupmyundong;
     private String addressCode;
 }
