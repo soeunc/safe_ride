@@ -1,9 +1,13 @@
 package com.example.safe_ride.member.service;
 
+import com.example.safe_ride.member.dto.JoinDto;
+import com.example.safe_ride.member.entity.Authority;
+import com.example.safe_ride.member.entity.CustomMemberDetails;
 import com.example.safe_ride.member.repo.MemberRepo;
 import com.example.safe_ride.member.dto.MemberDto;
 import com.example.safe_ride.member.dto.UpdateDto;
 import com.example.safe_ride.member.entity.Member;
+import com.example.safe_ride.myPage.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +24,7 @@ public class MemberService {
     private final MemberRepo memberRepo;
     private final UserDetailsManager manager;
     private final PasswordEncoder passwordEncoder;
+    private final MyPageService myPageService;
 
     public MemberDto readMember(String userId){
         Member member = memberRepo.findByUserId(userId)
@@ -73,5 +78,21 @@ public class MemberService {
                         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
                 );
         return member.getId();
+    }
+
+    //회원가입
+    @Transactional
+    public void join(JoinDto dto){
+        manager.createUser(CustomMemberDetails.builder()
+                .userId(dto.getUserId())
+                .userName(dto.getUserName())
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .email(dto.getEmail())
+                .nickname(dto.getNickName())
+                .phoneNumber(dto.getPhoneNumber())
+                .birthday(dto.getBirthday())
+                .authority(Authority.ROLE_INACTIVE_USER)
+                .build()
+        );
     }
 }

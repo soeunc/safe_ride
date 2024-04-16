@@ -1,6 +1,8 @@
 package com.example.safe_ride.member.controller;
 
 import com.example.safe_ride.facade.AuthenticationFacade;
+import com.example.safe_ride.member.dto.JoinDto;
+import com.example.safe_ride.member.dto.MemberDto;
 import com.example.safe_ride.member.entity.CustomMemberDetails;
 import com.example.safe_ride.member.dto.LoginDto;
 import com.example.safe_ride.member.dto.UpdateDto;
@@ -72,32 +74,10 @@ public class MemberController {
     //회원가입
     @PostMapping("/join")
     public String signUp(
-            @RequestParam("userId")
-            String userId,
-            @RequestParam("password")
-            String password,
-            @RequestParam("passwordCk")
-            String passwordCk,
-            @RequestParam("email")
-            String email,
-            @RequestParam("nickname")
-            String nickname,
-            @RequestParam("phoneNumber")
-            String phoneNumber,
-            @RequestParam("birthday")
-            String birthday
+            JoinDto dto
     ){
-        if (password.equals(passwordCk)){
-            manager.createUser(CustomMemberDetails.builder()
-                    .userId(userId)
-                    .password(passwordEncoder.encode(password))
-                    .email(email)
-                    .nickname(nickname)
-                    .phoneNumber(phoneNumber)
-                    .birthday(birthday)
-                    .authority(Authority.ROLE_INACTIVE_USER)
-                    .build()
-            );
+        if (dto.getPassword().equals(dto.getPasswordCk())){
+            memberService.join(dto);
         }
         return "redirect:/login";
     }
