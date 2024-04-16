@@ -62,6 +62,27 @@ public class WebSecurityConfig {
                                         "/safe-ride/myprofile/create-today"//오늘 기록 입력
                                 )
                                 .authenticated()
+                                // 커뮤니티 - 게시글
+                                .requestMatchers(
+                                        "/article", // 전체 글 조회
+                                        "/article/create", // 게시글 생성
+                                        "/article/filter", // 도시 응답
+                                        "/article/{id}", // 게시글 상세 조회
+                                        "/article/{id}/edit", // 게시글 수정
+                                        "/article/{id}/delete", // 게시글 삭제
+                                        "/city"
+                                )
+                                .authenticated()
+                                // 커뮤니티 - 매칭글
+                                .requestMatchers(
+                                        "/matching/list", // 전체 매칭글 조회
+                                        "/matching/create", // 매칭글 생성
+                                        "/matching/{id}", // 매칭글 상세 조회
+                                        "/matching/{id}/edit", // 매칭글 수정
+                                        "/matching/{id}/delete", // 매칭글 삭제
+                                        "/matching/{id}/apply" // 매칭글 상세 조회
+                                )
+                                .authenticated()
 
                 )
                 // html form 요소를 이용해 로그인을 시키는 설정

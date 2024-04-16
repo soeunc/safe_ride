@@ -21,6 +21,9 @@ public class MemberDto {
     private Authority authority;
 
     public static MemberDto fromEntity(Member entity){
+//        if (entity == null) {
+//            return null; // 또는 적절한 처리를 수행할 수 있습니다.
+//        }
         return MemberDto.builder()
                 .id(entity.getId())
                 .userId(entity.getUserId())

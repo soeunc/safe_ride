@@ -1,9 +1,9 @@
 package com.example.safe_ride.member.service;
 
+import com.example.safe_ride.member.MemberRepo;
 import com.example.safe_ride.member.dto.JoinDto;
 import com.example.safe_ride.member.entity.Authority;
 import com.example.safe_ride.member.entity.CustomMemberDetails;
-import com.example.safe_ride.member.repo.MemberRepo;
 import com.example.safe_ride.member.dto.MemberDto;
 import com.example.safe_ride.member.dto.UpdateDto;
 import com.example.safe_ride.member.entity.Member;

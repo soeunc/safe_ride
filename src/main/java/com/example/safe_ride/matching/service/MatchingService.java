@@ -1,0 +1,116 @@
+package com.example.safe_ride.matching.service;
+
+import com.example.safe_ride.article.entity.Region;
+import com.example.safe_ride.article.repository.RegionRepository;
+import com.example.safe_ride.matching.dto.MatchingApplicationDto;
+import com.example.safe_ride.matching.dto.MatchingDto;
+import com.example.safe_ride.matching.entity.Matching;
+import com.example.safe_ride.matching.entity.MatchingApplication;
+import com.example.safe_ride.matching.entity.MatchingStatus;
+import com.example.safe_ride.matching.repository.MatchingRepository;
+import com.example.safe_ride.member.MemberRepo;
+import com.example.safe_ride.member.entity.Member;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+
+@Service
+@RequiredArgsConstructor
+public class MatchingService {
+    private final MatchingRepository matchingRepository;
+    private final MemberRepo memberRepository;
+    private final RegionRepository regionRepository;
+
+    // 매칭글 생성
+    public MatchingDto createMatching(MatchingDto matchingDto) {
+        // 게시글에 선택된 지역 정보 가져오기
+        if (matchingDto.getMetropolitanCity() == null || matchingDto.getCity() == null) {
+            throw new IllegalArgumentException("Metropolitan city and city must not be null");
+        }
+
+        // 광역자치구와 도시에 해당하는 Region ID 가져오기
+        Long regionId = regionRepository.findByMetropolitanCityAndCity(matchingDto.getMetropolitanCity(), matchingDto.getCity())
+                .map(Region::getId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid metropolitan city or city"));
+
+        // 현재 시간 가져오기
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+
+        // Matching 엔티티 생성시 Member 엔티티를 설정
+        Matching matching = Matching.builder()
+                .region(new Region(regionId)) // 광역자치구와 도시에 해당하는 Region ID 설정
+                .comment(matchingDto.getComment())
+                .createTime(currentTime)
+                .status(null) // 상태를 null로 설정
+                .build();
+
+        // 생성된 Matching 엔티티 저장
+        Matching savedMatching = matchingRepository.save(matching);
+        return MatchingDto.fromEntity(savedMatching);
+    }
+
+    // 특정 ID의 매칭글 조회
+    public MatchingDto getMatchingById(Long matchingId) {
+        Matching matching = matchingRepository.findById(matchingId)
+                .orElseThrow(() -> new IllegalArgumentException("Matching not found with id: " + matchingId));
+        return MatchingDto.fromEntity(matching);
+    }
+
+    // 게시글 전체 조회
+    public Page<MatchingDto> readPage(Pageable pageable) {
+        Page<Matching> matchings = matchingRepository.findAll(pageable);
+        return matchings.map(MatchingDto::fromEntity);
+    }
+
+    // 매칭글 수정
+    public MatchingDto updateMatching(Long id, MatchingDto dto) {
+        // 해당 ID의 매칭글을 조회
+        Matching matching = matchingRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found with id: " + id));
+
+        // 매칭글에 변경된 내용 적용
+        matching.setComment(dto.getComment());
+
+        // 광역자치구와 도시에 해당하는 Region ID 가져오기
+        Long regionId = regionRepository.findByMetropolitanCityAndCity(dto.getMetropolitanCity(), dto.getCity())
+                .map(Region::getId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid metropolitan city or city"));
+
+        matching.setRegion(new Region(regionId)); // 광역자치구와 도시에 해당하는 Region ID 설정
+
+        // 수정된 게시글 저장
+        return MatchingDto.fromEntity(matchingRepository.save(matching));
+    }
+
+    // 매칭글 삭제
+    public void deleteMatching(Long matchingId) {
+        matchingRepository.deleteById(matchingId);
+    }
+
+    public void applyForMatching(Long matchingId, MatchingApplicationDto applicationDto) {
+        Matching matching = matchingRepository.findById(matchingId)
+                .orElseThrow(() -> new IllegalArgumentException("Matching not found with id: " + matchingId));
+
+        Member applicant = null;
+        if (applicationDto.getApplicant() != null) {
+            applicant = memberRepository.findByEmail(applicationDto.getApplicant().getEmail())
+                    .orElseThrow(() -> new IllegalArgumentException("Applicant not found with email: " + applicationDto.getApplicant().getEmail()));
+        }
+
+        MatchingApplication application = MatchingApplication.builder()
+                .matching(matching)
+                .applicant(applicant)
+                .message(applicationDto.getMessage()) // 메시지 설정
+                .build();
+
+        matching.getApplications().add(application);
+
+        // 매칭 상태를 PENDING으로 변경
+        matching.setStatus(MatchingStatus.PENDING);
+
+        matchingRepository.save(matching);
+    }
+}
