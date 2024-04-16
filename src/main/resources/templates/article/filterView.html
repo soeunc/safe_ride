@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Filtered Articles</title>
+</head>
+<body>
+<div>
+  <h1>Filtered Articles</h1>
+  <div id="articleContainer" class="post-box">
+    <div class="article_details" th:each="article : ${articles}">
+      <a th:href="@{/templates/article/{id}(id=${article.id})}">
+        <h3 th:text="${article.title}"></h3>
+      </a>
+      <span>작성일자: <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
+      <span>조회수: <span th:text="${article.hit}"></span></span>
+      <br>
+    </div>
+  </div>
+</div>
+</body>
+</html>

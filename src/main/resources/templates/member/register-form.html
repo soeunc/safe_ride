@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
@@ -17,31 +20,35 @@
             <h1 class="text-center mb-5">회원가입</h1>
             <form action="/safe-ride/join" method="post">
               <div class="form-floating mb-3">
-                <input class="form-control" id="userId" name="userId" type="text" placeholder="아이디 입력">
+                <input class="form-control" id="userId" name="userId" type="text" required placeholder="아이디 입력">
                 <label for="userId">ID</label>
               </div>
               <div class="form-floating mb-3">
-                <input class="form-control" id="password" name="password" type="password" placeholder="비밀번호 입력">
+                <input class="form-control" id="userName" name="userName" type="text" required placeholder="이름 입력">
+                <label for="userName">Username</label>
+              </div>
+              <div class="form-floating mb-3">
+                <input class="form-control" id="password" name="password" type="password" required placeholder="비밀번호 입력">
                 <label for="password">Password</label>
               </div>
               <div class="form-floating mb-3">
-                <input class="form-control" id="passwordCk" name="passwordCk" type="password" placeholder="비밀번호 확인">
+                <input class="form-control" id="passwordCk" name="passwordCk" type="password" required placeholder="비밀번호 확인">
                 <label for="passwordCk">Password Check</label>
               </div>
               <div class="form-floating mb-3">
-                <input class="form-control" id="email" name="email" type="text" placeholder="이메일을 입력하세요">
+                <input class="form-control" id="email" name="email" type="text" required placeholder="이메일을 입력하세요">
                 <label for="email">Email</label>
               </div>
               <div class="form-floating mb-3">
-                <input class="form-control" id="nickname" name="nickname" type="text" placeholder="닉네임을 입력하세요">
+                <input class="form-control" id="nickname" name="nickname" type="text" required placeholder="닉네임을 입력하세요">
                 <label for="nickname">Nickname</label>
               </div>
               <div class="form-floating mb-3">
-                <input class="form-control" id="phoneNumber" name="phoneNumber" type="number" placeholder="전화번호를 입력하세요">
+                <input class="form-control" id="phoneNumber" name="phoneNumber" type="number" required placeholder="전화번호를 입력하세요">
                 <label for="phoneNumber">Phone Number</label>
               </div>
               <div class="form-floating mb-3">
-                <input class="form-control" id="birthday" name="birthday" type="number" placeholder="생년월일을 입력하세요">
+                <input class="form-control" id="birthday" name="birthday" type="number" required placeholder="생년월일을 입력하세요">
                 <label for="birthday">BirthDay</label>
               </div>
               <div class="d-grid"><button class="btn btn-primary btn-lg" id="sign-in-button" type="submit">Submit</button></div>

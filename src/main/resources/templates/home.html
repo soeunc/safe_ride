@@ -2,6 +2,7 @@
 <html
         lang="en"
         xmlns:sec="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
 >
 <head>
     <meta charset="UTF-8">
@@ -20,6 +21,15 @@
     </form>
     <a href="/safe-ride/myprofile">마이프로필</a>
 </div>
+<script th:inline="javascript">
+    window.onload = function () {
+        //alert
+        const alertMsg = [[${msg}]];
 
+        if (alertMsg){
+            alert(alertMsg);
+        }
+    }
+</script>
 </body>
 </html>
