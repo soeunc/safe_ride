@@ -38,6 +38,7 @@ public class WebSecurityConfig {
                                         "/safe-ride",//메인페이지
                                         "/safe-ride/login",//로그인
                                         "/safe-ride/join",//회원가입
+                                        "/safety-direction/**",
                                         //템플릿 관련
                                         "/css/**",
                                         "/js/**",
