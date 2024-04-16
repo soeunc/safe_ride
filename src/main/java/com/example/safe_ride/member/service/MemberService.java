@@ -1,20 +1,25 @@
-package com.example.safe_ride.member;
+package com.example.safe_ride.member.service;
 
+import com.example.safe_ride.member.repo.MemberRepo;
+import com.example.safe_ride.member.dto.MemberDto;
+import com.example.safe_ride.member.dto.UpdateDto;
 import com.example.safe_ride.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.lang.reflect.Field;
 
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepo memberRepo;
+    private final UserDetailsManager manager;
+    private final PasswordEncoder passwordEncoder;
 
     public MemberDto readMember(String userId){
         Member member = memberRepo.findByUserId(userId)
@@ -38,7 +43,7 @@ public class MemberService {
         //null과 공백 체크 and 값이 변경되었다면
         if (!ObjectUtils.isEmpty(dto.getPassword()) &&
             !dto.getPassword().equals(member.getPassword())){
-            member.setPassword(dto.getPassword());
+            member.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
         if (!ObjectUtils.isEmpty(dto.getEmail()) &&
             !dto.getEmail().equals(member.getEmail())){
