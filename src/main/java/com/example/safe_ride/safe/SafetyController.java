@@ -1,27 +1,28 @@
 package com.example.safe_ride.safe;
 
-import com.example.safe_ride.safe.dto.PointDto;
-import com.example.safe_ride.safe.dto.SafetyDirectionDto;
 import com.example.safe_ride.safe.service.SafetyService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 
-@Slf4j
-@RestController
-@RequestMapping("safety-direction")
+import java.util.List;
+
+@Controller
 @RequiredArgsConstructor
 public class SafetyController {
     private final SafetyService service;
 
-    @PostMapping("/check")
-    public PointDto locateAddress(
-            @RequestBody SafetyDirectionDto dto
-            ) {
-        return service.locateAddress(dto);
+    @GetMapping("/safety-direction")
+    public String mapView() {
+        return "safety/main";
+    }
+
+    @GetMapping("/safety-direction/location")
+    public String location(Model model) {
+        List<String> location = service.fetchDataFromApi("41", "150");   // 경기도, 의정부시 기준 검색
+        model.addAttribute("location", location);
+        return "safety/location";
     }
 
 }
