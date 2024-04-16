@@ -50,7 +50,6 @@ public class MyPageController {
     //마이페이지 수정
     @PostMapping("/update")
     public String updateProfile(
-//            @RequestBody
             UpdateDto dto,
             RedirectAttributes redirectAttributes
     ) {
