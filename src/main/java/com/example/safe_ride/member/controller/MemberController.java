@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @Controller
@@ -28,7 +29,7 @@ public class MemberController {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationFacade authFacade;
     private final MemberService memberService;
-    String msg = "";
+    private static String msg = "";
     //메인화면
     @GetMapping
     public String home(
@@ -63,7 +64,11 @@ public class MemberController {
     }
     //로그아웃
     @PostMapping("/logout")
-    public String logout() {
+    public String logout(
+            RedirectAttributes redirectAttributes
+    ) {
+        msg = "로그아웃 되었습니다 ^^.";
+        redirectAttributes.addFlashAttribute("msg", msg);
         return "redirect:/safe-ride";
     }
     // 회원가입 화면
@@ -74,12 +79,15 @@ public class MemberController {
     //회원가입
     @PostMapping("/join")
     public String signUp(
-            JoinDto dto
+            JoinDto dto,
+            RedirectAttributes redirectAttributes
     ){
         if (dto.getPassword().equals(dto.getPasswordCk())){
             memberService.join(dto);
         }
-        return "redirect:/login";
+        msg = "회원가입 되었습니다 ^^.";
+        redirectAttributes.addFlashAttribute("msg", msg);
+        return "redirect:/safe-ride/login";
     }
 
 }
