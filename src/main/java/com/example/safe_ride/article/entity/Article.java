@@ -1,11 +1,7 @@
 package com.example.safe_ride.article.entity;
 
-import com.example.safe_ride.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
@@ -20,13 +16,24 @@ public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Setter
     private String title;
+    @Setter
     private String content;
-    private Integer hit;           // 조회수
+    @Setter
+    private Integer hit = 0; // 조회수
+    @Setter
     private Timestamp createdAt;   // 작성 시간
+    @Setter
     private Timestamp updatedAt;   // 수정 시간
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "member_id")
+//    private Member member;
+
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
-}
+    @JoinColumn(name = "region_id")
+    private Region region; // 수정된 부분
+ }

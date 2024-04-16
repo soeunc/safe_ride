@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Article</title>
+</head>
+<body>
+
+<h1>게시글 작성</h1>
+
+<form th:action="@{/article/create}" method="post">
+  <label for="title">제목:</label><br>
+  <input type="text" id="title" name="title"><br>
+
+  <label for="content">내용:</label><br>
+  <textarea id="content" name="content"></textarea><br>
+
+  <label for="metropolitanCity">Metropolitan City:</label><br>
+  <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
+    <option value="">광역자치구를 선택하시오.</option>
+    <option th:each="city : ${metropolitanCities}" th:value="${city}" th:text="${city}"></option>
+  </select><br>
+
+  <label for="city">도시를 선택하시오:</label><br>
+  <select id="city" name="city">
+    <option value="">도시를 선택하시오</option>
+  </select><br>
+
+  <button type="submit">작성</button>
+</form>
+<a href="/" >뒤로 가기</a> <br>
+<script>
+    function fetchCities() {
+        var metropolitanCity = document.getElementById('metropolitanCity').value;
+        var citySelect = document.getElementById('city');
+        var regionIdInput = document.getElementById('regionId'); // Get hidden input field
+
+        // AJAX 요청을 통해 선택된 광역자치구에 해당하는 도시 목록을 서버로부터 가져옴
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var cities = JSON.parse(xhr.responseText);
+
+                    // 도시 목록을 새로고침
+                    citySelect.innerHTML = '';
+                    cities.forEach(function(city) {
+                        var option = document.createElement('option');
+                        option.value = city.city; // 도시명을 가져와야 함
+                        option.textContent = city.city;
+                        citySelect.appendChild(option);
+                    });
+
+                    // Set selected regionId value
+                    // regionId 값을 문자열에서 숫자로 변환하여 설정
+                    if (regionIdInput) {
+                        regionIdInput.value = parseInt(metropolitanCity); // Assuming metropolitanCity ID is used as regionId
+                    }
+                } else {
+                    console.error('Failed to fetch cities');
+                }
+            }
+        };
+
+        xhr.open('GET', '/city?metropolitanCity=' + metropolitanCity);
+        xhr.send();
+    }
+</script>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-package com.example.safe_ride.member.repo;
+package com.example.safe_ride.member;
 
 import com.example.safe_ride.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +11,5 @@ public interface MemberRepo extends JpaRepository<Member, Long> {
     Optional<Member> findByUserId(String userId);
     boolean existsByUserId(String userId);
     boolean existsByEmail(String email);
+    Optional<Member> findByEmail(String email);
 }

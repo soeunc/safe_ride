@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Home</title>
+</head>
+<body>
+<div class="main">
+  <div th:if="${page.content.isEmpty()}">
+    <p>작성된 게시글이 없습니다.</p>
+  </div>
+  <div th:unless="${page.content.isEmpty()}">
+    <label for="metropolitanCity">광역자치구:</label>
+    <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
+      <option value="">광역자치구를 선택하세요</option>
+      <!-- 서버에서 받은 광역자치구 목록을 여기에 추가 -->
+      <th:block th:each="city : ${metropolitanCities}">
+        <option th:value="${city}" th:text="${city}"></option>
+      </th:block>
+    </select>
+
+    <label for="city">시군구:</label>
+    <select id="city" name="city" onchange="fetchFilteredArticles()">
+      <option value="">시군구를 선택하세요</option>
+      <!-- 선택된 광역자치구에 따라 서버에서 받은 시군구 목록을 여기에 추가 -->
+      <th:block th:each="city : ${cities}">
+        <option th:value="${city}" th:text="${city}"></option>
+      </th:block>
+    </select>
+
+    <div id="articleContainer" class="post-box">
+      <div class="article_details" th:each="article : ${page.content}">
+        <a th:href="@{/article/{id}(id=${article.id})}">
+          <h3 th:text="${article.title}"></h3>
+        </a>
+        <span>작성일자: <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
+        <span>조회수: <span th:text="${article.hit}"></span></span>
+        <br>
+      </div>
+    </div>
+  </div>
+  <br>
+  <a href="/article/create">글 작성</a> <br>
+</div>
+<div class="footer">
+  <!-- 페이지네이션 링크 추가 -->
+  <div th:if="${page.totalPages > 1}" class="pagination">
+    <div>
+      <a th:each="i : ${#numbers.sequence(0, page.totalPages-1)}"
+         th:href="@{'/article?page=' + ${i}}"
+         th:class="${i == page.number} ? 'active'">
+        <span th:text="${i + 1}"></span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+    function fetchCities() {
+        var metropolitanCity = document.getElementById('metropolitanCity').value;
+        var citySelect = document.getElementById('city');
+
+        // AJAX 요청을 통해 선택된 광역자치구에 해당하는 도시 목록을 서버로부터 가져옴
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var cities = JSON.parse(xhr.responseText);
+
+                    // 도시 목록을 새로고침
+                    citySelect.innerHTML = '';
+                    cities.forEach(function(city) {
+                        var option = document.createElement('option');
+                        option.value = city.city; // 도시명을 가져와야 함
+                        option.textContent = city.city;
+                        citySelect.appendChild(option);
+                    });
+
+                    // 도시를 선택하면 자동으로 필터링된 게시글 가져오기
+                    fetchFilteredArticles();
+                } else {
+                    console.error('Failed to fetch cities');
+                }
+            }
+        };
+
+        xhr.open('GET', '/city?metropolitanCity=' + metropolitanCity);
+        xhr.send();
+    }
+
+    function fetchFilteredArticles() {
+        var metropolitanCity = document.getElementById('metropolitanCity').value;
+        var city = document.getElementById('city').value;
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    // 필터링된 게시글을 화면에 업데이트
+                    var filteredArticles = JSON.parse(xhr.responseText);
+                    var articleContainer = document.getElementById('articleContainer');
+                    articleContainer.innerHTML = ''; // 기존 게시글 삭제
+
+                    // 필터링된 게시글을 화면에 추가
+                    filteredArticles.forEach(function(article) {
+                        var articleDiv = document.createElement('div');
+                        articleDiv.classList.add('article_details');
+
+                        var titleLink = document.createElement('a');
+                        titleLink.href = '/article/' + article.id;
+                        titleLink.textContent = article.title;
+
+                        var createdAtSpan = document.createElement('span');
+                        // 작성일시를 Date 객체로 파싱
+                        var createdAt = new Date(article.createdAt);
+                        // 원하는 형식으로 작성일시 포맷팅
+                        var formattedCreatedAt = `${createdAt.getFullYear()}-${(createdAt.getMonth() + 1).toString().padStart(2, '0')}-${createdAt.getDate().toString().padStart(2, '0')} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
+                        createdAtSpan.textContent = formattedCreatedAt;
+
+                        var hitSpan = document.createElement('span');
+                        hitSpan.textContent = article.hit;
+
+                        articleDiv.appendChild(titleLink);
+                        articleDiv.appendChild(createdAtSpan);
+                        articleDiv.appendChild(hitSpan);
+
+                        articleContainer.appendChild(articleDiv);
+                    });
+                } else {
+                    console.error('Failed to fetch filtered articles');
+                }
+            }
+        };
+
+        xhr.open('GET', '/article/filter?metropolitanCity=' + metropolitanCity + '&city=' + city);
+        xhr.send();
+    }
+</script>
+</body>
+</html>
