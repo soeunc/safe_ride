@@ -33,22 +33,24 @@
     <title>마이프로필</title>
 </head>
 <body>
-<h1>My Profile</h1>
-<h3>반갑습니다, <span sec:authentication="name"></span>님!</h3>
+    <h1>My Profile</h1>
+    <h3>반갑습니다, <span sec:authentication="name"></span>님!</h3>
+    <!--뱃지 넣기-->
     <div id="container">
     <!--라이딩 기록-->
         <div id="riding-record">
             <h2>라이딩 기록</h2>
             <div id="total-record">
                 <h3>총 기록</h3>
-                <span>12345km 탔어요! :)</span>
+                <span>[[${ridingRecord.record}]]km 탔어요! :)</span>
             </div>
             <div id="weekly-record">
                 <h3>주간 기록</h3>
-                <span>123km 탔어요! :)</span>
+                <span>[[${ridingRecord.weeklyRecord}]]km 탔어요! :)</span>
             </div>
             <div id="today-record">
                 <h3>오늘 기록</h3>
+                <span>[[${ridingRecord.todayRecord}]]km 탔어요! :)</span>
                 <form>
                     <input id="today-record-input" name="today-record" type="text" placeholder="오늘의 주행 거리를 입력">
                     <input type="submit" value="입력">

@@ -1,7 +1,9 @@
 package com.example.safe_ride.myPage.controller;
 
 import com.example.safe_ride.facade.AuthenticationFacade;
+import com.example.safe_ride.member.dto.MemberDto;
 import com.example.safe_ride.member.dto.UpdateDto;
+import com.example.safe_ride.member.entity.Member;
 import com.example.safe_ride.member.service.MemberService;
 import com.example.safe_ride.myPage.service.MyPageService;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +33,12 @@ public class MyPageController {
             Model model
     ){
         //사용자 개인정보 가져오기
+        MemberDto memberDto = memberService.readMember(authFacade.getAuth().getName());
+        model.addAttribute("member", memberDto);
+        //라이딩 정보 가져오기
         model.addAttribute(
-                "member",
-                memberService.readMember(authFacade.getAuth().getName())
-        );
+                "ridingRecord",
+                myPageService.readRidingRecord(memberDto.getId()));
         return "member/myprofile";
     }
     //마이페이지 수정
@@ -45,12 +49,12 @@ public class MyPageController {
             Model model
     ) {
         memberService.updateMember(authFacade.getAuth().getName(), dto);
-
+        
         msg = "수정되었습니다.^^";
 
         model.addAttribute("msg", msg);
         return "redirect:/safe-ride/myprofile";
     }
 
-    //@GetMapping("")
+
 }
