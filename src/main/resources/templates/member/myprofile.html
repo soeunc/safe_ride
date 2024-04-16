@@ -7,43 +7,144 @@
           integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <head>
     <meta charset="UTF-8">
+    <style>
+        /*#container {*/
+        /*    width: 80%;*/
+        /*    height: 600px;*/
+        /*    border: 2px solid blue;*/
+        /*    margin: 0 auto; !* container 영역을 브라우저에서 가운데 정렬하기 위해 auto설정 *!*/
+        /*    text-align: center; !* inline-block화 된 div들을 텍스트 마냥 center로 정렬*!*/
+        /*}*/
+
+        #riding-record {
+            display: inline-block; /* 가로로 나열하기 위해 block레벨 요소를 inline-block레벨로 전환 */
+            width: 33%; /* 영역 크기 지정 안해주면 inline 레벨처럼 내용물 만큼만 차지하기 때문에 크기 지정 */
+            border: 2px solid aqua;
+            background: orange;
+        }
+        #prifile-update {
+            display: inline-block; /* 가로로 나열하기 위해 block레벨 요소를 inline-block레벨로 전환 */
+            width: 50%; /* 영역 크기 지정 안해주면 inline 레벨처럼 내용물 만큼만 차지하기 때문에 크기 지정 */
+            border: 2px solid aqua;
+            background: orange;
+        }
+
+    </style>
     <title>마이프로필</title>
 </head>
 <body>
 <h1>My Profile</h1>
 <h3>반갑습니다, <span sec:authentication="name"></span>님!</h3>
-<!--라이딩 기록-->
-
-<!--프로필 수정-->
-    <form action="/safe-ride/myprofile/update" method="post">
-        <div>
-          <label for="password">비밀번호</label>
-          <input id="password" name="password" type="password" placeholder="비밀번호 재설정">
+    <div id="container">
+    <!--라이딩 기록-->
+        <div id="riding-record">
+            <h2>라이딩 기록</h2>
+            <div id="total-record">
+                <h3>총 기록</h3>
+                <span>12345km 탔어요! :)</span>
+            </div>
+            <div id="weekly-record">
+                <h3>주간 기록</h3>
+                <span>123km 탔어요! :)</span>
+            </div>
+            <div id="today-record">
+                <h3>오늘 기록</h3>
+                <form>
+                    <input id="today-record-input" name="today-record" type="text" placeholder="오늘의 주행 거리를 입력">
+                    <input type="submit" value="입력">
+                </form>
+            </div>
+            <div id="matching-recodr">
+                <h3>매칭기록</h3>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">매칭 신청자 ID</th>
+                        <th scope="col">평가 점수</th>
+                        <th scope="col">리뷰 코멘트</th>
+                        <th scope="col">리뷰 작성자 ID</th>
+                        <th scope="col">리뷰 받은 사람 ID</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <!--Matching-->
+                        <th scope="col" th:text="사용자1"></th>
+                        <th scope="col" th:text="별다섯개"></th>
+                        <th scope="col" th:text="재밌었습니다"></th>
+                        <th scope="col" th:text="사용자1"></th>
+                        <th scope="col" th:text="사용자2"></th>
+                    </tr>
+                    <tr>
+                        <!--Matching-->
+                        <th scope="col" th:text="사용자1"></th>
+                        <th scope="col" th:text="별다섯개"></th>
+                        <th scope="col" th:text="재밌었습니다"></th>
+                        <th scope="col" th:text="사용자1"></th>
+                        <th scope="col" th:text="사용자2"></th>
+                    </tr>
+                    <tr>
+                        <!--Matching-->
+                        <th scope="col" th:text="사용자1"></th>
+                        <th scope="col" th:text="별다섯개"></th>
+                        <th scope="col" th:text="재밌었습니다"></th>
+                        <th scope="col" th:text="사용자1"></th>
+                        <th scope="col" th:text="사용자2"></th>
+                    </tr>
+                    <tr>
+                        <!--Matching-->
+                        <th scope="col" th:text="사용자1"></th>
+                        <th scope="col" th:text="별다섯개"></th>
+                        <th scope="col" th:text="재밌었습니다"></th>
+                        <th scope="col" th:text="사용자1"></th>
+                        <th scope="col" th:text="사용자2"></th>
+                    </tr>
+                    <tr>
+                        <!--Matching-->
+                        <th scope="col" th:text="사용자1"></th>
+                        <th scope="col" th:text="별다섯개"></th>
+                        <th scope="col" th:text="재밌었습니다"></th>
+                        <th scope="col" th:text="사용자1"></th>
+                        <th scope="col" th:text="사용자2"></th>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div>
-            <label for="passwordCk">비밀번호</label>
-            <input id="passwordCk" name="passwordCk" type="password" placeholder="비밀번호 재설정 확인">
+    <!--프로필 수정-->
+        <div id="prifile-update">
+            <h2>프로필 수정</h2>
+            <form action="/safe-ride/myprofile/update" method="post">
+                <div>
+                  <label for="password">비밀번호</label>
+                  <input id="password" name="password" type="password" placeholder="비밀번호 재설정">
+                </div>
+                <div>
+                    <label for="passwordCk">비밀번호</label>
+                    <input id="passwordCk" name="passwordCk" type="password" placeholder="비밀번호 재설정 확인">
+                </div>
+                <div>
+                  <label for="email">이메일</label>
+                  <input id="email" name="email" type="text" th:value="${member.email}">
+                </div>
+                <div>
+                  <label for="nickName">닉네임</label>
+                  <input id="nickName" name="nickName" type="text" th:value="${member.nickname}">
+                </div>
+                <div>
+                  <label for="phoneNumber">전화번호</label>
+                  <input id="phoneNumber" name="phoneNumber" type="number" th:value="${member.getPhoneNumber()}">
+                </div>
+                <div>
+                  <label for="birthday">생년월일</label>
+                  <input id="birthday" name="birthday" type="number" th:value="${member.getBirthday()}">
+                </div>
+                <div>
+                    <input type="submit" value="수정하기">
+                </div>
+            </form>
         </div>
-        <div>
-          <label for="email">이메일</label>
-          <input id="email" name="email" type="text" th:value="${member.email}">
-        </div>
-        <div>
-          <label for="nickName">닉네임</label>
-          <input id="nickName" name="nickName" type="text" th:value="${member.nickname}">
-        </div>
-        <div>
-          <label for="phoneNumber">전화번호</label>
-          <input id="phoneNumber" name="phoneNumber" type="number" th:value="${member.getPhoneNumber()}">
-        </div>
-        <div>
-          <label for="birthday">생년월일</label>
-          <input id="birthday" name="birthday" type="number" th:value="${member.getBirthday()}">
-        </div>
-        <div>
-            <input type="submit" value="수정하기">
-        </div>
-    </form>
+    </div>
     <form action="/safe-ride/logout">
       <input type="submit" value="로그아웃">
     </form>
