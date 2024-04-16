@@ -51,8 +51,8 @@
             <div id="today-record">
                 <h3>오늘 기록</h3>
                 <span>[[${ridingRecord.todayRecord}]]km 탔어요! :)</span>
-                <form>
-                    <input id="today-record-input" name="today-record" type="text" placeholder="오늘의 주행 거리를 입력">
+                <form action="/safe-ride/myprofile/create-today" method="post">
+                    <input id="today-record-input" name="todayRecord" type="number" required placeholder="오늘의 주행 거리를 입력">
                     <input type="submit" value="입력">
                 </form>
             </div>

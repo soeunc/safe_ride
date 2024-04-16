@@ -65,4 +65,13 @@ public class MemberService {
         memberRepo.save(member);
 
     }
+
+    //id찾기
+    public Long readMemberId(String userId){
+        Member member = memberRepo.findByUserId(userId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+                );
+        return member.getId();
+    }
 }

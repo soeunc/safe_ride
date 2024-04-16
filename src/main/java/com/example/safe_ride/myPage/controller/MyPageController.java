@@ -15,6 +15,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 //라이딩기록과 매칭기록을 마이페이지에 보여준다.
 @Slf4j
 @Controller
@@ -39,6 +41,8 @@ public class MyPageController {
         model.addAttribute(
                 "ridingRecord",
                 myPageService.readRidingRecord(memberDto.getId()));
+        //매칭 기록 가져오기
+        //매칭기록과 함께 매너 기록도 가져와야 함
         return "member/myprofile";
     }
     //마이페이지 수정
@@ -50,6 +54,20 @@ public class MyPageController {
     ) {
         memberService.updateMember(authFacade.getAuth().getName(), dto);
         
+        msg = "수정되었습니다.^^";
+
+        model.addAttribute("msg", msg);
+        return "redirect:/safe-ride/myprofile";
+    }
+    //오늘 주행기록 입력
+    @PostMapping("/create-today")
+    public String createToday(
+            @RequestParam("todayRecord")
+            int todayRecord,
+            Model model
+    ){
+        Long memberId = memberService.readMemberId(authFacade.getAuth().getName());
+        myPageService.createToday(memberId, todayRecord);
         msg = "수정되었습니다.^^";
 
         model.addAttribute("msg", msg);
