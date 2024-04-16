@@ -36,8 +36,6 @@ public class WebSecurityConfig {
                                 // 모든 접근 허가
                                 .requestMatchers(
                                         "/safe-ride",//메인페이지
-                                        "/safe-ride/login",//로그인
-                                        "/safe-ride/join",//회원가입
                                         //템플릿 관련
                                         "/css/**",
                                         "/js/**",
@@ -46,12 +44,12 @@ public class WebSecurityConfig {
                                 )
                                 // 이 경로에 도달할 수 있는 사람에 대한 설정(모두)
                                 .permitAll()
-//                                //익명사용자 접근 허가
-//                                .requestMatchers(
-//                                    "/safe-ride/login",//로그인
-//                                    "/safe-ride/join"//회원가입
-//                                )
-//                                .anonymous()
+                                //익명사용자 접근 허가
+                                .requestMatchers(
+                                    "/safe-ride/login",//로그인
+                                    "/safe-ride/join"//회원가입
+                                )
+                                .anonymous()
                                 //인증된 사용자 접근 허가
                                 .requestMatchers(
                                         "/safe-ride/logout",//로그아웃
