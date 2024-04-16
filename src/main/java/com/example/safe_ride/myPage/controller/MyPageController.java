@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 //라이딩기록과 매칭기록을 마이페이지에 보여준다.
 @Slf4j
@@ -42,6 +43,7 @@ public class MyPageController {
                 "ridingRecord",
                 myPageService.readRidingRecord(memberDto.getId()));
         //매칭 기록 가져오기
+
         //매칭기록과 함께 매너 기록도 가져와야 함
         return "member/myprofile";
     }
@@ -50,13 +52,11 @@ public class MyPageController {
     public String updateProfile(
 //            @RequestBody
             UpdateDto dto,
-            Model model
+            RedirectAttributes redirectAttributes
     ) {
         memberService.updateMember(authFacade.getAuth().getName(), dto);
-        
         msg = "수정되었습니다.^^";
-
-        model.addAttribute("msg", msg);
+        redirectAttributes.addFlashAttribute("msg", msg);
         return "redirect:/safe-ride/myprofile";
     }
     //오늘 주행기록 입력
@@ -64,13 +64,13 @@ public class MyPageController {
     public String createToday(
             @RequestParam("todayRecord")
             int todayRecord,
-            Model model
+            Model model,
+            RedirectAttributes redirectAttributes
     ){
         Long memberId = memberService.readMemberId(authFacade.getAuth().getName());
         myPageService.createToday(memberId, todayRecord);
-        msg = "수정되었습니다.^^";
-
-        model.addAttribute("msg", msg);
+        msg = "오늘 기록이 추가되었습니다.^^";
+        redirectAttributes.addFlashAttribute("msg", msg);
         return "redirect:/safe-ride/myprofile";
     }
 
