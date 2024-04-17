@@ -1,5 +1,7 @@
 package com.example.safe_ride.safe.service;
 
+import com.example.safe_ride.safe.SafetyRepository;
+import com.example.safe_ride.safe.entity.SafetyDirection;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,9 +19,15 @@ import java.util.List;
 @Slf4j
 @Service
 public class SafetyService {
+    private final SafetyRepository safetyRepository;
+
     private static final String BASE_URL = "https://apis.data.go.kr/B552061/frequentzoneBicycle/getRestFrequentzoneBicycle";
     @Value("${public.api.key}")
     private String SERVICE_KEY;
+
+    public SafetyService(SafetyRepository safetyRepository) {
+        this.safetyRepository = safetyRepository;
+    }
 
     // 자전거 사고다발지역
     public String buildApi(String siDo, String guGun) throws UnsupportedEncodingException {
@@ -40,7 +48,7 @@ public class SafetyService {
 
     // http 응답받아 문자열로 변환
     // API에서 데이터를 가져오는 메소드
-    public List<String> fetchDataFromApi( String siDo, String guGun) {
+    public List<String> fetchDataFromApi(String siDo, String guGun) {
         try {
             String urlStr = buildApi(siDo, guGun);
             URL url = new URL(urlStr);
@@ -76,7 +84,7 @@ public class SafetyService {
     public List<String> ParsingDate(String jsonResponse) throws JSONException {
         // JSON 응답 문자열 파싱
         JSONObject jsonObject = new JSONObject(jsonResponse);
-        // 위치 정보 추출 (예시: 사용자 위치에 따라 다른 정보를 포함하는 경우)
+        // 사고 정보 추출
         JSONArray items = jsonObject.getJSONObject("items").getJSONArray("item");
 
         List<String> results = new ArrayList<>();
@@ -90,7 +98,7 @@ public class SafetyService {
             Integer seDnvCnt = item.getInt("se_dnv_cnt"); // 중상자 수
             Integer slDnvCnt = item.getInt("sl_dnv_cnt"); // 경상자 수
             String geomJson = item.getString("geom_json"); // 사고 지점 지리적 위치 데이터(List형태)
-            String loCrd = item.getString("lo_crd"); // 경도(lot)
+            String loCrd = item.getString("lo_crd"); // 경도(lnt)
             String laCrd = item.getString("la_crd"); // 위도(lat)
 
             String result = String.format("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s",
@@ -101,5 +109,26 @@ public class SafetyService {
 
         return results;
     }
+
+    // 법정동 코드만 추출하여 리스트로 저장
+    public List<String> getBjDongCodes(String jsonResponse) throws JSONException {
+        // 기존 ParsingDate 메서드를 호출하여 전체 데이터를 파싱
+        List<String> allData = ParsingDate(jsonResponse);
+
+        List<String> bjdCodes = new ArrayList<>();
+        for (String data : allData) {
+            // 데이터 문자열을 쉼표(,)로 분리
+            String[] splitData = data.split(", ");
+            // splitData[0]은 법정동 코드(bjdCd)를 포함하고 있음
+            String bjdCd = splitData[0];
+            // 법정동 코드만 별도의 리스트에 추가
+            bjdCodes.add(bjdCd);
+        }
+
+        return bjdCodes;
+    }
+
+    // 리스트로 저장된 법정동 코드를 사용자위치의 법정동 코드와 하나씩 비교하여 일치하면 사고 다발 위치를 지도에 표시
+
 
 }

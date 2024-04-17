@@ -22,8 +22,10 @@ public class SafetyDirection {
     private Long id;
 //    private String safetyInfor;  // 안전지역 안내
 //    private String address;      // 사용자 현재 위치(지번, 도로명)
-    private String sido;
-    private String sigungu;
-    private String eubmyundong;
-    private String addressCode;
+//    private String sido;
+//    private String sigungu;
+//    private String eubmyundong;
+//    private String addressCode;
+    private Double lnt;          // 경도
+    private Double lat;          // 위도
 }
