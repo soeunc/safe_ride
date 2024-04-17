@@ -13,7 +13,7 @@
 <div id="map" style="width:75%;height: 50vh;" class="mb-3"></div>
 <div class="mb-3 w-50">
   <div class="mb-3">
-    <label for="search-input" class="form-label">현재 위치를 지번, 도로명로 입력해주세요.</label>
+    <label for="search-input" class="form-label">현재 위치를 지번, 도로명로 입력해주세요.(예. 분당구)</label>
     <input id="search-input" class="form-control" type="text">
   </div>
   <button id="find-route-to-address-btn" class="btn btn-primary" type="button">현재 위치로</button>
@@ -103,7 +103,7 @@
                 map.setCenter({lat, lng});
                 alert(`${query} 위치로 이동되었습니다.`);
                 // 콘솔에 법정동 코드 출력(확인 완)
-                // console.log(`법정동 코드: ${bjDongCode}`);
+                console.log(`법정동 코드: ${bjDongCode}`);
             } else {
                 // 응답이 성공적이지 않은 경우, 오류 메시지 출력
                 alert('주소를 찾을 수 없습니다.');
@@ -131,6 +131,21 @@
         })
 
     })
+
+    // 받아온 데이터의 위도, 경도를 지도에 표시
+    // const accidentData = [[${accidents}]]; // Controller에서 전달된 사고다발 지역 데이터
+    // const lotData = [[${lot}]];
+    // const latData = [[${lat}]];
+    //
+    // accidentData.forEach(function(accident) {
+    //     // 데이터 형식에 따라 경도, 위도 정보를 추출해야 합니다.
+    //     // 여기서는 accident 변수가 경도와 위도 정보를 포함하고 있다고 가정합니다.
+    //     var marker = new naver.maps.Marker({
+    //         position: new naver.maps.LatLng(accident.latitude, accident.longitude),
+    //         map: map
+    //     });
+    // });
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
