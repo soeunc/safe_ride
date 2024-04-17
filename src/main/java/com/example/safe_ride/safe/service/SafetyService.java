@@ -19,15 +19,11 @@ import java.util.List;
 @Slf4j
 @Service
 public class SafetyService {
-    private final SafetyRepository safetyRepository;
 
     private static final String BASE_URL = "https://apis.data.go.kr/B552061/frequentzoneBicycle/getRestFrequentzoneBicycle";
     @Value("${public.api.key}")
     private String SERVICE_KEY;
 
-    public SafetyService(SafetyRepository safetyRepository) {
-        this.safetyRepository = safetyRepository;
-    }
 
     // 자전거 사고다발지역
     public String buildApi(String siDo, String guGun) throws UnsupportedEncodingException {
