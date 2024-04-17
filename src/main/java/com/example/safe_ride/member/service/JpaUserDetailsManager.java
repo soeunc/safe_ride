@@ -1,9 +1,10 @@
 package com.example.safe_ride.member.service;
 
-import com.example.safe_ride.member.MemberRepo;
+
 import com.example.safe_ride.member.entity.CustomMemberDetails;
 import com.example.safe_ride.member.entity.Authority;
 import com.example.safe_ride.member.entity.Member;
+import com.example.safe_ride.member.repo.MemberRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
