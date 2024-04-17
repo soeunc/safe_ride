@@ -9,4 +9,7 @@ public interface LocationInfoRepo extends JpaRepository<LocationInfo, Long> {
     List<LocationInfo> findBySido(String sido);
     List<LocationInfo> findAllBySido(String sido);
     List<LocationInfo> findAllBySigungu(String sigungu);
+
+    // 지번주소로 검색
+    List<LocationInfo> findAllBySidoAndSigunguAndEupmyundong(String sido, String sigungu, String eupmyundong);
 }
