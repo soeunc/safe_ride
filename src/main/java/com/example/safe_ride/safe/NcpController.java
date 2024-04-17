@@ -43,11 +43,13 @@ public class NcpController {
             @RequestBody NaviWithQueryDto dto
     ) {
         PointDto pointDto = service.locateAddress(dto);
+        log.info("좌표 확인: {}", pointDto);
         if (pointDto == null) {
             return ResponseEntity.badRequest().body("주소로부터 좌표를 얻는 데 실패했습니다.");
         }
 
         RGeoResponseDto rGeoResponseDto = service.getBjDongCode(pointDto);
+        log.info("법정동 코드 확인: {}", rGeoResponseDto);
         if (rGeoResponseDto == null) {
             return ResponseEntity.badRequest().body("법정동 코드를 조회하는 데 실패했습니다.");
         }

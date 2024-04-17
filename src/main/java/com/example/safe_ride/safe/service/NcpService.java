@@ -40,11 +40,6 @@ public class NcpService {
         Double lat = Double.valueOf(response.getAddresses().get(0).getY());
         Double lng = Double.valueOf(response.getAddresses().get(0).getX());
 
-        // 좌표로 법정동 코드 가져오기
-        getBjDongCode(new PointDto(lat, lng));
-        log.info("법정동 코드 확인: {}", getBjDongCode(new PointDto(lat, lng)));
-        log.info("좌표 확인: {}", new PointDto(lat, lng));
-
         // 좌표 정보 반환
         return new PointDto(lat, lng);
     }
