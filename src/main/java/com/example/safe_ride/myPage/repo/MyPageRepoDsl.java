@@ -49,6 +49,7 @@ public class MyPageRepoDsl {
     }
 
     //날짜별 주간 라이딩 기록
+    //일 -> 토 순서로 가져옴
     public List<Integer> getWeeklyRecordList(Long memberId, LocalDateTime start, LocalDateTime end){
         List<Integer> weeklyRecordList
                 = queryFactory
@@ -60,6 +61,7 @@ public class MyPageRepoDsl {
                         qMyPage.memberId.eq(memberId),
                         qMyPage.createDate.between(start, end)
                 )
+                .orderBy(qMyPage.createDate.asc())
                 .fetch();
         return weeklyRecordList;
     }
