@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <style>
+      .hidden {
+          display: none;
+      }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="post-details">
+    <div>
+      <p th:text="${matching.comment}" style="word-wrap: break-word;"></p>
+    </div>
+  </div>
+  <button id="applyButton" class="apply-button">매칭 신청</button>
+  <div id="applicationForm" class="hidden">
+    <form th:action="@{'/matching/' + ${matching.id} + '/apply'}" method="post">
+      <input type="hidden" name="matchingId" th:value="${matching.id}">
+      <!-- 다른 필드들과 함께 매칭 신청 관련 필드를 입력하는 폼 요소 추가 -->
+      <!-- 예: 신청 메시지를 입력하는 텍스트 입력란 -->
+      <label for="message">신청 메시지:</label>
+      <textarea id="message" name="message" rows="4" cols="50"></textarea><br>
+      <button type="submit" class="submit-button">신청하기</button>
+    </form>
+  </div>
+</div>
+<a th:href="@{'/matching/' + ${matching.id} + '/edit'}" class="edit-button">수정</a>
+<a href="/matching/list" >홈으로</a> <br>
+<form th:action="@{'/matching/' + ${matching.id} + '/delete'}" method="post">
+  <button type="submit" onclick="confirmDelete()" class="delete-button">삭제</button>
+</form>
+<script>
+    // 게시글 삭제 시 확인창
+    function confirmDelete() {
+        // 사용자에게 확인을 받기 위한 알림창 표시
+        if (confirm("정말로 삭제하시겠습니까?")) {
+            // '확인' 버튼이 클릭된 경우 폼 제출
+            document.getElementById("deleteForm").submit();
+        } else {
+            // '취소' 버튼이 클릭된 경우 아무 작업도 하지 않음
+            return false;
+        }
+    }
+
+    // 매칭 신청 폼을 토글하는 함수
+    function toggleApplicationForm() {
+        var form = document.getElementById("applicationForm");
+        form.classList.toggle("hidden");
+    }
+
+    // 매칭 신청 버튼 클릭 시 매칭 신청 폼을 토글
+    document.getElementById("applyButton").addEventListener("click", function() {
+        toggleApplicationForm();
+    });
+</script>
+</body>
+</html>

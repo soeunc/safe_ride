@@ -6,11 +6,11 @@ import java.util.List;
 
 @Data
 public class GeoAddress {
-    private String roadAddress;
-    private String jibunAddress;
-    private String englishAddress;
-    private List<Object> addressElements;
-    private String x;
-    private String y;
-    private Double distance;
+    private String roadAddress;  // 도로명 주소
+    private String jibunAddress; // 지번 주소
+    private String englishAddress; // 영어 주소
+    private List<Object> addressElements;  // 주소를 이루는 요소들
+    private String x;   // 경도
+    private String y;   // 위도
+    private Double distance;  // 검색 중심 좌표로부터의 거리
 }

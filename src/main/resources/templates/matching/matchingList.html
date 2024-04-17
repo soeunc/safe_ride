@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<div class="main">
+  <div th:if="${page.content.isEmpty()}">
+    <p>작성된 매칭글이 없습니다.</p>
+  </div>
+  <div th:unless="${page.content.isEmpty()}">
+    <div id="articleContainer" class="post-box">
+      <div class="article_details" th:each="matching : ${page.content}">
+        <a th:href="@{/matching/{id}(id=${matching.id})}">
+          <h3 th:text="${matching.comment}"></h3>
+        </a>
+        <span>작성일자: <span th:text="${#dates.format(matching.createTime, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
+        <p th:text="${matching.status}"></p>
+      </div>
+    </div>
+  </div>
+  <br>
+  <a href="/matching/create">매칭 구하기</a> <br>
+</div>
+<div class="footer">
+  <!-- 페이지네이션 링크 추가 -->
+  <div th:if="${page.totalPages > 1}" class="pagination">
+    <div>
+      <a th:each="i : ${#numbers.sequence(0, page.totalPages-1)}"
+         th:href="@{'/matching?page=' + ${i}}"
+         th:class="${i == page.number} ? 'active'">
+        <span th:text="${i + 1}"></span>
+      </a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

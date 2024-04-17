@@ -87,7 +87,7 @@ public class MemberService {
     //회원가입
     @Transactional
     public void join(JoinDto dto){
-         manager.createUser(CustomMemberDetails.builder()
+        manager.createUser(CustomMemberDetails.builder()
                 .userId(dto.getUserId())
                 .userName(dto.getUserName())
                 .password(passwordEncoder.encode(dto.getPassword()))
