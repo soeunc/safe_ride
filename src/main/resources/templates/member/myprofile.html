@@ -40,53 +40,61 @@
     <!--라이딩 기록-->
         <div id="riding-record">
             <h2>라이딩 기록</h2>
-            <div id="total-record">
-                <h3>총 기록</h3>
-                <span>[[${ridingRecord.record}]]km 탔어요! :)</span>
+            <!--라이딩 기록이 없을 떄-->
+            <div th:if="${#strings.isEmpty(ridingRecord.getId())}">
+                <h3>기록이 아직 없습니다!</h3>
             </div>
-            <div id="weekly-record">
-                <h3>주간 기록</h3>
-                <span>[[${ridingRecord.weeklyRecord}]]km 탔어요! :)</span>
+            <!--라이딩 기록이 존재한다면-->
+            <div th:unless="${#strings.isEmpty(ridingRecord.getId())}">
+                <div id="total-record">
+                    <h3>총 기록</h3>
+                    <span>[[${ridingRecord.getTotalRecord()}]]km 탔어요! :)</span>
+                </div>
+                <div id="weekly-record">
+                    <h3>주간 기록</h3>
+                    <span>[[${ridingRecord.getWeeklyRecord()}]]km 탔어요! :)</span>
+                </div>
+                <div id="today-record">
+                    <h3>오늘 기록</h3>
+                    <span>[[${ridingRecord.getTodayRecord()}]]km 탔어요! :)</span>
+                </div>
             </div>
-            <div id="today-record">
-                <h3>오늘 기록</h3>
-                <span>[[${ridingRecord.todayRecord}]]km 탔어요! :)</span>
-                <form action="/safe-ride/myprofile/create-today" method="post">
-                    <input id="today-record-input" name="todayRecord" type="number" required placeholder="오늘의 주행 거리를 입력">
-                    <input type="submit" value="입력">
-                </form>
-            </div>
-            <div id="matching-recodr">
-                <h3>매칭기록</h3>
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">매칭 신청자 ID</th>
-                        <th scope="col">평가 점수</th>
-                        <th scope="col">리뷰 코멘트</th>
-                        <th scope="col">리뷰 작성자 ID</th>
-                        <th scope="col">리뷰 받은 사람 ID</th>
-                    </tr>
-                    </thead>
-                    <tbody th:if="${ridingRecord.getManner().id == null}">
-                        <tr>
-                            <!--Matching-->
-                            <th scope="col" th:text="데이터없음"></th>
-                        </tr>
-                    </tbody>
-                    <tbody th:unless="${ridingRecord.getManner().id == null}">
-                    <tr>
-                        <!--Matching-->
-                        <th scope="col" th:text="사용자1"></th>
-                        <th scope="col" th:text="별다섯개"></th>
-                        <th scope="col" th:text="재밌었습니다"></th>
-                        <th scope="col" th:text="사용자1"></th>
-                        <th scope="col" th:text="사용자2"></th>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+            <form action="/safe-ride/myprofile/create-today" method="post">
+                <input id="today-record-input" name="todayRecord" type="number" required placeholder="오늘 기록을 입력">
+                <input type="submit" value="입력">
+            </form>
         </div>
+<!--        <div id="matching-record">-->
+<!--            <h3>매칭기록</h3>-->
+<!--            <table class="table">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th scope="col">매칭 신청자 ID</th>-->
+<!--                    <th scope="col">평가 점수</th>-->
+<!--                    <th scope="col">리뷰 코멘트</th>-->
+<!--                    <th scope="col">리뷰 작성자 ID</th>-->
+<!--                    <th scope="col">리뷰 받은 사람 ID</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody th:if="${ridingRecord.getManner().id == null}">-->
+<!--                    <tr>-->
+<!--                        &lt;!&ndash;Matching&ndash;&gt;-->
+<!--                        <th scope="col" th:text="데이터없음"></th>-->
+<!--                    </tr>-->
+<!--                </tbody>-->
+<!--                <tbody th:unless="${ridingRecord.getManner().id == null}">-->
+<!--                <tr>-->
+<!--                    &lt;!&ndash;Matching&ndash;&gt;-->
+<!--                    <th scope="col" th:text="사용자1"></th>-->
+<!--                    <th scope="col" th:text="별다섯개"></th>-->
+<!--                    <th scope="col" th:text="재밌었습니다"></th>-->
+<!--                    <th scope="col" th:text="사용자1"></th>-->
+<!--                    <th scope="col" th:text="사용자2"></th>-->
+<!--                </tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        </div>-->
+
     <!--프로필 수정-->
         <div id="prifile-update">
             <h2>프로필 수정</h2>
