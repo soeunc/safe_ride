@@ -1,7 +1,5 @@
 package com.example.safe_ride.safe.service;
 
-import com.example.safe_ride.safe.SafetyRepository;
-import com.example.safe_ride.safe.entity.SafetyDirection;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
