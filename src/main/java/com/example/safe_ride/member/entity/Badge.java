@@ -1,6 +1,5 @@
-package com.example.safe_ride.myPage.entity;
+package com.example.safe_ride.member.entity;
 
-import com.example.safe_ride.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;

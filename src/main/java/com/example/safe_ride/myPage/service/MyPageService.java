@@ -1,67 +1,134 @@
 package com.example.safe_ride.myPage.service;
 
-import com.example.safe_ride.matching.entity.Manner;
-import com.example.safe_ride.matching.entity.Matching;
 import com.example.safe_ride.myPage.dto.MyPageDto;
 import com.example.safe_ride.myPage.entity.MyPage;
 import com.example.safe_ride.myPage.repo.MyPageRepo;
+import com.example.safe_ride.myPage.repo.MyPageRepoDsl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
+import static java.lang.String.format;
 
 @Service
 @RequiredArgsConstructor
 public class MyPageService {
     private final MyPageRepo myPageRepo;
+    private final MyPageRepoDsl myPageRepoDsl;
+
     //라이딩 정보 가져오기
     @Transactional
     public MyPageDto readRidingRecord(Long memberId){
-        Optional<MyPage> optionalMyPage = myPageRepo.findByMemberId(memberId);
+        Optional<MyPage> optionalMyPage =
+                myPageRepo.findByMemberIdAndCreateDateAfter(
+                    memberId, LocalDate.now().atStartOfDay()
+                );
         MyPageDto myPageDto = new MyPageDto();
-        MyPage myPage = new MyPage();
+
+        MyPage myPage;
         //마이페이지 값이 존재한다면
         if (optionalMyPage.isPresent()){
             myPage = optionalMyPage.get();
-        } 
-        //존재하지 않는다면
-        else {
-            //새로 생성
-            createRecord(memberId);
-            //다시불러오기
-            optionalMyPage = myPageRepo.findByMemberId(memberId);
-            myPage = optionalMyPage.get();
+
+        } else {
+            return myPageDto;
         }
         myPageDto = MyPageDto.fromEntity(myPage);
+        //전체기록합산
+        myPageDto.setTotalRecord(findTotalRecord(memberId));
+        //주간기록합산
+        myPageDto.setWeeklyRecord(findWeeklyRecord(memberId));
+        //이번주 날짜(일~토)
+        myPageDto.setThisWeek(getThisWeekDayList());
+        //주간 개별 기록
+        myPageDto.setWeeklyRecordList(findWeeklyRecordList(memberId));
         return myPageDto;
     }
+
+    //주단위 기록
+    public List<String> getThisWeekDayList(){
+        List<String> thisWeekDayList = new ArrayList<>();
+        //오늘날짜
+        LocalDate today = LocalDate.now();
+        int day = today.get(ChronoField.DAY_OF_WEEK);
+        if (day == 7) day = 0;
+        //이번주 시작일자(일요일)
+        LocalDate start = today.minusDays(day);
+        //이번주 끝일자
+        LocalDate end = start.plusDays(6);
+        for(int i = 0; i < 7; i++) {
+            thisWeekDayList.add(start.plusDays(i).toString());
+        }
+        return thisWeekDayList;
+    }
+
     //오늘 주행기록 입력
     @Transactional
     public void createToday(Long memberId, int todayRecord){
-        MyPage myPage = myPageRepo.findByMemberId(memberId).orElseThrow(
-                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "라이딩 정보를 찾을 수 없습니다.")
-        );
-        //총 / 주간 / 오늘 주행기록에 더해주기
-        myPage.setRecord(myPage.getRecord() + todayRecord);
-        myPage.setWeeklyRecord(myPage.getWeeklyRecord() + todayRecord);
-        myPage.setTodayRecord(myPage.getTodayRecord() + todayRecord);
+        Optional<MyPage> optionalMyPage =
+                myPageRepo.findByMemberIdAndCreateDateAfter(
+                        memberId, LocalDate.now().atStartOfDay()
+                );
+        //오늘 주행기록이 이미 존재한다면
+        if (optionalMyPage.isPresent()){
+            MyPage myPage = optionalMyPage.get();
+            //더해주기
+            myPage.setTodayRecord(myPage.getTodayRecord() + todayRecord);
+        } 
+        //오늘 주행기록이 없다면
+        else {
+            //새로운 주행기록 만들기
+            MyPage myPage = MyPage.builder()
+                    .memberId(memberId)
+                    .todayRecord(todayRecord)
+                    .createDate(LocalDateTime.now())
+                    .build();
+            myPageRepo.save(myPage);
+        }
     }
-    //빈 주행기록 생성
-    //마이페이지 방문 시 주행기록이 없는 신규유저 대상 목적
-    @Transactional
-    public void createRecord(Long memberId){
-        MyPage myPage = MyPage.builder()
-                .memberId(memberId)
-                .record(0)
-                .weeklyRecord(0)
-                .todayRecord(0)
-                .manner(null)
-                .build();
+    //주간기록합산결과
+    public int findWeeklyRecord(Long memberId){
+        int weeklyRecord = 0;
+        LocalDateTime today = LocalDate.now().atStartOfDay();
+        int day = today.get(ChronoField.DAY_OF_WEEK);
+        if (day == 7) day = 0;
+        //이번주 시작일자(일요일)
+        LocalDateTime start = today.minusDays(day);
+        //이번주 끝일자
+        LocalDateTime end = start.plusDays(6);
 
-        myPageRepo.save(myPage);
+        //dsl로 sum해서 가져옴
+        weeklyRecord = myPageRepoDsl.getTotalWeeklyRecord(memberId, start, end);
+        
+        return weeklyRecord;
+        
+        
+    }
+    //주간개별기록
+    public List<Integer> findWeeklyRecordList(Long memberId){
+        List<Integer> weeklyRecordList = new ArrayList<>();
+        LocalDateTime today = LocalDate.now().atStartOfDay();
+        int day = today.get(ChronoField.DAY_OF_WEEK);
+        if (day == 7) day = 0;
+        //이번주 시작일자(일요일)
+        LocalDateTime start = today.minusDays(day);
+        //이번주 끝일자
+        LocalDateTime end = start.plusDays(6);
+        weeklyRecordList = myPageRepoDsl.getWeeklyRecordList(memberId,start,end);
+        return weeklyRecordList;
+    }
+    //전체기록합산결과
+    public int findTotalRecord(Long memberId){
+        return myPageRepoDsl.getTotalRecord(memberId);
     }
 
 }

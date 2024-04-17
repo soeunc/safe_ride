@@ -1,12 +1,11 @@
 package com.example.safe_ride.member.service;
 
-import com.example.safe_ride.member.MemberRepo;
 import com.example.safe_ride.member.dto.JoinDto;
-import com.example.safe_ride.member.entity.Authority;
-import com.example.safe_ride.member.entity.CustomMemberDetails;
+import com.example.safe_ride.member.entity.*;
+import com.example.safe_ride.member.repo.BadgeRepo;
+import com.example.safe_ride.member.repo.MemberRepo;
 import com.example.safe_ride.member.dto.MemberDto;
 import com.example.safe_ride.member.dto.UpdateDto;
-import com.example.safe_ride.member.entity.Member;
 import com.example.safe_ride.myPage.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class MemberService {
     private final UserDetailsManager manager;
     private final PasswordEncoder passwordEncoder;
     private final MyPageService myPageService;
+    private final BadgeRepo badgeRepo;
 
     public MemberDto readMember(String userId){
         Member member = memberRepo.findByUserId(userId)
@@ -94,5 +98,20 @@ public class MemberService {
                 .authority(Authority.ROLE_INACTIVE_USER)
                 .build()
         );
+    }
+
+    //뱃지 생성
+    //등급 뱃지 하나 추가(킥보드 등급)
+    @Transactional
+    public Badge createBadge(String userId){
+        Member member = memberRepo.findByUserId(userId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+                );
+        Badge badge = Badge.builder()
+                .member(member)
+                .grade(Grade.QUICK_BOARD)
+                .build();
+        return badgeRepo.save(badge);
     }
 }

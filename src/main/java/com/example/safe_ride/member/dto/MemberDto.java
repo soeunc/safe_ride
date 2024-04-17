@@ -4,6 +4,11 @@ import com.example.safe_ride.member.entity.Authority;
 import com.example.safe_ride.member.entity.Member;
 import lombok.*;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Builder
 @Getter
 @Setter
@@ -19,11 +24,16 @@ public class MemberDto {
     private String phoneNumber;
     private String birthday;
     private Authority authority;
+    private List<BadgeDto> badges;
 
     public static MemberDto fromEntity(Member entity){
-//        if (entity == null) {
-//            return null; // 또는 적절한 처리를 수행할 수 있습니다.
-//        }
+        //없으면 빈리스트 생성 및 반환
+        List<BadgeDto> badgeDtos = Optional.ofNullable(entity.getBadges())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(BadgeDto::fromEntity)
+                .collect(Collectors.toList());
+
         return MemberDto.builder()
                 .id(entity.getId())
                 .userId(entity.getUserId())
@@ -34,6 +44,7 @@ public class MemberDto {
                 .phoneNumber(entity.getPhoneNumber())
                 .birthday(entity.getBirthday())
                 .authority(entity.getAuthority())
+                .badges(badgeDtos)
                 .build();
     }
 }
