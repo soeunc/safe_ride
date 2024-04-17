@@ -4,6 +4,11 @@ import com.example.safe_ride.member.entity.Authority;
 import com.example.safe_ride.member.entity.Member;
 import lombok.*;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Builder
 @Getter
 @Setter
@@ -39,6 +44,7 @@ public class MemberDto {
                 .phoneNumber(entity.getPhoneNumber())
                 .birthday(entity.getBirthday())
                 .authority(entity.getAuthority())
+                .badges(badgeDtos)
                 .build();
     }
 }
