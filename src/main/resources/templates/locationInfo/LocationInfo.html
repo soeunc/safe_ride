@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>자전거 대여소 정보</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+<body>
+<!-- 주소 폼 데이터 입력-->
+<form action="/public-bicycle" method="post">
+  <select name="sido" id="sido-select" onchange="updateSigunguDropdown()">
+    <option value="">시도 선택</option>
+    <option th:each="sido : ${sidoList}" th:value="${sido}" th:text="${sido}"></option>
+  </select>
+  <select name="sigungu" id="sigungu-select" onchange="updateEupMyunDongDropdown()">
+    <option value="">시군구 선택</option>
+  </select>
+  <select name="eupmyundong" id="eupmyundong-select">
+    <option value="">읍면동 선택</option>
+  </select>
+  <button type="submit">검색</button>
+</form>
+
+<!--폼 데이터 제출 후 정보 출력-->
+<h1>자전거 대여소 정보</h1>
+<div th:if="${results1}">
+  <ul>
+    <li th:each="result : ${results1}" th:text="${result}"></li>
+  </ul>
+</div>
+
+<h1>대여 가능 자전거 정보</h1>
+<div th:if="${results2}">
+  <ul>
+    <li th:each="result : ${results2}" th:text="${result}"></li>
+  </ul>
+</div>
+
+<script>
+    function updateSigunguDropdown() {
+        var selectedSido = $('#sido-select').val();
+        $.ajax({
+            url: '/public-bicycle/sigungu',
+            type: 'GET',
+            data: {sido: selectedSido},
+            success: function(data) {
+                var sigunguSelect = $('#sigungu-select');
+                sigunguSelect.empty();
+                sigunguSelect.append($('<option>', {
+                    value: '',
+                    text: '시군구 선택'
+                }));
+                $.each(data, function(index, value) {
+                    sigunguSelect.append($('<option>', {
+                        value: value,
+                        text: value
+                    }));
+                });
+                // 읍면동 선택을 초기화
+                $('#eupmyundong-select').empty().append($('<option>', {
+                    value: '',
+                    text: '읍면동 선택'
+                }));
+            }
+        });
+    }
+
+    function updateEupMyunDongDropdown() {
+        var selectedSigungu = $('#sigungu-select').val();
+        $.ajax({
+            url: '/public-bicycle/eupmyundong',
+            type: 'GET',
+            data: {sigungu: selectedSigungu},
+            success: function(data) {
+                var eupmyundongSelect = $('#eupmyundong-select');
+                eupmyundongSelect.empty();
+                eupmyundongSelect.append($('<option>', {
+                    value: '',
+                    text: '읍면동 선택'
+                }));
+                $.each(data, function(index, value) {
+                    eupmyundongSelect.append($('<option>', {
+                        value: value,
+                        text: value
+                    }));
+                });
+            }
+        });
+    }
+</script>
+</body>
+</html>
