@@ -1,4 +1,4 @@
-package com.example.safe_ride.myPage.entity;
+package com.example.safe_ride.member.entity;
 
 import lombok.Getter;
 
