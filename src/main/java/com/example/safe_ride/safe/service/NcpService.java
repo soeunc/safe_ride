@@ -40,6 +40,11 @@ public class NcpService {
         Double lat = Double.valueOf(response.getAddresses().get(0).getY());
         Double lng = Double.valueOf(response.getAddresses().get(0).getX());
 
+        // 좌표로 법정동 코드 가져오기
+        getBjDongCode(new PointDto(lat, lng));
+        log.info("법정동 코드 확인: {}", getBjDongCode(new PointDto(lat, lng)));
+        log.info("좌표 확인: {}", new PointDto(lat, lng));
+
         // 좌표 정보 반환
         return new PointDto(lat, lng);
     }
@@ -60,24 +65,6 @@ public class NcpService {
 //                code.getType() + " " +
 //                code.getMappingId();
         return new RGeoResponseDto(bjDongCode.trim());
-    }
-
-    // 사용자 주소로 법정동 코드 추출
-    // TODO 현재 locateAddress, getBjDongCode 메서드가 두번씩 실행되고 있다.(다른 방법 생각필요)
-    public RGeoResponseDto getBjDongCodeFromAddress(NaviWithQueryDto dto) {
-        // 주소를 좌표로 변환
-        PointDto pointDto = locateAddress(dto);
-        log.info("좌표 확인: {}", pointDto);
-        if (pointDto == null) {
-            // 좌표 변환에 실패한 경우
-            log.error("주소로부터 좌표를 얻는 데 실패했습니다.");
-            return null;
-        }
-
-        log.info("법정동 코드 확인: {}", getBjDongCode(pointDto));
-
-        // 변환된 좌표를 사용하여 법정동 코드를 얻음
-        return getBjDongCode(pointDto);
     }
 
 }

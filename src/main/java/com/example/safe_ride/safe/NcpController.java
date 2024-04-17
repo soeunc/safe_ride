@@ -1,5 +1,6 @@
 package com.example.safe_ride.safe;
 
+import com.example.safe_ride.safe.dto.LocationInfoDto;
 import com.example.safe_ride.safe.dto.NaviWithQueryDto;
 import com.example.safe_ride.safe.dto.PointDto;
 import com.example.safe_ride.safe.dto.rgeocoding.RGeoResponseDto;
@@ -36,8 +37,9 @@ public class NcpController {
         return service.getBjDongCode(point);
     }
 
+    // 좌표와 법정동 코드도 같이 전달
     @PostMapping("/check")
-    public ResponseEntity<?> locateAddressAndGetBjDongCode(
+    public ResponseEntity<?> locateAddress(
             @RequestBody NaviWithQueryDto dto
     ) {
         PointDto pointDto = service.locateAddress(dto);
@@ -45,13 +47,17 @@ public class NcpController {
             return ResponseEntity.badRequest().body("주소로부터 좌표를 얻는 데 실패했습니다.");
         }
 
-        RGeoResponseDto rGeoResponseDto = service.getBjDongCodeFromAddress(dto);
+        RGeoResponseDto rGeoResponseDto = service.getBjDongCode(pointDto);
         if (rGeoResponseDto == null) {
             return ResponseEntity.badRequest().body("법정동 코드를 조회하는 데 실패했습니다.");
         }
 
-        // 법정동 코드와 좌표 정보를 함께 반환
-        return ResponseEntity.ok(rGeoResponseDto);
+        LocationInfoDto locationInfo = new LocationInfoDto();
+        locationInfo.setLat(pointDto.getLat());
+        locationInfo.setLng(pointDto.getLng());
+        locationInfo.setBjDongCode(rGeoResponseDto.getBjDongCode());
+
+        return ResponseEntity.ok(locationInfo);
     }
 
 }
