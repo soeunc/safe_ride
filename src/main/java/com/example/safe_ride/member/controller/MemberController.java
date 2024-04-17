@@ -85,6 +85,8 @@ public class MemberController {
         if (dto.getPassword().equals(dto.getPasswordCk())){
             memberService.join(dto);
         }
+        //뱃지 생성
+        memberService.createBadge(dto.getUserId());
         msg = "회원가입 되었습니다 ^^.";
         redirectAttributes.addFlashAttribute("msg", msg);
         return "redirect:/safe-ride/login";

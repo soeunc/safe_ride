@@ -1,6 +1,5 @@
 package com.example.safe_ride.member.entity;
 
-import com.example.safe_ride.myPage.entity.Badge;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -26,5 +25,8 @@ public class Member {
     private String phoneNumber;
     private String birthday;
     private Authority authority;
-
+    //뱃지
+    @Setter
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<Badge> badges;
 }
