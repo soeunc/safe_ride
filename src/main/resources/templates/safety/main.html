@@ -18,17 +18,7 @@
   </div>
   <button id="find-route-to-address-btn" class="btn btn-primary" type="button">현재 위치로</button>
 </div>
-<div class="w-50">
-  <div class="mb-3">
-    <label for="start-ip-input" class="form-label">시작 IP</label>
-    <input id="start-ip-input" class="form-control" type="text">
-  </div>
-  <div class="mb-3">
-    <label for="goal-ip-input" class="form-label">도착 IP</label>
-    <input id="goal-ip-input" class="form-control" type="text">
-  </div>
-  <button id="find-route-ip-btn" class="btn btn-primary" type="button">경로 구하기</button>
-</div>
+
 <script>
     let position = new naver.maps.LatLng(37.3595704, 127.105399)
     let mapOptions = {
@@ -45,21 +35,9 @@
     let markers = [];
 
     naver.maps.Event.addListener(map, 'click', function(e) {
-        if (polyline !== null) polyline.setMap(null)
-        // marker.setPosition(e.coord);
-        if (markers.length === 2) {
-            markers.forEach(marker => {
-                marker.setMap(null)
-            })
-            markers.length = 0
-        }
-
-        else {
-            markers.push(new naver.maps.Marker({
-                position: e.coord,
-                map: map
-            }))
-        }
+        if (polyline !== null) polyline.setMap(null);
+        markers.forEach(marker => marker.setMap(null));
+        markers = [];
     });
 
     const drawRoute = (resultPath) => {
@@ -96,6 +74,7 @@
         }).then(async response => {
             console.log(response)
             if (response.ok) {
+                // 사용자 위치를 받아왔으면 지도를 옮겨지고, 사고다발구역 마커가 표시될 수 있도록 하기 fetch를 한번더 해서 받아올 수있나?
                 const data = await response.json(); // 응답에서 데이터 추출
                 const {lat, lng, bjDongCode} = data; // 법정동 코드 추가
                 // const {lat, lng} = await response.json(); // 응답에서 위도와 경도 추출
@@ -111,30 +90,9 @@
         });
     });
 
-    const startIpInput = document.getElementById('start-ip-input')
-    const goalIpInput = document.getElementById('goal-ip-input')
-    document.getElementById('find-route-ip-btn').addEventListener('click', () => {
-        const startIp = startIpInput.value
-        const goalIp = goalIpInput.value
-        fetch('/navigate/ips', {
-            method: 'post',
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify({ startIp, goalIp })
-        }).then(async response => {
-            console.log(response)
-            if (response.ok) {
-                drawRoute((await response.json()).path)
-                alert(`${startIp} -> ${goalIp}`)
-            }
-        })
-
-    })
-
     // 받아온 데이터의 위도, 경도를 지도에 표시
-    // const accidentData = [[${accidents}]]; // Controller에서 전달된 사고다발 지역 데이터
-    // const lotData = [[${lot}]];
+    // const accidentData = [[${accidents}]];
+    // const lntData = [[${lnt}]];
     // const latData = [[${lat}]];
     //
     // accidentData.forEach(function(accident) {

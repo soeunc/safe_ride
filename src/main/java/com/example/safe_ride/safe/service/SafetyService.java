@@ -1,6 +1,9 @@
 package com.example.safe_ride.safe.service;
 
+import com.example.safe_ride.safe.dto.PointDto;
+import com.example.safe_ride.safe.dto.rgeocoding.RGeoResponseDto;
 import com.example.safe_ride.safe.entity.AccidentInfo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,16 +16,23 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SafetyService {
+    private final NcpService ncpService;
 
     private static final String BASE_URL = "https://apis.data.go.kr/B552061/frequentzoneBicycle/getRestFrequentzoneBicycle";
     @Value("${public.api.key}")
     private String SERVICE_KEY;
+    private static final String URL = "jdbc:sqlite:db.sqlite";
 
 
     // 자전거 사고다발지역
@@ -42,6 +52,7 @@ public class SafetyService {
 
     // http 응답받아 문자열로 변환
     // API에서 데이터를 가져오는 메소드
+    // 여기서 법정동 코드 일치 메서드 사용하기
     public List<AccidentInfo> fetchDataFromApi() {
         try {
             String urlStr = buildApi();
@@ -63,12 +74,12 @@ public class SafetyService {
                 }
                 in.close();
 
-                // 추출 데이터의 마지막 8,9번째의 경도,위도를 가져오고 싶다.
-                // 현재는 리스트 데이터의 0번째를 가져오고 있다.
 
                 // 응답 문자열 반환
-                log.info("응답 확인: {}", ParsingDate(response.toString()).get(0).getBjdCd());
-                return ParsingDate(response.toString()).stream().toList();
+                log.info("법정동 코드 응답 확인: {}", ParsingDate(response.toString()).get(0).getBjDongCode());
+                log.info("응답: {}", ParsingDate(response.toString()).stream().toList());
+
+                return ParsingDate(response.toString());
             } else {
                 System.out.println("GET 요청에 실패했습니다.");
             }
@@ -91,7 +102,7 @@ public class SafetyService {
             JSONObject item = items.getJSONObject(i);
 
             AccidentInfo accidentInfo = new AccidentInfo();
-            accidentInfo.setBjdCd(item.getString("bjd_cd")); // 법정동 코드
+            accidentInfo.setBjDongCode(item.getString("bjd_cd")); // 법정동 코드
             accidentInfo.setSpotNm(item.getString("spot_nm")); // 사고가 발생한 시도 및 시군구 명칭
             accidentInfo.setOccrrncCnt(item.getInt("occrrnc_cnt")); // 발생 건수
             accidentInfo.setCasltCnt(item.getInt("caslt_cnt")); // 사상자 수
@@ -108,25 +119,71 @@ public class SafetyService {
         return accidentInfoList;
     }
 
-    // 법정동 코드만 추출하여 리스트로 저장
-/*    public List<String> getBjDongCodes(String jsonResponse) throws JSONException {
-        // 기존 ParsingDate 메서드를 호출하여 전체 데이터를 파싱
-        List<AccidentInfo> allData = ParsingDate(jsonResponse);
 
-        List<String> bjdCodes = new ArrayList<>();
-        for (AccidentInfo data : allData) {
-            // 데이터 문자열을 쉼표(,)로 분리
-            String[] splitData = data.split(", ");
-            // splitData[0]은 법정동 코드(bjdCd)를 포함하고 있음
-            String bjdCd = splitData[0];
-            // 법정동 코드만 별도의 리스트에 추가
-            bjdCodes.add(bjdCd);
+    // 사고다발지역 데이터 저장
+    public void saveAccidentInfo(List<AccidentInfo> accidentInfoList) {
+        String sql = "INSERT INTO accident_info (bjd_cd, spot_nm, occrrnc_cnt, caslt_cnt, dth_dnv_cnt, se_dnv_cnt, sl_dnv_cnt, geom_json, lo_crd, la_crd) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            for (AccidentInfo info : accidentInfoList) {
+                pstmt.setString(1, info.getBjDongCode());
+                pstmt.setString(2, info.getSpotNm());
+                pstmt.setInt(3, info.getOccrrncCnt());
+                pstmt.setInt(4, info.getCasltCnt());
+                pstmt.setInt(5, info.getDthDnvCnt());
+                pstmt.setInt(6, info.getSeDnvCnt());
+                pstmt.setInt(7, info.getSlDnvCnt());
+                pstmt.setString(8, info.getGeomJson());
+                pstmt.setString(9, info.getLoCrd());
+                pstmt.setString(10, info.getLaCrd());
+                pstmt.executeUpdate();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 법정동 일치하는 데이터만 저장
+    public void saveFilteredAccidentInfo(PointDto dto) {
+        List<AccidentInfo> allAccidentInfo = fetchDataFromApi(); // API로부터 모든 사고 정보를 가져옴
+        List<AccidentInfo> filteredAccidentInfo = new ArrayList<>();
+
+        String ncpBjDongCode = ncpService.getBjDongCode(dto).getBjDongCode(); // PointDto로부터 법정동 코드를 가져옴
+
+        for (AccidentInfo accidentInfo : allAccidentInfo) {
+            if (accidentInfo.getBjDongCode().equals(ncpBjDongCode)) {
+                filteredAccidentInfo.add(accidentInfo); // 법정동 코드가 일치하는 사고 정보만 필터링
+            }
         }
 
-        return bjdCodes;
-    }*/
+        saveAccidentInfo(filteredAccidentInfo); // 필터링된 사고 정보를 저장
+    }
 
-    // 리스트로 저장된 법정동 코드를 사용자위치의 법정동 코드와 하나씩 비교하여 일치하면 사고 다발 위치를 지도에 표시
+    // 법정동 코드 일치 확인 메서드
+    // 법정동 코드 앞자리 4개만 일치하는 것으로 수정 예정
+    public boolean getBjDongCodeMatch(PointDto dto) {
+        try {
+            // NcpService를 통해 법정동 코드 가져오기
+            RGeoResponseDto rGeoResponseDto = ncpService.getBjDongCode(dto);
+            String ncpBjDongCode = rGeoResponseDto.getBjDongCode();
+
+            List<AccidentInfo> accidentInfoList = fetchDataFromApi();
+            for (AccidentInfo accidentInfo : accidentInfoList) {
+                String safetyServiceBjDongCode = accidentInfo.getBjDongCode();
+                if (safetyServiceBjDongCode.equals(ncpBjDongCode)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // 일치한 법정동 코드 좌표 반환 메서드
 
 
 }

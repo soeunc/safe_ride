@@ -18,7 +18,7 @@ public class AccidentInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String bjdCd;  // 법정동 코드
+    private String bjDongCode;  // 법정동 코드
     private String spotNm; // 사고가 발생한 시도 및 시군구 명칭
     private Integer occrrncCnt; // 발생 건수
     private Integer casltCnt; // 사상자 수
