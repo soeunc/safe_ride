@@ -4,7 +4,6 @@ import com.example.safe_ride.safe.dto.NaviWithQueryDto;
 import com.example.safe_ride.safe.dto.PointDto;
 import com.example.safe_ride.safe.dto.geocoding.GeoNcpResponse;
 import com.example.safe_ride.safe.dto.rgeocoding.RGeoNcpResponse;
-import com.example.safe_ride.safe.dto.rgeocoding.RGeoRegion;
 import com.example.safe_ride.safe.dto.rgeocoding.RGeoResponseDto;
 import com.example.safe_ride.safe.dto.rgeocoding.RGoCode;
 import lombok.RequiredArgsConstructor;
