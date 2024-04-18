@@ -42,9 +42,8 @@ public class MyPageController {
         model.addAttribute(
                 "ridingRecord",
                 myPageService.readRidingRecord(memberDto.getId()));
-        //매칭 기록 가져오기
-
-        //매칭기록과 함께 매너 기록도 가져와야 함
+        //뱃지 가져오기
+        model.addAttribute("badges", myPageService.readBadges(memberDto.getId()));
         return "member/myprofile";
     }
     //마이페이지 수정

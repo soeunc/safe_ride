@@ -1,5 +1,8 @@
 package com.example.safe_ride.myPage.service;
 
+import com.example.safe_ride.member.dto.BadgeDto;
+import com.example.safe_ride.member.entity.Badge;
+import com.example.safe_ride.member.repo.BadgeRepo;
 import com.example.safe_ride.myPage.dto.MyPageDto;
 import com.example.safe_ride.myPage.entity.MyPage;
 import com.example.safe_ride.myPage.repo.MyPageRepo;
@@ -24,6 +27,7 @@ import static java.lang.String.format;
 public class MyPageService {
     private final MyPageRepo myPageRepo;
     private final MyPageRepoDsl myPageRepoDsl;
+    private final BadgeRepo badgeRepo;
 
     //라이딩 정보 가져오기
     @Transactional
@@ -130,5 +134,17 @@ public class MyPageService {
     public int findTotalRecord(Long memberId){
         return myPageRepoDsl.getTotalRecord(memberId);
     }
-
+    
+    //뱃지 가져오기
+    public BadgeDto readBadges(Long memberId){
+        Optional<Badge> optionalBadge = badgeRepo.findByMemberId(memberId);
+        BadgeDto badgeDto = new BadgeDto();
+        if (optionalBadge.isPresent()){
+            Badge badge = optionalBadge.get();
+            badgeDto = BadgeDto.fromEntity(badge);
+        } else {
+            return badgeDto;
+        }
+        return badgeDto;
+    }
 }

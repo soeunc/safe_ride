@@ -15,7 +15,9 @@
         /*    margin: 0 auto; !* container 영역을 브라우저에서 가운데 정렬하기 위해 auto설정 *!*/
         /*    text-align: center; !* inline-block화 된 div들을 텍스트 마냥 center로 정렬*!*/
         /*}*/
-
+        #topInfo{
+            height: 130px;
+        }
         #riding-record {
             display: inline-block; /* 가로로 나열하기 위해 block레벨 요소를 inline-block레벨로 전환 */
             width: 33%; /* 영역 크기 지정 안해주면 inline 레벨처럼 내용물 만큼만 차지하기 때문에 크기 지정 */
@@ -28,14 +30,35 @@
             border: 2px solid aqua;
             background: orange;
         }
-
+        #introduce{
+            display: inline-block;
+        }
+        .badge-grade{
+            width: 70px;
+        }
     </style>
     <title>마이프로필</title>
 </head>
 <body>
-    <h1>My Profile</h1>
-    <h3>반갑습니다, <span sec:authentication="name"></span>님!</h3>
+    <div id="topInfo">
+        <h1>My Profile</h1>
+        <h3 id="introduce">반갑습니다, <span sec:authentication="name"></span>님!</h3>
+        <span th:if="${#strings.equals(badges.getGrade(), 'QUICK_BOARD')}">
+            <img class="badge-grade" src="/img/badge/kickboard.png" >
+        </span>
+        <span th:if="${#strings.equals(badges.getGrade(), 'BYCICLE')}">
+            <img class="badge-grade" src="/img/badge/bicycle.png">
+        </span>
+        <span th:if="${#strings.equals(badges.getGrade(), 'SCOOTER')}">
+            <img class="badge-grade" src="/img/badge/scooter.png">
+        </span>
+        <span th:if="${#strings.equals(badges.getGrade(), 'MOTOR_CYCLE')}">
+            <img class="badge-grade" src="/img/badge/motorcycle.png">
+        </span>
+
+    </div>
     <!--뱃지 넣기-->
+
     <div id="container">
     <!--라이딩 기록-->
         <div id="riding-record">
