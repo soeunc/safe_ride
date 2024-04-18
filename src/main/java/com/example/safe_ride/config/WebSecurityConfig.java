@@ -84,7 +84,10 @@ public class WebSecurityConfig {
                                         "/matching/{id}", // 매칭글 상세 조회
                                         "/matching/{id}/edit", // 매칭글 수정
                                         "/matching/{id}/delete", // 매칭글 삭제
-                                        "/matching/{id}/apply" // 매칭글 상세 조회
+                                        "/matching/{id}/apply" ,// 매칭글 상세 조회
+                                        "/matching/{matchingId}/accept/{applicationId}", // 매칭글
+                                        "/matching/{matchingId}/reject/{applicationId}", // 매칭글
+                                        "/matching/{matchingId}/cancel-application"
                                 )
                                 .authenticated()
 
