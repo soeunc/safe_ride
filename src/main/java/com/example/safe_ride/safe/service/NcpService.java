@@ -4,7 +4,6 @@ import com.example.safe_ride.safe.dto.NaviWithQueryDto;
 import com.example.safe_ride.safe.dto.PointDto;
 import com.example.safe_ride.safe.dto.geocoding.GeoNcpResponse;
 import com.example.safe_ride.safe.dto.rgeocoding.RGeoNcpResponse;
-import com.example.safe_ride.safe.dto.rgeocoding.RGeoRegion;
 import com.example.safe_ride.safe.dto.rgeocoding.RGeoResponseDto;
 import com.example.safe_ride.safe.dto.rgeocoding.RGoCode;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +40,7 @@ public class NcpService {
         Double lng = Double.valueOf(response.getAddresses().get(0).getX());
 
         // 좌표 정보 반환
-        return new PointDto(lat, lng);
+        return new PointDto(lng, lat);
     }
 
     // reverse grocode를 사용해서 좌표를 입력받아 법정동 코드를 반환하는 메서드
@@ -56,9 +55,6 @@ public class NcpService {
                 .getCode();
 
         String bjDongCode = code.getId();
-//                + " " +
-//                code.getType() + " " +
-//                code.getMappingId();
         return new RGeoResponseDto(bjDongCode.trim());
     }
 
