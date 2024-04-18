@@ -1,5 +1,6 @@
-package com.example.safe_ride.safe;
+package com.example.safe_ride.safe.controller;
 
+import com.example.safe_ride.safe.entity.AccidentInfo;
 import com.example.safe_ride.safe.service.SafetyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,31 +15,23 @@ import java.util.List;
 public class SafetyController {
     private final SafetyService service;
 
-//    @GetMapping("/safety-direction")
-//    public String mapView() {
-//        return "safety/main";
-//    }
-
+    // 사고다발 지역 정보 추출 test
     @GetMapping("/safety-direction/location")
     public String location(Model model) {
-        List<String> location = service.fetchDataFromApi("41", "150");   // 경기도, 의정부시 기준 검색
+        List<AccidentInfo> location = service.fetchDataFromApi();
         model.addAttribute("location", location);
         return "safety/location";
     }
 
-    // 시도, 군면 정보는 필수
     // 법정동 코드를 비교해서 일치 시 주변 사고정보를 불러오도록 하기
     @GetMapping("/safety-direction")
-    public String showAccidents(
-//            @RequestParam String siDo,
-//            @RequestParam String guGun,
-            Model model
-    ) {
+    public String showAccidents(Model model) {
         // 사고다발 지역 데이터 가져오기
-        List<String> accidentData = service.fetchDataFromApi("41", "150");
+        List<AccidentInfo> accidentData = service.fetchDataFromApi();
 
         // 모델에 데이터 추가
-        model.addAttribute("accidents", accidentData);
+        // test로 리스트 1번째의 법정동 코드 보여주기
+        model.addAttribute("accidents", accidentData.get(0).getBjdCd());
 
         // 뷰 이름 반환
         return "safety/main";

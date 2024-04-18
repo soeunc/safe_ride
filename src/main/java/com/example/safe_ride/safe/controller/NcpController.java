@@ -1,6 +1,6 @@
-package com.example.safe_ride.safe;
+package com.example.safe_ride.safe.controller;
 
-import com.example.safe_ride.safe.dto.LocationInfoDto;
+import com.example.safe_ride.safe.dto.NcpInfoDto;
 import com.example.safe_ride.safe.dto.NaviWithQueryDto;
 import com.example.safe_ride.safe.dto.PointDto;
 import com.example.safe_ride.safe.dto.rgeocoding.RGeoResponseDto;
@@ -21,23 +21,16 @@ public class NcpController {
     private final NcpService service;
 
     // 사용자의 현재 위치를 입력받아 좌표 반환
-//    @PostMapping("/check")
-//    public PointDto locateAddress(
-//            @RequestBody NaviWithQueryDto dto
-//            ) {
-//        return service.locateAddress(dto);
-//    }
-
-    // 좌표를 입력 받아 법정동 코드 반환
-    @PostMapping("start-query")
-    public RGeoResponseDto getBjDongCode(
-            @RequestBody
-            PointDto point
+    @PostMapping("/check-test")
+    public PointDto locateAddressTest(
+            @RequestBody NaviWithQueryDto dto
     ) {
-        return service.getBjDongCode(point);
+        return service.locateAddress(dto);
     }
 
+
     // 좌표와 법정동 코드도 같이 전달
+    // TODO 폼에서 주소를 입력하는 곳이 사용자가 편리하지 않은 방식이다. 다른 방법으로 한번 생각해볼 필요 있음.
     @PostMapping("/check")
     public ResponseEntity<?> locateAddress(
             @RequestBody NaviWithQueryDto dto
@@ -54,12 +47,12 @@ public class NcpController {
             return ResponseEntity.badRequest().body("법정동 코드를 조회하는 데 실패했습니다.");
         }
 
-        LocationInfoDto locationInfo = new LocationInfoDto();
-        locationInfo.setLat(pointDto.getLat());
-        locationInfo.setLng(pointDto.getLng());
-        locationInfo.setBjDongCode(rGeoResponseDto.getBjDongCode());
+        NcpInfoDto ncpInfoDto = new NcpInfoDto();
+        ncpInfoDto.setLat(pointDto.getLat());
+        ncpInfoDto.setLng(pointDto.getLng());
+        ncpInfoDto.setBjDongCode(rGeoResponseDto.getBjDongCode());
 
-        return ResponseEntity.ok(locationInfo);
+        return ResponseEntity.ok(ncpInfoDto);
     }
 
 }
