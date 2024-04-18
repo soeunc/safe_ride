@@ -23,10 +23,11 @@ public class Matching {
     @JoinColumn(name = "member_id")
     private Member member;          // 매칭글 작성자
 
+
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_id")
-    private Region region; // 수정된 부분
+    private Region region;
     private String comment;         // 매칭 코멘트
     private Timestamp createTime;   // 작성 시간
     @Setter
