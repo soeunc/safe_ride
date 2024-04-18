@@ -3,14 +3,12 @@ package com.example.safe_ride.locationInfo.controller;
 import com.example.safe_ride.locationInfo.repo.LocationInfoRepo;
 import com.example.safe_ride.locationInfo.service.AddressService;
 import com.example.safe_ride.locationInfo.service.LocationInfoService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -72,6 +70,29 @@ public class LocationInfoController {
         results.put("results2", results2);
 
         return results;
+    }
+
+    // 주소 API 호출
+    @RequestMapping(value = {"/public-bicycle/jusoPopup"})
+    public String jusoPopup(HttpServletRequest request, Model model) {
+        String inputYn = request.getParameter("inputYn");
+        String roadFullAddr = request.getParameter("roadFullAddr");
+        String roadAddrPart1 = request.getParameter("roadAddrPart1");
+        String roadAddrPart2 = request.getParameter("roadAddrPart2");
+
+
+        log.debug("▶▶▶▶▶▶▶▶▶▶▶▶▶▶▶▶ inputYn: {}"
+                        + ", roadFullAddr: {}"
+                        + ", roadAddrPart1: {}"
+                        + ", roadAddrPart2: {}"
+                        , inputYn, roadFullAddr, roadAddrPart1, roadAddrPart2);
+
+        String confmKey = "devU01TX0FVVEgyMDI0MDQxODE3MDEwNzExNDcwMTQ=";
+
+        model.addAttribute("confmKey", confmKey);
+        model.addAttribute("inputYn", inputYn);
+
+        return "/locationInfo/jusoPopup";
     }
 
 }
