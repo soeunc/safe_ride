@@ -77,7 +77,6 @@ public class SafetyService {
 
                 // 응답 문자열 반환
                 log.info("법정동 코드 응답 확인: {}", ParsingDate(response.toString()).get(0).getBjDongCode());
-                log.info("응답: {}", ParsingDate(response.toString()).stream().toList());
 
                 return ParsingDate(response.toString());
             } else {
@@ -147,6 +146,7 @@ public class SafetyService {
     }
 
     // 법정동 일치하는 데이터만 저장
+    // 문제 - 데이터를 이미 불러온 상태 / 데이터 불러오기 전에 필터링을 해서 가져오고 싶음
     public void saveFilteredAccidentInfo(PointDto dto) {
         List<AccidentInfo> allAccidentInfo = fetchDataFromApi(); // API로부터 모든 사고 정보를 가져옴
         List<AccidentInfo> filteredAccidentInfo = new ArrayList<>();
