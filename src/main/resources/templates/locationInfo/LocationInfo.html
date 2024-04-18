@@ -4,8 +4,26 @@
   <meta charset="UTF-8">
   <title>자전거 대여소 정보</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+      var pop;
+
+      function goPopup() {
+          pop = window.open("public-bicycle/jusoPopup", "pop", "width=570, height=420, scrollbars=yes");
+      }
+      function jusoCallBack(roadFullAddr, roadAddrPart1) {
+          var form = $('<form></form>');
+          form.attr('action', '/public-bicycle');
+          form.attr('method', 'post');
+          form.appendTo('body');
+          form.append($('<input type="hidden" value="' + roadFullAddr + '" name=roadFullAddr>'));
+          form.append($('<input type="hidden" value="' + roadAddrPart1 + '" name=roadAddrPart1>'));
+          form.submit();
+          pop.close();
+      }
+  </script>
 </head>
 <body>
+<button onclick="goPopup();">도로명주소 호출해보기</button>
 <!-- 주소 폼 데이터 입력-->
 <form id="searchForm">
   <select name="sido" id="sido-select" onchange="updateSigunguDropdown()">
@@ -36,7 +54,7 @@
 
 <script>
     // 페이지 로드 시 시도 목록 불러오기
-    $(document).ready(function() {
+    $(document).ready(function () {
         initializeSidoSelect();
     });
 
@@ -46,7 +64,7 @@
         var sidoSelect = $('#sido-select');
         var priorityCities = ['서울특별시', '대전광역시', '세종특별자치시'];
 
-        var options = sidoSelect.find('option').get().map(function(option) {
+        var options = sidoSelect.find('option').get().map(function (option) {
             return {
                 text: $(option).text(),
                 value: $(option).val(),
@@ -55,7 +73,7 @@
         });
 
         sidoSelect.empty(); // 기존 옵션 제거
-        sidoSelect.append($('<option>', { value: '', text: '시도 선택' })); // 기본 옵션 추가
+        sidoSelect.append($('<option>', {value: '', text: '시도 선택'})); // 기본 옵션 추가
 
         // 1. 우선순위 지역 안내
         sidoSelect.append($('<option>', {
@@ -65,9 +83,9 @@
         }));
 
         // 2. 우선순위 지역 추가
-        options.forEach(function(option) {
+        options.forEach(function (option) {
             if (option.priority === 0) {
-                sidoSelect.append($('<option>', { value: option.value, text: option.text }));
+                sidoSelect.append($('<option>', {value: option.value, text: option.text}));
             }
         });
 
@@ -86,8 +104,8 @@
         }));
 
         // 5. 그 외 지역 리스트
-        options.forEach(function(option) {
-            sidoSelect.append($('<option>', { value: option.value, text: option.text }));
+        options.forEach(function (option) {
+            sidoSelect.append($('<option>', {value: option.value, text: option.text}));
         });
     }
 
@@ -100,14 +118,14 @@
             type: 'GET',
             data: {sido: selectedSido},
             // 성공 시 아래 내용 수행
-            success: function(data) {
+            success: function (data) {
                 var sigunguSelect = $('#sigungu-select');
                 sigunguSelect.empty();
                 sigunguSelect.append($('<option>', {
                     value: '',
                     text: '시군구 선택'
                 }));
-                $.each(data, function(index, value) {
+                $.each(data, function (index, value) {
                     sigunguSelect.append($('<option>', {
                         value: value,
                         text: value
@@ -129,14 +147,14 @@
             url: '/public-bicycle/eupmyundong',
             type: 'GET',
             data: {sigungu: selectedSigungu},
-            success: function(data) {
+            success: function (data) {
                 var eupmyundongSelect = $('#eupmyundong-select');
                 eupmyundongSelect.empty();
                 eupmyundongSelect.append($('<option>', {
                     value: '',
                     text: '읍면동 선택'
                 }));
-                $.each(data, function(index, value) {
+                $.each(data, function (index, value) {
                     eupmyundongSelect.append($('<option>', {
                         value: value,
                         text: value
@@ -147,7 +165,7 @@
     }
 
     // 폼 제출 처리
-    $('#searchForm').on('submit', function(e) {
+    $('#searchForm').on('submit', function (e) {
         e.preventDefault();
 
         var formData = $(this).serialize();
@@ -157,14 +175,14 @@
             type: 'POST',
             data: formData,
             dataType: 'json', // JSON 형태로 데이터를 받음
-            success: function(response) {
+            success: function (response) {
                 // results1과 results2를 페이지에 표시
                 var results1Html = response.results1.map(item => '<li>' + item + '</li>').join('');
                 var results2Html = response.results2.map(item => '<li>' + item + '</li>').join('');
                 $('#results1').html(results1Html);
                 $('#results2').html(results2Html);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error("Error: " + error);
             }
         });
