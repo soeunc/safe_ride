@@ -8,13 +8,6 @@
     <head>
     <meta charset="UTF-8">
     <style>
-        /*#container {*/
-        /*    width: 80%;*/
-        /*    height: 600px;*/
-        /*    border: 2px solid blue;*/
-        /*    margin: 0 auto; !* container 영역을 브라우저에서 가운데 정렬하기 위해 auto설정 *!*/
-        /*    text-align: center; !* inline-block화 된 div들을 텍스트 마냥 center로 정렬*!*/
-        /*}*/
         #topInfo{
             height: 130px;
         }
@@ -35,6 +28,10 @@
         }
         .badge-grade{
             width: 70px;
+        }
+        #chart{
+            width: 800px;
+            height: 400px;
         }
     </style>
     <title>마이프로필</title>
@@ -86,6 +83,9 @@
                 <input id="today-record-input" name="todayRecord" type="number" required placeholder="오늘 기록을 입력">
                 <input type="submit" value="입력">
             </form>
+        </div>
+        <div id="chart">
+            <canvas id="bar-chart"></canvas>
         </div>
 <!--        <div id="matching-record">-->
 <!--            <h3>매칭기록</h3>-->
@@ -157,11 +157,10 @@
     </form>
 
     <a href="/safe-ride">홈으로</a>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-            crossorigin="anonymous">
-    </script>
+    <!--chart.js-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
     <script th:inline="javascript">
+
         window.onload = function () {
             //alert
             const alertMsg = [[${msg}]];
@@ -170,6 +169,49 @@
                 alert(alertMsg);
             }
         }
+        const thisWeek = [[${ridingRecord.thisWeek}]];
+        const weeklyRecordList = [[${ridingRecord.weeklyRecordList}]];
+        new Chart(document.getElementById("bar-chart"), {
+            type: 'bar',
+            data: {
+                labels: [
+                    thisWeek.at(0),
+                    thisWeek.at(1),
+                    thisWeek.at(2),
+                    thisWeek.at(3),
+                    thisWeek.at(4),
+                    thisWeek.at(5),
+                    thisWeek.at(6)],
+                datasets: [
+                    {
+                        label: "Population (millions)",
+                        backgroundColor: ["#ff0000", "#ff7f27","#ffd900","#00db07","#00b7ff","#3700dc","#a600ff"],
+                        data: [
+                            weeklyRecordList.at(0),
+                            weeklyRecordList.at(1),
+                            weeklyRecordList.at(2),
+                            weeklyRecordList.at(3),
+                            weeklyRecordList.at(4),
+                            weeklyRecordList.at(5),
+                            weeklyRecordList.at(6),
+                        ]
+                    }
+                ]
+            },
+            options: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: '주간 라이딩 기록'
+                }
+            }
+        });
     </script>
+    <!--bootstrap-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous">
+    </script>
+
 </body>
 </html>
