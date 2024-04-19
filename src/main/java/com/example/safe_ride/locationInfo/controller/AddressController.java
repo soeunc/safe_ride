@@ -1,6 +1,5 @@
 package com.example.safe_ride.locationInfo.controller;
 
-import com.example.safe_ride.locationInfo.service.AddressService;
 import com.example.safe_ride.locationInfo.service.LocationInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +16,14 @@ import java.util.List;
 public class AddressController {
 
     private final LocationInfoService locationInfoService;
-    private final AddressService addressService;
+
 
     @GetMapping("/sigungu")
     public ResponseEntity<List<String>> getSigunguBySido(
             @RequestParam("sido")
             String sido
     ) {
-        List<String> sigunguList = addressService.getSigunguBySido(sido);
+        List<String> sigunguList = locationInfoService.getSigunguBySidoList(sido);
         if (sigunguList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -37,7 +36,7 @@ public class AddressController {
             @RequestParam("sigungu")
             String sigungu
     ) {
-        List<String> eupmyundongList = addressService.getEupmyundongBySigungu(sigungu);
+        List<String> eupmyundongList = locationInfoService.getEupmyundongBySigunguList(sigungu);
         if (eupmyundongList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

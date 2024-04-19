@@ -8,185 +8,42 @@
       var pop;
 
       function goPopup() {
-          pop = window.open("public-bicycle/jusoPopup", "pop", "width=570, height=420, scrollbars=yes");
+          pop = window.open("/public-bicycle/jusoPopup", "pop", "width=570, height=420, scrollbars=yes");
       }
+
       function jusoCallBack(roadFullAddr, roadAddrPart1) {
-          var form = $('<form></form>');
-          form.attr('action', '/public-bicycle');
-          form.attr('method', 'post');
-          form.appendTo('body');
-          form.append($('<input type="hidden" value="' + roadFullAddr + '" name=roadFullAddr>'));
-          form.append($('<input type="hidden" value="' + roadAddrPart1 + '" name=roadAddrPart1>'));
-          form.submit();
-          pop.close();
+          console.log("도로명 주소: " + roadAddrPart1);
+          console.log("전체 주소: " + roadFullAddr);
+          document.getElementById('roadFullAddr').value = roadFullAddr;
+          document.getElementById('roadAddrPart1').value = roadAddrPart1;
+          document.getElementById('addressForm').submit();
       }
   </script>
 </head>
 <body>
-<button onclick="goPopup();">도로명주소 호출해보기</button>
-<!-- 주소 폼 데이터 입력-->
-<form id="searchForm">
-  <select name="sido" id="sido-select" onchange="updateSigunguDropdown()">
-    <option value="">시도 선택</option>
-    <option th:each="sido : ${sidoList}" th:value="${sido}" th:text="${sido}"></option>
-  </select>
-  <select name="sigungu" id="sigungu-select" onchange="updateEupMyunDongDropdown()">
-    <option value="">시군구 선택</option>
-  </select>
-  <select name="eupmyundong" id="eupmyundong-select">
-    <option value="">읍면동 선택</option>
-  </select>
-  <button type="submit">검색</button>
+<h1>도로명 주소 검색</h1>
+<button onclick="goPopup();">🔎 도로명주소 검색</button>
+<form id="addressForm" action="/public-bicycle" method="post">
+  <input type="hidden" id="roadFullAddr" name="roadFullAddr">
+  <input type="hidden" id="roadAddrPart1" name="roadAddrPart1">
 </form>
 
-<!--폼 데이터 제출 후 정보 출력-->
-<div id="resultDiv">
-  <h1>자전거 대여소 정보</h1>
-  <div>
-    <ul id="results1"></ul>
-  </div>
-
-  <h1>대여 가능 자전거 정보</h1>
-  <div>
-    <ul id="results2"></ul>
-  </div>
+<h1>도로명 주소 테스트 결과</h1>
+<div>
+  <p>전체 주소: <span th:text="${roadFullAddr}"></span></p>
+  <p>도로명 주소: <span th:text="${roadAddrPart1}"></span></p>
+  <p>도로명 주소 상세주소 제외: <span th:text="${doroJuso}"></span></p>
+  <p>시도: <span th:text="${sido}"></span></p>
+  <p>지자체코드: <span th:text="${lcgvmnInstCd}"></span></p>
 </div>
 
-<script>
-    // 페이지 로드 시 시도 목록 불러오기
-    $(document).ready(function () {
-        initializeSidoSelect();
-    });
+<!-- 대여소 정보 출력 -->
+<h1>자전거 대여소 정보</h1>
+<div th:if="${results1}">
+  <ul>
+    <li th:each="result : ${results1}" th:text="${result}"></li>
+  </ul>
+</div>
 
-
-    // 초기 시도 선택
-    function initializeSidoSelect() {
-        var sidoSelect = $('#sido-select');
-        var priorityCities = ['서울특별시', '대전광역시', '세종특별자치시'];
-
-        var options = sidoSelect.find('option').get().map(function (option) {
-            return {
-                text: $(option).text(),
-                value: $(option).val(),
-                priority: priorityCities.includes($(option).text()) ? 0 : 1
-            };
-        });
-
-        sidoSelect.empty(); // 기존 옵션 제거
-        sidoSelect.append($('<option>', {value: '', text: '시도 선택'})); // 기본 옵션 추가
-
-        // 1. 우선순위 지역 안내
-        sidoSelect.append($('<option>', {
-            value: '',
-            text: '🔵서비스 가능 지역🔵',
-            disabled: 'disabled'
-        }));
-
-        // 2. 우선순위 지역 추가
-        options.forEach(function (option) {
-            if (option.priority === 0) {
-                sidoSelect.append($('<option>', {value: option.value, text: option.text}));
-            }
-        });
-
-        // 3. 우선순위 지역 다음에 구분선 추가
-        sidoSelect.append($('<option>', {
-            value: '',
-            text: '──────────',
-            disabled: 'disabled'
-        }));
-
-        // 4. 그 외 지역 안내
-        sidoSelect.append($('<option>', {
-            value: '',
-            text: '🔺서비스 준비 지역🔺',
-            disabled: 'disabled'
-        }));
-
-        // 5. 그 외 지역 리스트
-        options.forEach(function (option) {
-            sidoSelect.append($('<option>', {value: option.value, text: option.text}));
-        });
-    }
-
-    // 시군구 업데이트 함수
-    function updateSigunguDropdown() {
-        var selectedSido = $('#sido-select').val();
-        $.ajax({
-            // 쿼리 파라미터를 만들어줌
-            url: '/public-bicycle/sigungu',
-            type: 'GET',
-            data: {sido: selectedSido},
-            // 성공 시 아래 내용 수행
-            success: function (data) {
-                var sigunguSelect = $('#sigungu-select');
-                sigunguSelect.empty();
-                sigunguSelect.append($('<option>', {
-                    value: '',
-                    text: '시군구 선택'
-                }));
-                $.each(data, function (index, value) {
-                    sigunguSelect.append($('<option>', {
-                        value: value,
-                        text: value
-                    }));
-                });
-                // 읍면동 선택을 초기화
-                $('#eupmyundong-select').empty().append($('<option>', {
-                    value: '',
-                    text: '읍면동 선택'
-                }));
-            }
-        });
-    }
-
-    // 읍면동 업데이트 함수
-    function updateEupMyunDongDropdown() {
-        var selectedSigungu = $('#sigungu-select').val();
-        $.ajax({
-            url: '/public-bicycle/eupmyundong',
-            type: 'GET',
-            data: {sigungu: selectedSigungu},
-            success: function (data) {
-                var eupmyundongSelect = $('#eupmyundong-select');
-                eupmyundongSelect.empty();
-                eupmyundongSelect.append($('<option>', {
-                    value: '',
-                    text: '읍면동 선택'
-                }));
-                $.each(data, function (index, value) {
-                    eupmyundongSelect.append($('<option>', {
-                        value: value,
-                        text: value
-                    }));
-                });
-            }
-        });
-    }
-
-    // 폼 제출 처리
-    $('#searchForm').on('submit', function (e) {
-        e.preventDefault();
-
-        var formData = $(this).serialize();
-
-        $.ajax({
-            url: '/public-bicycle',
-            type: 'POST',
-            data: formData,
-            dataType: 'json', // JSON 형태로 데이터를 받음
-            success: function (response) {
-                // results1과 results2를 페이지에 표시
-                var results1Html = response.results1.map(item => '<li>' + item + '</li>').join('');
-                var results2Html = response.results2.map(item => '<li>' + item + '</li>').join('');
-                $('#results1').html(results1Html);
-                $('#results2').html(results2Html);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error: " + error);
-            }
-        });
-    });
-</script>
 </body>
 </html>

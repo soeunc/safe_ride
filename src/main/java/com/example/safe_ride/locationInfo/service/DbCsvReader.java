@@ -10,7 +10,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CsvDataReader {
+public class DbCsvReader {
     public List<LocationInfo> readCsvData(String filePath) {
         List<LocationInfo> addresses = new ArrayList<>();
         try (Reader reader = new FileReader(filePath);

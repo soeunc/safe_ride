@@ -1,6 +1,6 @@
 package com.example.safe_ride;
 
-import com.example.safe_ride.locationInfo.service.DatabaseLoader;
+import com.example.safe_ride.locationInfo.service.DbLoader;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,9 +14,9 @@ public class SafeRideApplication {
 	}
 	// CommandLineRunner 빈을 등록하여 애플리케이션 시작 시 테이블 생성 로직 실행
 	@Bean
-	CommandLineRunner createTable(DatabaseLoader databaseLoader) {
+	CommandLineRunner createTable(DbLoader dbLoader) {
 		return args -> {
-			databaseLoader.createTableIfNotExist();
+			dbLoader.createTableIfNotExist();
 		};
 	}
 }
