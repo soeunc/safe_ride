@@ -61,11 +61,11 @@
         <div id="riding-record">
             <h2>라이딩 기록</h2>
             <!--라이딩 기록이 없을 떄-->
-            <div th:if="${#strings.isEmpty(ridingRecord.getId())}">
+            <div th:if="${#strings.isEmpty(ridingRecord.getTotalRecord())}">
                 <h3>기록이 아직 없습니다!</h3>
             </div>
             <!--라이딩 기록이 존재한다면-->
-            <div th:unless="${#strings.isEmpty(ridingRecord.getId())}">
+            <div th:unless="${#strings.isEmpty(ridingRecord.getTotalRecord())}">
                 <div id="total-record">
                     <h3>총 기록</h3>
                     <span>[[${ridingRecord.getTotalRecord()}]]km 탔어요! :)</span>
@@ -74,7 +74,11 @@
                     <h3>주간 기록</h3>
                     <span>[[${ridingRecord.getWeeklyRecord()}]]km 탔어요! :)</span>
                 </div>
-                <div id="today-record">
+                <!--오늘자 기록이 없을 떄-->
+                <div th:if="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
+                    <h4>오늘 기록이 아직 없습니다! 열심히 달려봐요! :)</h4>
+                </div>
+                <div th:unless="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
                     <h3>오늘 기록</h3>
                     <span>[[${ridingRecord.getTodayRecord()}]]km 탔어요! :)</span>
                 </div>
