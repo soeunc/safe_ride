@@ -1,7 +1,6 @@
 package com.example.safe_ride.safe.service;
 
 import com.example.safe_ride.safe.dto.PointDto;
-import com.example.safe_ride.safe.dto.rgeocoding.RGeoResponseDto;
 import com.example.safe_ride.safe.entity.AccidentInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +20,17 @@ public class SafetyService {
 
     // 사고다발지역 데이터 저장
     public void saveAccidentInfo(List<AccidentInfo> accidentInfoList) {
-        // DB한번 삭제하고 다시 저장하도록 수정
-//        String deleteSql = "DELETE FROM accident_info";
+        // 사용자 위치를 입력할 때마다 DB 새로 저장
+        String deleteSql = "DELETE FROM accident_info";
         String sql = "INSERT INTO accident_info (bjd_cd, spot_nm, occrrnc_cnt, caslt_cnt, dth_dnv_cnt, se_dnv_cnt, sl_dnv_cnt, geom_json, lo_crd, la_crd) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             // 기존 데이터 삭제를 위한 PreparedStatement
+             PreparedStatement deleteStmt = conn.prepareStatement(deleteSql);
 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            // 삭제 실행
+            deleteStmt.executeUpdate();
             for (AccidentInfo info : accidentInfoList) {
                 pstmt.setString(1, info.getBjDongCode());
                 pstmt.setString(2, info.getSpotNm());
@@ -47,7 +50,7 @@ public class SafetyService {
         }
     }
 
-    // 법정동 일치하는 데이터만 저장
+    // 법정동 코드 시/군/구 자리로 일치하는 데이터 필터링
     public void saveFilteredAccidentInfo(PointDto dto) {
         // API로부터 모든 사고 정보를 가져오기
         List<AccidentInfo> allAccidentInfo = apiService.fetchDataFromApi();
@@ -55,10 +58,13 @@ public class SafetyService {
 
         // PointDto로부터 법정동 코드를 가져옴
         String ncpBjDongCode = ncpService.getBjDongCode(dto).getBjDongCode();
+        // 법정동 코드의 앞 5자리만 추출(시/군/구)
+        String ncpCiGunGu = ncpBjDongCode.substring(0, 4);
 
         for (AccidentInfo accidentInfo : allAccidentInfo) {
-            if (accidentInfo.getBjDongCode().equals(ncpBjDongCode)) {
-                // 법정동 코드가 일치하는 사고 정보만 필터링
+            // 사고 정보의 법정동 코드 앞 5자리 추출(시/군/구)
+            String accidentCiGunGu = accidentInfo.getBjDongCode().substring(0, 4);
+            if (accidentCiGunGu.equals(ncpCiGunGu)) {
                 filteredAccidentInfo.add(accidentInfo);
             }
         }
@@ -66,29 +72,5 @@ public class SafetyService {
         // 필터링된 사고 정보를 저장
         saveAccidentInfo(filteredAccidentInfo);
     }
-
-    // 법정동 코드 일치 확인 메서드
-    // 법정동 코드 앞자리 4개만 일치하는 것으로 수정 예정
-    public boolean getBjDongCodeMatch(PointDto dto) {
-        try {
-            // NcpService를 통해 법정동 코드 가져오기
-            RGeoResponseDto rGeoResponseDto = ncpService.getBjDongCode(dto);
-            String ncpBjDongCode = rGeoResponseDto.getBjDongCode();
-
-            List<AccidentInfo> accidentInfoList = apiService.fetchDataFromApi();
-            for (AccidentInfo accidentInfo : accidentInfoList) {
-                String safetyServiceBjDongCode = accidentInfo.getBjDongCode();
-                if (safetyServiceBjDongCode.equals(ncpBjDongCode)) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    // 일치한 법정동 코드 좌표 반환 메서드
-
 
 }
