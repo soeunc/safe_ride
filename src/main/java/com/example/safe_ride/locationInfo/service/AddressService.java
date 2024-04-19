@@ -6,12 +6,29 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AddressService {
     private final LocationInfoRepo locationInfoRepo;
+
+    // 제출된 폼의 메인 도로명주소 추출 (ex. 충청남도 천안시 동남구 목천읍 독립기념관로)
+    public String getDoroJuso(String roadAddrPart1) {
+        /*
+         *  정규 표현식을 컴파일
+         * ^: 문자열의 시작
+         * (.*?):가능한 적은 문자를 비탐욕적(non-greedy)으로 매칭
+         * (\\d+)는 하나 이상의 숫자를 매칭
+         */
+        Pattern pattern = Pattern.compile("^(.*?)(\\d+)");
+        Matcher matcher = pattern.matcher(roadAddrPart1);
+        if (matcher.find()) System.out.println(matcher.group(1));
+        return matcher.group(1);
+    }
+
 
     // 전체 데이터 중에 시도 데이터 불러오기 (폼 제출용)
     public List<String> getSido() {
@@ -20,6 +37,7 @@ public class AddressService {
                 .distinct()
                 .collect(Collectors.toList());
     }
+
     // 시도 중에 시군구 데이터 불러오기 (폼 제출용)
     public List<String> getSigunguBySido(String sido) {
         return locationInfoRepo.findAllBySido(sido).stream()
@@ -27,6 +45,7 @@ public class AddressService {
                 .distinct()
                 .collect(Collectors.toList());
     }
+
     // 시군구 중에 읍면동 데이터 불러오기 (폼 제출용)
     public List<String> getEupmyundongBySigungu(String sigungu) {
         return locationInfoRepo.findAllBySigungu(sigungu).stream()
@@ -43,8 +62,6 @@ public class AddressService {
         }
         return null;  // 결과가 없으면 null 반환
     }
-
-    // 제출된 폼의 지역 코드 추출 (API 인자로 써야함)
 
 
     // 제출된 시도, 시군구, 읍면동 데이터로 해당하는 지역의 데이터 표현하기

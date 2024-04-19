@@ -50,47 +50,44 @@ public class LocationInfoController {
     }
 
 
-    // 폼 제출 후 메인 페이지
+    // 폼 제출 후 메인 페이지 (도로명)
     @PostMapping("/public-bicycle")
-    @ResponseBody
-    public Map<String, List<String>> searchFormData(
-            @RequestParam
-            String sido,
-            @RequestParam
-            String sigungu,
-            @RequestParam
-            String eupmyundong
-    ) throws IOException {
-        String lcgvmnInstCd = addressService.getAddressCode(sido);
-        List<String> results1 = locationInfoService.fetchData(sido, sigungu, eupmyundong, "inf_101_00010001", lcgvmnInstCd, null, null, "1");
-        List<String> results2 = locationInfoService.fetchData(sido, sigungu, eupmyundong,"inf_101_00010002", lcgvmnInstCd, null, null, "2");
+    public String testFormData(
+            @RequestParam String roadFullAddr,
+            @RequestParam String roadAddrPart1,
+            Model model
+    ) {
+        String doroJuso = addressService.getDoroJuso(roadAddrPart1);
 
-        Map<String, List<String>> results = new HashMap<>();
-        results.put("results1", results1);
-        results.put("results2", results2);
+        model.addAttribute("roadFullAddr", roadFullAddr);
+        model.addAttribute("roadAddrPart1", roadAddrPart1);
+        model.addAttribute("doroJuso", doroJuso);
 
-        return results;
+        return "/locationInfo/LocationInfo";
     }
 
     // 주소 API 호출
     @RequestMapping(value = {"/public-bicycle/jusoPopup"})
-    public String jusoPopup(HttpServletRequest request, Model model) {
+    public String jusoPopup(
+            HttpServletRequest request,
+            Model model
+    ) {
         String inputYn = request.getParameter("inputYn");
         String roadFullAddr = request.getParameter("roadFullAddr");
         String roadAddrPart1 = request.getParameter("roadAddrPart1");
-        String roadAddrPart2 = request.getParameter("roadAddrPart2");
 
 
-        log.debug("▶▶▶▶▶▶▶▶▶▶▶▶▶▶▶▶ inputYn: {}"
+        log.debug("inputYn: {}"
                         + ", roadFullAddr: {}"
                         + ", roadAddrPart1: {}"
-                        + ", roadAddrPart2: {}"
-                        , inputYn, roadFullAddr, roadAddrPart1, roadAddrPart2);
+                , inputYn, roadFullAddr, roadAddrPart1);
 
         String confmKey = "devU01TX0FVVEgyMDI0MDQxODE3MDEwNzExNDcwMTQ=";
 
         model.addAttribute("confmKey", confmKey);
         model.addAttribute("inputYn", inputYn);
+        model.addAttribute("roadFullAddr", roadFullAddr);
+        model.addAttribute("roadAddrPart1", roadAddrPart1);
 
         return "/locationInfo/jusoPopup";
     }
