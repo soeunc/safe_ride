@@ -48,20 +48,23 @@ public class SafetyService {
     }
 
     // 법정동 일치하는 데이터만 저장
-    // 문제 - 데이터를 이미 불러온 상태 / 데이터 불러오기 전에 필터링을 해서 가져오고 싶음
     public void saveFilteredAccidentInfo(PointDto dto) {
-        List<AccidentInfo> allAccidentInfo = apiService.fetchDataFromApi(); // API로부터 모든 사고 정보를 가져옴
+        // API로부터 모든 사고 정보를 가져오기
+        List<AccidentInfo> allAccidentInfo = apiService.fetchDataFromApi();
         List<AccidentInfo> filteredAccidentInfo = new ArrayList<>();
 
-        String ncpBjDongCode = ncpService.getBjDongCode(dto).getBjDongCode(); // PointDto로부터 법정동 코드를 가져옴
+        // PointDto로부터 법정동 코드를 가져옴
+        String ncpBjDongCode = ncpService.getBjDongCode(dto).getBjDongCode();
 
         for (AccidentInfo accidentInfo : allAccidentInfo) {
             if (accidentInfo.getBjDongCode().equals(ncpBjDongCode)) {
-                filteredAccidentInfo.add(accidentInfo); // 법정동 코드가 일치하는 사고 정보만 필터링
+                // 법정동 코드가 일치하는 사고 정보만 필터링
+                filteredAccidentInfo.add(accidentInfo);
             }
         }
 
-        saveAccidentInfo(filteredAccidentInfo); // 필터링된 사고 정보를 저장
+        // 필터링된 사고 정보를 저장
+        saveAccidentInfo(filteredAccidentInfo);
     }
 
     // 법정동 코드 일치 확인 메서드
