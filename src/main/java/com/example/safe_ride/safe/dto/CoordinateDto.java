@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class CoordinateDto {
-    private String lnt;  // 경도
-    private String lat;  // 위도
+    private String accidentLnt;  // 경도
+    private String accidentLat;  // 위도
 }

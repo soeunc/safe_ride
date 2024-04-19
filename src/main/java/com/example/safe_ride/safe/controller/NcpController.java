@@ -1,5 +1,6 @@
 package com.example.safe_ride.safe.controller;
 
+import com.example.safe_ride.safe.dto.CoordinateDto;
 import com.example.safe_ride.safe.dto.NcpInfoDto;
 import com.example.safe_ride.safe.dto.NaviWithQueryDto;
 import com.example.safe_ride.safe.dto.PointDto;
@@ -39,8 +40,7 @@ public class NcpController {
     // TODO 폼에서 주소를 입력하는 곳이 사용자가 편리하지 않은 방식이다. 다른 방법으로 한번 생각해볼 필요 있음.
     @PostMapping("/check")
     public ResponseEntity<?> locateAddress(
-            @RequestBody NaviWithQueryDto dto,
-            Model model
+            @RequestBody NaviWithQueryDto dto
     ) {
         // 1. 사용자 위치 데이터 받기
         PointDto pointDto = service.locateAddress(dto);
@@ -61,21 +61,16 @@ public class NcpController {
         safetyService.saveFilteredAccidentInfo(pointDto);
 
         // 3-3. DB에 저장된 좌표 가져오기
-        safetyService.getCoordinates();
-        log.info("좌표값 :{}",safetyService.getCoordinates());
-//        model.addAttribute("accidents", accidentData.get(0).getBjDongCode());
-//        model.addAttribute("lnt", accidentData.get(0).getLoCrd());
-//        model.addAttribute("lat", accidentData.get(0).getLaCrd());
+        List<CoordinateDto> coordinates = safetyService.getCoordinates();
+        log.info("사고위치 좌표값 :{}", coordinates);
 
-
-        // 사용자 위치 좌표 및 법정동 코드
+        // 사용자 위치 좌표 및 법정동 코드, 사고 좌표
         NcpInfoDto ncpInfoDto = new NcpInfoDto();
-        ncpInfoDto.setLat(pointDto.getLat());
         ncpInfoDto.setLng(pointDto.getLng());
+        ncpInfoDto.setLat(pointDto.getLat());
         ncpInfoDto.setBjDongCode(rGeoResponseDto.getBjDongCode());
+        ncpInfoDto.setAccidentCoordinates(coordinates);
 
-        // 사용자의 좌표와 데이터의 좌표를 전달해야함
-        // 지금은 사용자의 좌표만 전달 중
         return ResponseEntity.ok(ncpInfoDto);
     }
 

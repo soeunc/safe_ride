@@ -34,25 +34,6 @@
     let polyline = null;
     let markers = [];
 
-    naver.maps.Event.addListener(map, 'click', function(e) {
-        if (polyline !== null) polyline.setMap(null);
-        markers.forEach(marker => marker.setMap(null));
-        markers = [];
-    });
-
-    const drawRoute = (resultPath) => {
-        if (polyline !== null) polyline.setMap(null)
-        const path = []
-        resultPath.forEach(point => {
-            path.push(new naver.maps.LatLng(point.lat, point.lng))
-        })
-
-        polyline = new naver.maps.Polyline({
-            map: map,
-            path: path
-        })
-    }
-
     const queryInput = document.getElementById('search-input');
     document.getElementById('find-route-to-address-btn').addEventListener('click', () => {
         const query = queryInput.value;
@@ -60,8 +41,6 @@
             alert('검색어를 입력하세요');
             return;
         }
-        const lat = map.getCenter().lat();
-        const lng = map.getCenter().lng();
         // 사용자가 입력한 주소에 대한 좌표를 받아오기 위한 fetch 요청
         fetch('/safety-direction/check', {
             method: 'post',
@@ -74,36 +53,30 @@
         }).then(async response => {
             console.log(response)
             if (response.ok) {
-                // 사용자 위치를 받아왔으면 지도를 옮겨지고, 사고다발구역 마커가 표시될 수 있도록 하기 fetch를 한번더 해서 받아올 수있나?
-                const data = await response.json(); // 응답에서 데이터 추출
-                const {lat, lng, bjDongCode} = data; // 법정동 코드 추가
-                // const {lat, lng} = await response.json(); // 응답에서 위도와 경도 추출
+                const data = await response.json();
+                const {lat, lng, accidentCoordinates} = data;
                 // 지도의 중심을 사용자가 입력한 주소의 좌표로 이동
                 map.setCenter({lat, lng});
                 alert(`${query} 위치로 이동되었습니다.`);
-                // 콘솔에 법정동 코드 출력(확인 완)
-                console.log(`법정동 코드: ${bjDongCode}`);
+                // 기존 마커 삭제
+                markers.forEach(marker => marker.setMap(null));
+                markers = [];
+
+                // 사고 위치에 마커 생성
+                accidentCoordinates.forEach(function(coordinate) {
+                    const marker = new naver.maps.Marker({
+                        position: new naver.maps.LatLng(coordinate.accidentLat, coordinate.accidentLnt),
+                        map: map
+                    });
+                    console.log("마커확인: {}", marker)
+                    markers.push(marker); // 생성된 마커를 배열에 추가
+                });
             } else {
                 // 응답이 성공적이지 않은 경우, 오류 메시지 출력
                 alert('주소를 찾을 수 없습니다.');
             }
         });
     });
-
-    // 받아온 데이터의 위도, 경도를 지도에 표시
-    // const accidentData = [[${accidents}]];
-    // const lntData = [[${lnt}]];
-    // const latData = [[${lat}]];
-    //
-    // accidentData.forEach(function(accident) {
-    //     // 데이터 형식에 따라 경도, 위도 정보를 추출해야 합니다.
-    //     // 여기서는 accident 변수가 경도와 위도 정보를 포함하고 있다고 가정합니다.
-    //     var marker = new naver.maps.Marker({
-    //         position: new naver.maps.LatLng(accident.latitude, accident.longitude),
-    //         map: map
-    //     });
-    // });
-
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
