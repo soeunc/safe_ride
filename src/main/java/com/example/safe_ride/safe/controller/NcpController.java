@@ -57,13 +57,12 @@ public class NcpController {
         }
 
         // 3. 데이터 정보 불러오기
-        // 3-1. 사고다발 지역 데이터 가져오기
-        List<AccidentInfo> accidentData = apiService.fetchDataFromApi();
-        // 3-2. 필더링된 데이터 가져오기
+        // 3-1. 필더링된 사고정보 가져오기
         safetyService.saveFilteredAccidentInfo(pointDto);
 
         // 3-3. DB에 저장된 좌표 가져오기
-
+        safetyService.getCoordinates();
+        log.info("좌표값 :{}",safetyService.getCoordinates());
 //        model.addAttribute("accidents", accidentData.get(0).getBjDongCode());
 //        model.addAttribute("lnt", accidentData.get(0).getLoCrd());
 //        model.addAttribute("lat", accidentData.get(0).getLaCrd());

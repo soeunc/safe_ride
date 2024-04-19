@@ -1,6 +1,7 @@
 package com.example.safe_ride.safe.service;
 
 import com.example.safe_ride.safe.dto.PointDto;
+import com.example.safe_ride.safe.dto.CoordinateDto;
 import com.example.safe_ride.safe.entity.AccidentInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,13 +51,13 @@ public class SafetyService {
         }
     }
 
-    // 법정동 코드 시/군/구 자리로 일치하는 데이터 필터링
+    // 법정동 코드 시/군/구 자리 일치하는 데이터 필터링
     public void saveFilteredAccidentInfo(PointDto dto) {
         // API로부터 모든 사고 정보를 가져오기
         List<AccidentInfo> allAccidentInfo = apiService.fetchDataFromApi();
         List<AccidentInfo> filteredAccidentInfo = new ArrayList<>();
 
-        // PointDto로부터 법정동 코드를 가져옴
+        // PointDto로부터 법정동 코드를 가져오기
         String ncpBjDongCode = ncpService.getBjDongCode(dto).getBjDongCode();
         // 법정동 코드의 앞 5자리만 추출(시/군/구)
         String ncpCiGunGu = ncpBjDongCode.substring(0, 4);
@@ -73,4 +74,24 @@ public class SafetyService {
         saveAccidentInfo(filteredAccidentInfo);
     }
 
+    // db에 저장된 좌표 가져오기
+    public List<CoordinateDto> getCoordinates() {
+        List<CoordinateDto> coordinates = new ArrayList<>();
+        String sql = "SELECT lo_crd, la_crd FROM accident_info";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String lnt = rs.getString("lo_crd");
+                    String lat = rs.getString("la_crd");
+                    coordinates.add(new CoordinateDto(lnt, lat));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return coordinates;
+    }
 }
