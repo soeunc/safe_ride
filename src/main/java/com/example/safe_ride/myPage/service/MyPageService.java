@@ -32,21 +32,21 @@ public class MyPageService {
     //라이딩 정보 가져오기
     @Transactional
     public MyPageDto readRidingRecord(Long memberId){
+        MyPage myPage;
+        MyPageDto myPageDto = new MyPageDto();
+        //memberId로 조회 시 데이터가 하나라도 있는가
+        boolean isExist = myPageRepo.existsByMemberId(memberId);
+        if (!isExist) return myPageDto;
+
+        //오늘자 데이터가 있는지 확인
         Optional<MyPage> optionalMyPage =
                 myPageRepo.findByMemberIdAndCreateDateAfter(
                     memberId, LocalDate.now().atStartOfDay()
                 );
-        MyPageDto myPageDto = new MyPageDto();
-
-        MyPage myPage;
-        //마이페이지 값이 존재한다면
-        if (optionalMyPage.isPresent()){
+        if (optionalMyPage.isPresent()) {
             myPage = optionalMyPage.get();
-
-        } else {
-            return myPageDto;
+            myPageDto = MyPageDto.fromEntity(myPage);
         }
-        myPageDto = MyPageDto.fromEntity(myPage);
         //전체기록합산
         myPageDto.setTotalRecord(findTotalRecord(memberId));
         //주간기록합산
@@ -55,6 +55,7 @@ public class MyPageService {
         myPageDto.setThisWeek(getThisWeekDayList());
         //주간 개별 기록
         myPageDto.setWeeklyRecordList(findWeeklyRecordList(memberId));
+
         return myPageDto;
     }
 

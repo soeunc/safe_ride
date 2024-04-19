@@ -14,4 +14,6 @@ public interface MyPageRepo extends JpaRepository<MyPage, Long> {
     Optional<MyPage> findByMemberId(Long memberId);
     //오늘자(00시00분) 이후 데이터 가져오기
     Optional<MyPage> findByMemberIdAndCreateDateAfter(Long memberId, LocalDateTime today);
+    Boolean existsByMemberId(Long memberId);
+
 }
