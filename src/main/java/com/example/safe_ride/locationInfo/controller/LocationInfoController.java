@@ -1,7 +1,5 @@
 package com.example.safe_ride.locationInfo.controller;
 
-import com.example.safe_ride.locationInfo.repo.LocationInfoRepo;
-import com.example.safe_ride.locationInfo.service.AddressService;
 import com.example.safe_ride.locationInfo.service.LocationInfoService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Slf4j
@@ -21,7 +17,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LocationInfoController {
     private final LocationInfoService locationInfoService;
-    private final AddressService addressService;
 
     // API 호출 테스트 페이지
     @GetMapping("/public-bicycle-test")
@@ -30,7 +25,6 @@ public class LocationInfoController {
             String lcgvmnInstCd = "1100000000";
             List<String> results1 = locationInfoService.fetchDataTest("inf_101_00010001", lcgvmnInstCd, null, null, "1");
             List<String> results2 = locationInfoService.fetchDataTest("inf_101_00010002", lcgvmnInstCd, null, null, "2");
-//            List<String> results3 = locationInfoService.fetchData("inf_101_00010003", lcgvmnInstCd, "20230303", "20230304", "3");
 
             model.addAttribute("results1", results1);
             model.addAttribute("results2", results2);
@@ -43,25 +37,37 @@ public class LocationInfoController {
 
     // 메인 페이지
     @GetMapping("/public-bicycle")
-    public String showForm(Model model) {
-        List<String> sidoList = addressService.getSido();
-        model.addAttribute("sidoList", sidoList);
+    public String showForm() {
         return "/locationInfo/LocationInfo";
     }
 
 
     // 폼 제출 후 메인 페이지 (도로명)
     @PostMapping("/public-bicycle")
-    public String testFormData(
-            @RequestParam String roadFullAddr,
-            @RequestParam String roadAddrPart1,
+    public String formData(
+            @RequestParam
+            String roadFullAddr,
+            @RequestParam
+            String roadAddrPart1,
             Model model
-    ) {
-        String doroJuso = addressService.getDoroJuso(roadAddrPart1);
+    ) throws IOException {
+        //test
+        String sido = locationInfoService.getSido(roadAddrPart1);
 
+        //real
+        String lcgvmnInstCd = locationInfoService.getAddressCode(roadAddrPart1);
+        String doroJuso = locationInfoService.getDoroJuso(roadAddrPart1);
+        List<String> results1 = locationInfoService.fetchData(doroJuso, "inf_101_00010001","inf_101_00010002", lcgvmnInstCd, null, null);
+
+        //test
+        model.addAttribute("sido", sido);
         model.addAttribute("roadFullAddr", roadFullAddr);
         model.addAttribute("roadAddrPart1", roadAddrPart1);
+
+        //real
+        model.addAttribute("lcgvmnInstCd", lcgvmnInstCd);
         model.addAttribute("doroJuso", doroJuso);
+        model.addAttribute("results1", results1);
 
         return "/locationInfo/LocationInfo";
     }

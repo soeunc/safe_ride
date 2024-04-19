@@ -32,19 +32,18 @@
 <div>
   <p>전체 주소: <span th:text="${roadFullAddr}"></span></p>
   <p>도로명 주소: <span th:text="${roadAddrPart1}"></span></p>
-  <p>도로명 주소: <span th:text="${doroJuso}"></span></p>
+  <p>도로명 주소 상세주소 제외: <span th:text="${doroJuso}"></span></p>
+  <p>시도: <span th:text="${sido}"></span></p>
+  <p>지자체코드: <span th:text="${lcgvmnInstCd}"></span></p>
 </div>
 
-<div id="resultDiv">
-  <h1>자전거 대여소 정보</h1>
-  <div>
-    <ul id="results1"></ul>
-  </div>
-
-  <h1>대여 가능 자전거 정보</h1>
-  <div>
-    <ul id="results2"></ul>
-  </div>
+<!-- 대여소 정보 출력 -->
+<h1>자전거 대여소 정보</h1>
+<div th:if="${results1}">
+  <ul>
+    <li th:each="result : ${results1}" th:text="${result}"></li>
+  </ul>
 </div>
+
 </body>
 </html>
