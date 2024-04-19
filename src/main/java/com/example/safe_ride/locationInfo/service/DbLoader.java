@@ -10,7 +10,7 @@ import java.sql.Statement;
 import java.util.List;
 
 @Service
-public class DatabaseLoader {
+public class DbLoader {
 
     private static final String URL = "jdbc:sqlite:db.sqlite";
 
