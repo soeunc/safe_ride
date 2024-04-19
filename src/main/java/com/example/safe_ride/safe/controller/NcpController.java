@@ -4,12 +4,17 @@ import com.example.safe_ride.safe.dto.NcpInfoDto;
 import com.example.safe_ride.safe.dto.NaviWithQueryDto;
 import com.example.safe_ride.safe.dto.PointDto;
 import com.example.safe_ride.safe.dto.rgeocoding.RGeoResponseDto;
+import com.example.safe_ride.safe.entity.AccidentInfo;
+import com.example.safe_ride.safe.service.ApiService;
 import com.example.safe_ride.safe.service.NcpService;
+import com.example.safe_ride.safe.service.SafetyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Slf4j
@@ -18,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class NcpController {
     private final NcpService service;
+    private final SafetyService safetyService;
+    private final ApiService apiService;
 
     // 사용자의 현재 위치를 입력받아 좌표 반환
     @PostMapping("/check-test")
@@ -48,17 +55,17 @@ public class NcpController {
         }
 
 
-        /*// 1. 데이터 저장 전 법정동 코드 일치 확인
+        // 데이터 확인 안됨
+        // 1. 데이터 저장 전 법정동 코드 일치 확인
         safetyService.saveFilteredAccidentInfo(pointDto);
         // 2. 일치한 사고다발 지역 데이터 가져오기
-        List<AccidentInfo> accidentData = safetyService.fetchDataFromApi();
-        log.info("사고다발 지역 데이터: {}", accidentData.get(0));
+        List<AccidentInfo> accidentData = apiService.fetchDataFromApi();
 
         // 모델에 데이터 추가
         // test로 리스트 1번째의 법정동 코드 보여주기
         model.addAttribute("accidents", accidentData.get(0).getBjDongCode());
         model.addAttribute("lnt", accidentData.get(0).getLoCrd());
-        model.addAttribute("lat", accidentData.get(0).getLaCrd());*/
+        model.addAttribute("lat", accidentData.get(0).getLaCrd());
 
 
         // 사용자 위치 좌표 및 법정동 코드
