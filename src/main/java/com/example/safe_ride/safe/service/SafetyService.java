@@ -83,9 +83,9 @@ public class SafetyService {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    String lnt = rs.getString("lo_crd");
+                    String lng = rs.getString("lo_crd");
                     String lat = rs.getString("la_crd");
-                    coordinates.add(new CoordinateDto(lnt, lat));
+                    coordinates.add(new CoordinateDto(lng, lat));
                 }
             }
         } catch (SQLException e) {

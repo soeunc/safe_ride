@@ -31,8 +31,9 @@
     };
 
     let map = new naver.maps.Map('map', mapOptions);
-    let polyline = null;
     let markers = [];
+
+    // 마커를 사용할 수 있도록 수정
 
     const queryInput = document.getElementById('search-input');
     document.getElementById('find-route-to-address-btn').addEventListener('click', () => {
@@ -65,14 +66,13 @@
                 // 사고 위치에 마커 생성
                 accidentCoordinates.forEach(function(coordinate) {
                     const marker = new naver.maps.Marker({
-                        position: new naver.maps.LatLng(coordinate.accidentLat, coordinate.accidentLnt),
+                        position: new naver.maps.LatLng(coordinate.accidentLat, coordinate.accidentLng),
                         map: map
                     });
-                    console.log("마커확인: {}", marker)
+                    console.log(`마커 위치: 위도 ${marker.position.lat()}, 경도 ${marker.position.lng()}`);
                     markers.push(marker); // 생성된 마커를 배열에 추가
                 });
             } else {
-                // 응답이 성공적이지 않은 경우, 오류 메시지 출력
                 alert('주소를 찾을 수 없습니다.');
             }
         });
