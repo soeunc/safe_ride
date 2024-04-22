@@ -57,9 +57,12 @@
   window.onload = function () {
     //alert
     const alertMsg = [[${msg}]];
-
+    const isFail = location.search;
     if (alertMsg){
       alert(alertMsg);
+    }
+    if (isFail === '?fail'){
+      alert("로그인에 실패하였습니다. ㅠㅅㅠ");
     }
   }
 </script>
