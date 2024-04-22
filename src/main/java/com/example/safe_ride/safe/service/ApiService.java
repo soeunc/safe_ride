@@ -69,7 +69,6 @@ public class ApiService {
         StringBuilder urlBuilder = new StringBuilder(BASE_URL);
 
         urlBuilder.append("?ServiceKey=").append(SERVICE_KEY);
-        // TODO 데이터 업데이터가 1년주기로 1년의 사고만 업데이터 되는것 같다. 그럼 지금까지의 전체 데이터를 불러와야 될꺼 같다.
         urlBuilder.append("&searchYearCd=").append(URLEncoder.encode("2022", StandardCharsets.UTF_8));
         urlBuilder.append("&siDo=");  // 공백시 전체 추출
         urlBuilder.append("&guGun="); // 공백시 전체 추출

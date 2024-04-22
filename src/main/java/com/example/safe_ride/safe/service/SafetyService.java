@@ -77,15 +77,19 @@ public class SafetyService {
     // db에 저장된 좌표 가져오기
     public List<CoordinateDto> getCoordinates() {
         List<CoordinateDto> coordinates = new ArrayList<>();
-        String sql = "SELECT lo_crd, la_crd FROM accident_info";
+        String sql = "SELECT lo_crd, la_crd, occrrnc_cnt, dth_dnv_cnt, spot_nm FROM accident_info";
 
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
+                    String spotNm = rs.getString("spot_nm");
                     String lng = rs.getString("lo_crd");
                     String lat = rs.getString("la_crd");
-                    coordinates.add(new CoordinateDto(lng, lat));
+                    String occrrncCnt = rs.getString("occrrnc_cnt");
+                    String dthDnvCnt = rs.getString("dth_dnv_cnt");
+
+                    coordinates.add(new CoordinateDto(spotNm, lng, lat, occrrncCnt, dthDnvCnt));
                 }
             }
         } catch (SQLException e) {
