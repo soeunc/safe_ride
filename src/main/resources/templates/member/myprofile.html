@@ -109,28 +109,28 @@
                             <form action="/safe-ride/myprofile/update" method="post">
                                 <div>
                                     <label for="password">비밀번호</label>
-                                    <input id="password" name="password" type="password" placeholder="비밀번호 재설정">
+                                    <input id="password" name="password" type="password" maxlength="30" placeholder="비밀번호 재설정">
                                 </div>
                                 <div>
                                     <label for="passwordCk">비밀번호</label>
-                                    <input id="passwordCk" name="passwordCk" type="password" placeholder="비밀번호 재설정 확인">
+                                    <input id="passwordCk" name="passwordCk" type="password" maxlength="30" placeholder="비밀번호 재설정 확인">
                                 </div>
                                 <div>
                                     <label for="email">이메일</label>
-                                    <input id="email" name="email" type="text" th:value="${member.email}">
+                                    <input id="email" name="email" type="text" maxlength="30" th:value="${member.email}">
                                 </div>
                                 <div>
                                     <label for="nickName">닉네임</label>
-                                    <input id="nickName" name="nickName" type="text" th:value="${member.nickname}">
+                                    <input id="nickName" name="nickName" type="text" maxlength="30" th:value="${member.nickname}">
                                 </div>
                                 <div>
                                     <label for="phoneNumber">전화번호</label>
-                                    <input id="phoneNumber" name="phoneNumber" type="number"
+                                    <input id="phoneNumber" name="phoneNumber" type="text" oninput="onInputPhone(this)" maxlength="13"
                                            th:value="${member.getPhoneNumber()}">
                                 </div>
                                 <div>
                                     <label for="birthday">생년월일</label>
-                                    <input id="birthday" name="birthday" type="number"
+                                    <input id="birthday" name="birthday" type="text" oninput="onInputBirth(this)" maxlength="8"
                                            th:value="${member.getBirthday()}">
                                 </div>
                                 <div>
@@ -202,6 +202,19 @@
             }
         }
     });
+
+    //전화번호정규식
+    function onInputPhone(target) {
+        target.value = target.value
+            .replace(/[^0-9]/g, '')
+            .replace(/(^02.{0}|^01.{1}|[0-9]{3,4})([0-9]{3,4})([0-9]{4})/g, "$1-$2-$3");
+    }
+    //생년월일정규식
+    function onInputBirth(target) {
+        target.value = target.value
+            .replace(/[^0-9]/g, '')
+            .replace(/^(19[0-9][0-9]|20\d{2})(0[0-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$/);
+    }
 </script>
 <!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
 </body>
