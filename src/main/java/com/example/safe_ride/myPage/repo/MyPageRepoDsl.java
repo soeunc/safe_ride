@@ -30,7 +30,9 @@ public class MyPageRepoDsl {
                         qMyPage.createDate.between(start, end)
                     )
                     .fetchOne();
-         
+        //주간 라이딩 기록이 없을 시 0으로 보여준다.
+        if (weeklyRecord == null)
+            weeklyRecord = 0;
         return weeklyRecord;
     }
     //전체 라이딩 기록
