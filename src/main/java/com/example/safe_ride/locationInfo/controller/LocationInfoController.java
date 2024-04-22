@@ -1,5 +1,8 @@
 package com.example.safe_ride.locationInfo.controller;
 
+import com.example.safe_ride.locationInfo.dto.BicycleInfo;
+import com.example.safe_ride.locationInfo.dto.StationAndBicycleInfo;
+import com.example.safe_ride.locationInfo.dto.StationInfo;
 import com.example.safe_ride.locationInfo.service.LocationInfoService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +12,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -18,29 +25,12 @@ import java.util.List;
 public class LocationInfoController {
     private final LocationInfoService locationInfoService;
 
-    // API 호출 테스트 페이지
-    @GetMapping("/public-bicycle-test")
-    public String getFirst(Model model) {
-        try {
-            String lcgvmnInstCd = "1100000000";
-            List<String> results1 = locationInfoService.fetchDataTest("inf_101_00010001", lcgvmnInstCd, null, null, "1");
-            List<String> results2 = locationInfoService.fetchDataTest("inf_101_00010002", lcgvmnInstCd, null, null, "2");
-
-            model.addAttribute("results1", results1);
-            model.addAttribute("results2", results2);
-
-            return "/locationInfo/LocationInfoTest";
-        } catch (IOException e) {
-            return "error";
-        }
-    }
-
     // 메인 페이지
     @GetMapping("/public-bicycle")
-    public String showForm() {
+    public String showForm(Model model) {
+        model.addAttribute("combinedInfo", new ArrayList<>());
         return "/locationInfo/LocationInfo";
     }
-
 
     // 폼 제출 후 메인 페이지 (도로명)
     @PostMapping("/public-bicycle")
@@ -51,23 +41,20 @@ public class LocationInfoController {
             String roadAddrPart1,
             Model model
     ) throws IOException {
-        //test
-        String sido = locationInfoService.getSido(roadAddrPart1);
 
-        //real
         String lcgvmnInstCd = locationInfoService.getAddressCode(roadAddrPart1);
         String doroJuso = locationInfoService.getDoroJuso(roadAddrPart1);
-        List<String> results1 = locationInfoService.fetchData(doroJuso, "inf_101_00010001","inf_101_00010002", lcgvmnInstCd, null, null);
+        List<StationInfo> stationInfos = locationInfoService.fetchStationData(doroJuso, "inf_101_00010001",lcgvmnInstCd, null, null);
+        List<BicycleInfo> bicycleInfos = locationInfoService.fetchStationAndBicycleData("inf_101_00010002",lcgvmnInstCd, null, null);
 
-        //test
-        model.addAttribute("sido", sido);
-        model.addAttribute("roadFullAddr", roadFullAddr);
-        model.addAttribute("roadAddrPart1", roadAddrPart1);
+        List<StationAndBicycleInfo> combinedInfo = new ArrayList<>();
+        for (StationInfo station : stationInfos) {
+            BicycleInfo bicycle = locationInfoService.findBicycleInfoByStationId(station.getRntstnId(), bicycleInfos);
+            combinedInfo.add(new StationAndBicycleInfo(station, bicycle));
+        }
 
-        //real
-        model.addAttribute("lcgvmnInstCd", lcgvmnInstCd);
         model.addAttribute("doroJuso", doroJuso);
-        model.addAttribute("results1", results1);
+        model.addAttribute("combinedInfo", combinedInfo);
 
         return "/locationInfo/LocationInfo";
     }
@@ -97,5 +84,8 @@ public class LocationInfoController {
 
         return "/locationInfo/jusoPopup";
     }
+
+    // geolocation
+
 
 }
