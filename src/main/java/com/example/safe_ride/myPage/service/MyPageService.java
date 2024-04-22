@@ -8,6 +8,7 @@ import com.example.safe_ride.myPage.entity.MyPage;
 import com.example.safe_ride.myPage.repo.MyPageRepo;
 import com.example.safe_ride.myPage.repo.MyPageRepoDsl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.Optional;
 import static java.lang.String.format;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MyPageService {
     private final MyPageRepo myPageRepo;
@@ -112,8 +114,13 @@ public class MyPageService {
         LocalDateTime end = start.plusDays(6);
 
         //dsl로 sum해서 가져옴
-        weeklyRecord = myPageRepoDsl.getTotalWeeklyRecord(memberId, start, end);
-        
+        try {
+            weeklyRecord = myPageRepoDsl.getTotalWeeklyRecord(memberId, start, end);
+        } catch (NullPointerException npe){
+            log.info("주간 기록 합산 결과 error : {}", npe.getMessage());
+            weeklyRecord = 0;
+        }
+
         return weeklyRecord;
         
         
