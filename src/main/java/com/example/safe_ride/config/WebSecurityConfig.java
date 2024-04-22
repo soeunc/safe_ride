@@ -35,6 +35,8 @@ public class WebSecurityConfig {
                         auth -> auth
                                 // 모든 접근 허가
                                 .requestMatchers(
+                                        "/",
+                                        "/route",
                                         "/safe-ride",//메인페이지
                                         "/safe-ride/login",//로그인
                                         "/safe-ride/join",//회원가입
