@@ -30,7 +30,6 @@ public class MyPageRepoDsl {
                         qMyPage.createDate.between(start, end)
                     )
                     .fetchOne();
-         
         return weeklyRecord;
     }
     //전체 라이딩 기록

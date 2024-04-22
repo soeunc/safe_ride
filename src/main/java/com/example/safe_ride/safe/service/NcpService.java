@@ -24,8 +24,6 @@ public class NcpService {
         // 주소의 좌표 찾기
         Map<String, Object> params = new HashMap<>();
         params.put("query", dto.getQuery());
-        // 중심좌표(위도, 경도)를 기준으로 주소 검색
-//        params.put("coordinate", dto.getStart().toQueryValue());
         params.put("page", 1);
         params.put("count", 1);
         GeoNcpResponse response = mapApiService.geocode(params);
