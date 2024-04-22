@@ -1,9 +1,6 @@
 package com.example.safe_ride.safe.controller;
 
-import com.example.safe_ride.safe.dto.CoordinateDto;
-import com.example.safe_ride.safe.dto.NcpInfoDto;
-import com.example.safe_ride.safe.dto.NaviWithQueryDto;
-import com.example.safe_ride.safe.dto.PointDto;
+import com.example.safe_ride.safe.dto.*;
 import com.example.safe_ride.safe.service.NcpService;
 import com.example.safe_ride.safe.service.SafetyService;
 import lombok.RequiredArgsConstructor;
@@ -45,16 +42,20 @@ public class NcpController {
         // 2. 데이터 정보 불러오기
         // 2-1. 필더링된 사고정보 가져오기
         safetyService.saveFilteredAccidentInfo(pointDto);
+        safetyService.saveFilteredSchoolZoneAccInfo(pointDto);
 
         // 2-2. DB에 저장된 좌표 및 정보 가져오기
         List<CoordinateDto> coordinates = safetyService.getCoordinates();
+        List<SchoolZoneInfoDto> schoolZoneInfoList = safetyService.getSchoolZoneInfo();
         log.info("사고위치 정보 :{}", coordinates);
+        log.info("스쿨존 사고 정보: {}", schoolZoneInfoList);
 
         // 사용자 위치 좌표 및 사고 좌표
         NcpInfoDto ncpInfoDto = new NcpInfoDto();
         ncpInfoDto.setLng(pointDto.getLng());
         ncpInfoDto.setLat(pointDto.getLat());
         ncpInfoDto.setAccidentCoordinates(coordinates);
+        ncpInfoDto.setSchoolZoneInfos(schoolZoneInfoList);
 
         return ResponseEntity.ok(ncpInfoDto);
     }

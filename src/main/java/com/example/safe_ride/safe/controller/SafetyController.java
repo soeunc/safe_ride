@@ -1,7 +1,6 @@
 package com.example.safe_ride.safe.controller;
 
-import com.example.safe_ride.safe.entity.AccidentInfo;
-import com.example.safe_ride.safe.entity.SchoolZoneAccInfo;
+import com.example.safe_ride.safe.entity.SchoolZoneInfo;
 import com.example.safe_ride.safe.service.ApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -18,7 +17,7 @@ public class SafetyController {
     // 사고다발 지역 정보 추출 test
     @GetMapping("/safety-direction/location")
     public String location(Model model) {
-        List<SchoolZoneAccInfo> location = apiService.schZonADataFromApi();
+        List<SchoolZoneInfo> location = apiService.schZonADataFromApi();
         model.addAttribute("location", location);
         return "safety/location";
     }
