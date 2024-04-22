@@ -19,11 +19,15 @@
         <div id="map" style="width:100%;height:400px;"></div>
         <div class="mb-3">
           <br>
-          <label for="search-input" class="form-label">현재 위치를 지번, 도로명로 입력해주세요.(예. 잠실3동)</label>
-          <div class="mb-3 w-25">
-            <input id="search-input" class="form-control" type="text">
+          <div class="mb-3 w-50">
+            <label for="search-input"></label>
+            <input id="search-input" class="form-control" type="text" placeholder="현재 위치를 지번, 도로명로 입력해주세요.(예. 잠실3동)">
           </div>
           <button id="find-route-to-address-btn" class="btn btn-primary" type="button">현재 위치로</button>
+        </div>
+        <div>
+          <h1>스쿨존 어린이 사고 다발 지역</h1>
+          <!-- ❗️현재 위치의 근방 스쿨존으로 결과 보여주기 -->
         </div>
       </div>
     </main>
@@ -45,8 +49,7 @@
 
     let map = new naver.maps.Map('map', mapOptions);
     let markers = [];
-
-    // 마커를 사용할 수 있도록 수정
+    let infoWindows = [];
 
     const queryInput = document.getElementById('search-input');
     document.getElementById('find-route-to-address-btn').addEventListener('click', () => {
@@ -71,10 +74,12 @@
                 const {lat, lng, accidentCoordinates} = data;
                 // 지도의 중심을 사용자가 입력한 주소의 좌표로 이동
                 map.setCenter({lat, lng});
-                alert(`${query} 위치로 이동되었습니다.`);
+
                 // 기존 마커 삭제
                 markers.forEach(marker => marker.setMap(null));
                 markers = [];
+                infoWindows.forEach(infoWindow => infoWindow.close());
+                infoWindows = [];
 
                 // 사고 위치에 마커 생성
                 accidentCoordinates.forEach(function (coordinate) {
@@ -82,8 +87,32 @@
                         position: new naver.maps.LatLng(coordinate.accidentLat, coordinate.accidentLng),
                         map: map
                     });
+                    // 마커에 대한 정보 창 생성
+                    const contentString = [
+                        '<div class="iw_inner" style="position: absolute; border-style: solid; border-width: 1.2rem 1rem 0 1rem; border-color: #ffffff transparent; ">',
+                        `<p><strong>${coordinate.spotNm}</strong><br>`,
+                        `발생 건수: ${coordinate.occrrncCnt}건<br>`,
+                        `사망자 수: ${coordinate.dthDnvCnt}건</p>`,
+                        '</div>'
+                    ].join('');
+
+                    // 마커에 대한 정보 창 생성
+                    const infoWindow = new naver.maps.InfoWindow({
+                        content: contentString
+                    });
+
+                    // 마커에 마우스를 가져갔을 때 이벤트 리스너
+                    naver.maps.Event.addListener(marker, 'mouseover', function (e) {
+                        infoWindow.open(map, marker); // 정보 창 열기
+                    });
+
+                    // 마커에서 마우스를 떼었을 때 이벤트 리스너
+                    naver.maps.Event.addListener(marker, 'mouseout', function (e) {
+                        infoWindow.close(); // 정보 창 닫기
+                    });
                     console.log(`마커 위치: 위도 ${marker.position.lat()}, 경도 ${marker.position.lng()}`);
                     markers.push(marker); // 생성된 마커를 배열에 추가
+                    infoWindows.push(infoWindow); // 생성된 정보 창을 배열에 추가
                 });
             } else {
                 alert('주소를 찾을 수 없습니다.');
