@@ -4,202 +4,44 @@
         xmlns:sec="http://www.w3.org/1999/xhtml"
         xmlns:th="http://www.thymeleaf.org"
 >
+
 <head>
-    <meta charset="UTF-8">
-    <title>메인화면</title>
-    <!-- teamplate : viewport -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!--  template : CSS파일 적용-->
-    <link href="/css/app.css" rel="stylesheet">
-    <!--  template : 폰트-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum:wght@300;400;600&display=swap" rel="stylesheet">
-    <!--  template : 부트스트랩, JS CDN-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-            crossorigin="anonymous"></script>
+    <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+    <!--👇여기에 기타 header 넣어주시면 됩니다👇-->
+
+    <!--👆 여기에 기타 header 넣어주시면 됩니다 👆-->
 </head>
+
 <body>
 <div class="wrapper">
-    <!-- 사이드 네비게이션바 (사이드바) -->
-    <nav id="sidebar" class="sidebar js-sidebar">
-        <div class="sidebar-content js-simplebar">
-            <a class="sidebar-brand" href="/safe-ride">
-                <span class="align-middle">SAFE RIDE</span>
-            </a>
+    <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
 
-
-            <ul class="sidebar-header">
-                <li class="sidebar-header">
-                    Weather
-                </li>
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="/weather">
-                        <i class="align-middle" data-feather="sun"></i> <span class="align-middle"> 실시간 날씨</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-header">
-                    Information
-                </li>
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="/public-bicycle">
-                        <i class="align-middle" data-feather="map-pin"></i> <span class="align-middle">공영자전거 현황</span>
-                    </a>
-
-                </li>
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="/safety-direction">
-                        <i class="align-middle" data-feather="map"></i> <span class="align-middle">안전한 자전거 길 안내</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-header">
-                    Community
-                </li>
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="/article">
-                        <i class="align-middle" data-feather="message-square"></i> <span class="align-middle">커뮤니티</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="/matching/list">
-                        <i class="align-middle" data-feather="users"></i> <span class="align-middle">라이더 매칭</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-nav">
-                <li class="sidebar-header">
-                    My Page
-                </li>
-
-                <!-- TODO : 추후 삭제 -->
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="/safe-ride/login">
-                        <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">로그인</span>
-                    </a>
-                </li>
-
-                <!-- TODO : 추후 삭제 -->
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="/safe-ride/join">
-                        <i class="align-middle" data-feather="user-plus"></i> <span class="align-middle">회원가입</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="/safe-ride/myprofile">
-                        <i class="align-middle" data-feather="user"></i> <span class="align-middle">마이페이지</span>
-                    </a>
-                </li>
-            </ul>
-
-            <!-- TODO 마이페이지 OR 라이딩 기록페이지 -->
-
-            <div class="sidebar-cta">
-                <div class="sidebar-cta-content">
-                    <strong class="d-inline-block mb-2"> Safety & Healthy</strong>
-                    <div class="mb-3 text-sm">
-                        안전하게 달리셨나요? 오늘의 라이딩을 기록해보세요!
-                    </div>
-                    <div class="d-grid">
-                        <a href="/route" class="btn btn-primary">기록하기</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
     <div class="main">
-        <nav class="navbar navbar-expand navbar-light navbar-bg">
-            <a class="sidebar-toggle js-sidebar-toggle">
-                <i class="hamburger align-self-center"></i>
-            </a>
-
-            <div class="navbar-collapse collapse">
-                <ul class="navbar-nav navbar-align">
-                    <li class="nav-item dropdown">
-                        <a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#" data-bs-toggle="dropdown">
-                            <i class="align-middle" data-feather="settings"></i>
-                        </a>
-
-                        <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-                            <img src="img/avatars/avatar.jpg" class="avatar img-fluid rounded me-1" alt="Charles Hall"/> <span
-                                class="text-dark">Charles Hall</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item" href="pages-profile.html"><i class="align-middle me-1" data-feather="user"></i>
-                                Profile</a>
-                            <a class="dropdown-item" href="#"><i class="align-middle me-1" data-feather="pie-chart"></i>
-                                Analytics</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="index.html"><i class="align-middle me-1" data-feather="settings"></i>
-                                Settings & Privacy</a>
-                            <a class="dropdown-item" href="#"><i class="align-middle me-1" data-feather="help-circle"></i> Help
-                                Center</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Log out</a>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-        <div class="main">
-            <main class="content">
-                메인화면입니다.[[${userId}]]님
+        <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
+        <main>
+            <div class="container mt-4">
+                <!--👇여기에 내용 넣어주시면 됩니다👇-->
                 <div sec:authorize="isAnonymous()">
                     <a href="/safe-ride/login">로그인</a>
                     <a href="/safe-ride/join">회원가입</a>
                 </div>
                 <div sec:authorize="isAuthenticated()">
-                    <h3>반갑습니다, <span sec:authentication="name"></span>님!</h3>
+<!--                    <h3>반갑습니다, <span sec:authentication="name"></span>님!</h3>-->
+                    <h3>반갑습니다, <span th:text="${userId}"></span>님!</h3>
                     <form action="/safe-ride/logout" method="post">
                         <input type="submit" value="로그아웃">
                     </form>
                     <a href="/safe-ride/myprofile">마이프로필</a>
                 </div>
-            </main>
-
-            <footer class="footer">
-                <div class="container-fluid">
-                    <div class="row text-muted">
-                        <div class="col-6 text-start">
-                            <p class="mb-0">
-                                <a class="text-muted"
-                                   href="https://img.animalplanet.co.kr/news/2019/08/10/700/2w4w02ks9531p3v874c7.jpg"
-                                   target="_blank"><strong>Team6 라이더스</strong></a>
-                            </p>
-                        </div>
-                        <div class="col-6 text-end">
-                            <ul class="list-inline">
-                                <li class="list-inline-item">
-                                    <a class="text-muted" href="https://github.com/soeunc/safe_ride" target="_blank">Github</a>
-                                </li>
-                                <li class="list-inline-item">
-                                    <a class="text-muted" href="https://www.notion.so/likelion/6-1cc32ef7fbbc4332b81f959fe6d153db"
-                                       target="_blank">Notion</a>
-                                </li>
-                                <li class="list-inline-item">
-                                    <a class="text-muted"
-                                       href="https://docs.google.com/spreadsheets/d/1GipYE2oyzrQxeagBfsVn9E8ZU_aX-j0JmuzPyywan3k/edit#gid=50422208"
-                                       target="_blank">Google sheet</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-        </div>
+                <!--👆여기에 내용 넣어주시면 됩니다👆-->
+            </div>
+        </main>
+        <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
     </div>
 </div>
 
+<script src="js/app.js"></script>
+<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
 <script th:inline="javascript">
     window.onload = function () {
         //alert
@@ -210,7 +52,6 @@
         }
     }
 </script>
-
-<script src="/js/app.js"></script>
+<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
 </body>
 </html>
