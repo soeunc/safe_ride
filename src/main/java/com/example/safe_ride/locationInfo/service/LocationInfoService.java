@@ -5,6 +5,7 @@ import com.example.safe_ride.locationInfo.dto.StationInfo;
 import com.example.safe_ride.locationInfo.entity.LocationInfo;
 import com.example.safe_ride.locationInfo.repo.LocationInfoRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LocationInfoService {
@@ -68,7 +70,7 @@ public class LocationInfoService {
                 response.append(line);
             }
             JSONObject jsonResponse = new JSONObject(response.toString());
-            System.out.println("total Count : " + jsonResponse.getJSONObject("body").getString("totalCount"));
+            log.info("total Count : " + jsonResponse.getJSONObject("body").getString("totalCount"));
             return Integer.parseInt(jsonResponse.getJSONObject("body").getString("totalCount"));
         } finally {
             connection.disconnect();
@@ -77,8 +79,7 @@ public class LocationInfoService {
 
     // 3. 공통 URL 설정 메서드 (total count를 받아 최종 result Url 생성)
     public String buildUrl(String apiUrl, String lcgvmnInstCd, String fromCrtrYmd, String toCrtrYmd, int pageNo, int numOfRows) throws UnsupportedEncodingException {
-        System.out.print("pageNo :" + pageNo);
-        System.out.println(" / numOfRows :" + numOfRows);
+        log.info("pageNo :" + pageNo + " / numOfRows :" + numOfRows);
         StringBuilder urlBuilder = new StringBuilder(BASE_URL);
         urlBuilder.append("/").append(apiUrl);
         urlBuilder.append("?serviceKey=").append(SERVICE_KEY);
@@ -137,7 +138,7 @@ public class LocationInfoService {
                     if (!stationResults.isEmpty()) {
                         allResults.addAll(stationResults);
                     } else {
-                        System.out.println("페이지 " + pageNo + "에서 유효한 데이터가 없습니다.");
+                        log.info("페이지 " + pageNo + "에서 유효한 데이터가 없습니다.");
                     }
                 }
                 // 응답 코드가 HTTP_OK가 아닌 경우 예외 처리
@@ -188,7 +189,7 @@ public class LocationInfoService {
                     if (!bicycleResults.isEmpty()) {
                         allResults.addAll(bicycleResults);
                     } else {
-                        System.out.println("페이지 " + pageNo + "에서 유효한 데이터가 없습니다.");
+                        log.info("페이지 " + pageNo + "에서 유효한 데이터가 없습니다.");
                     }
                 }
                 // 응답 코드가 HTTP_OK가 아닌 경우 예외 처리
@@ -220,25 +221,25 @@ public class LocationInfoService {
 
     // 데이터 포매팅 (대여소 현황)
     private StationInfo formatStation(JSONObject item) throws JSONException {
-        String bcyclDataCrtrYmd = item.getString("bcyclDataCrtrYmd");         // 데이터기준일자(2024-02-08)
-        String mngInstNm = item.getString("mngInstNm");                // 관리기관명(서울특별시)
-        String lcgvmnInstCd = item.getString("lcgvmnInstCd");             // 지자체 코드(1100000000)
-        String lcgvmnInstNm = item.getString("lcgvmnInstNm");             // 지자체명(서울특별시)
-        String rntstnId = item.getString("rntstnId");                 // 대여소 아이디(ST-10)
-        String rntstnNm = item.getString("rntstnNm");                 // 자전거대여소명(108. 서교동 사거리)
-        String roadNmAddr = item.getString("roadNmAddr");               // 소재지도로명주소(서울특별시 마포구 양화로 93 427)
-        String lotnoAddr = item.getString("lotnoAddr");                // 소재지지번주소(서울특별시 마포구 서교동 378-5)
-        String lat = item.getString("lat");                      // 위도(37.5527458200)
-        String lot = item.getString("lot");                      // 경도(126.9186172500)
-        String operBgngHrCn = item.getString("operBgngHrCn");             // 운영시작시각(00:00)
-        String operEndHrCn = item.getString("operEndHrCn");              // 운영종료시각(23:59)
-        String rpfactInstlYn = item.getString("rpfactInstlYn");            // 수리대설치여부(N)
-        String arinjcInstlYn = item.getString("arinjcInstlYn");            // 공기주입기비치여부(N)
-        String arinjcTypeNm = item.getString("arinjcTypeNm");             // 공기주입기유형(FV)
-        String rntstnFcltTypeNm = item.getString("rntstnFcltTypeNm");         // 자전거대여소구분(무인)
-        String rntstnOperDayoffDayCn = item.getString("rntstnOperDayoffDayCn");    // 휴무일(연중무휴)
-        String rntFeeTypeNm = item.getString("rntFeeTypeNm");             // 요금구분(유료)
-        String mngInstTelno = item.getString("mngInstTelno");             // 관리기관전화번호(https://data.seoul.go.kr)
+        String bcyclDataCrtrYmd = item.getString("bcyclDataCrtrYmd");           // 관리기관명(서울특별시)
+        String mngInstNm = item.getString("mngInstNm");                         // 데이터기준일자(2024-02-08)
+        String lcgvmnInstCd = item.getString("lcgvmnInstCd");                   // 지자체 코드(1100000000)
+        String lcgvmnInstNm = item.getString("lcgvmnInstNm");                   // 지자체명(서울특별시)
+        String rntstnId = item.getString("rntstnId");                           // 대여소 아이디(ST-10)
+        String rntstnNm = item.getString("rntstnNm");                           // 자전거대여소명(108. 서교동 사거리)
+        String roadNmAddr = item.getString("roadNmAddr");                       // 소재지도로명주소(서울특별시 마포구 양화로 93 427)
+        String lotnoAddr = item.getString("lotnoAddr");                         // 소재지지번주소(서울특별시 마포구 서교동 378-5)
+        String lat = item.getString("lat");                                     // 위도(37.5527458200)
+        String lot = item.getString("lot");                                     // 경도(126.9186172500)
+        String operBgngHrCn = item.getString("operBgngHrCn");                   // 운영시작시각(00:00)
+        String operEndHrCn = item.getString("operEndHrCn");                     // 운영종료시각(23:59)
+        String rpfactInstlYn = item.getString("rpfactInstlYn");                 // 수리대설치여부(N)
+        String arinjcInstlYn = item.getString("arinjcInstlYn");                 // 공기주입기비치여부(N)
+        String arinjcTypeNm = item.getString("arinjcTypeNm");                   // 공기주입기유형(FV)
+        String rntstnFcltTypeNm = item.getString("rntstnFcltTypeNm");           // 자전거대여소구분(무인)
+        String rntstnOperDayoffDayCn = item.getString("rntstnOperDayoffDayCn"); // 휴무일(연중무휴)
+        String rntFeeTypeNm = item.getString("rntFeeTypeNm");                   // 요금구분(유료)
+        String mngInstTelno = item.getString("mngInstTelno");                   // 관리기관전화번호(https://data.seoul.go.kr)
 
         return new StationInfo(bcyclDataCrtrYmd, mngInstNm, lcgvmnInstCd, lcgvmnInstNm, rntstnId, rntstnNm, roadNmAddr, lotnoAddr, lat, lot,
                 operBgngHrCn, operEndHrCn, rpfactInstlYn, arinjcInstlYn, arinjcTypeNm, rntstnFcltTypeNm, rntstnOperDayoffDayCn, rntFeeTypeNm, mngInstTelno);
@@ -259,7 +260,6 @@ public class LocationInfoService {
             // 대여소Id가 일치하는지 확인
             if (stationMap.containsKey(rntstnId)) {
                 results.add(formatBicycle(item)); // 조건에 맞으면 item에 대한 포맷팅 진행
-                System.out.println(rntstnId);
             }
         }
         return results;
@@ -267,13 +267,13 @@ public class LocationInfoService {
 
     // 필터링 된 데이터 문자열 생성
     public BicycleInfo formatBicycle(JSONObject item) throws JSONException {
-        String lcgvmnInstCd = item.getString("lcgvmnInstCd"); // 지자체 코드(1100000000)
-        String lcgvmnInstNm = item.getString("lcgvmnInstNm"); // 지자체명(서울특별시)
-        String rntstnId = item.getString("rntstnId"); // 대여소 아이디(ST-10)
-        String rntstnNm = item.getString("rntstnNm"); // 자전거대여소명(108. 서교동 사거리)
-        String lat = item.getString("lat"); // 위도(37.5527458200)
-        String lot = item.getString("lot"); // 경도(126.9186172500)
-        String bcyclTpkctNocs = item.optString("bcyclTpkctNocs", "0"); //자전거 주차 총 건수(12)
+        String lcgvmnInstCd = item.getString("lcgvmnInstCd");                       // 지자체 코드(1100000000)
+        String lcgvmnInstNm = item.getString("lcgvmnInstNm");                       // 지자체명(서울특별시)
+        String rntstnId = item.getString("rntstnId");                               // 대여소 아이디(ST-10)
+        String rntstnNm = item.getString("rntstnNm");                               // 자전거대여소명(108. 서교동 사거리)
+        String lat = item.getString("lat");                                         // 위도(37.5527458200)
+        String lot = item.getString("lot");                                         // 경도(126.9186172500)
+        String bcyclTpkctNocs = item.optString("bcyclTpkctNocs", "0");  //자전거 주차 총 건수(12)
 
         return new BicycleInfo(lcgvmnInstCd, lcgvmnInstNm, rntstnId, rntstnNm, lat, lot, bcyclTpkctNocs);
     }
@@ -281,6 +281,14 @@ public class LocationInfoService {
     // 대여소 아이디에 해당하는 자전거 현황 찾기
     public BicycleInfo findBicycleInfoByStationId(String rntstnId, List<BicycleInfo> bicycleInfos) {
         return bicycleInfos.stream()
+                .filter(b -> b.getRntstnId().equals(rntstnId))
+                .findFirst()
+                .orElse(null);  // 만약 찾지 못했다면 null을 반환
+    }
+
+    // 대여소 아이디에 해당하는 대여소 현황 찾기
+    public StationInfo findStationByStationId(String rntstnId, List<StationInfo> stationInfos) {
+        return stationInfos.stream()
                 .filter(b -> b.getRntstnId().equals(rntstnId))
                 .findFirst()
                 .orElse(null);  // 만약 찾지 못했다면 null을 반환
@@ -298,7 +306,7 @@ public class LocationInfoService {
          */
         Pattern pattern = Pattern.compile("^(.*?)(\\d+)");
         Matcher matcher = pattern.matcher(roadAddrPart1);
-        if (matcher.find()) System.out.println(matcher.group(1));
+        if (matcher.find()) log.info(matcher.group(1));
         return matcher.group(1);
     }
 
