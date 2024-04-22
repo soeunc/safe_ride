@@ -56,7 +56,7 @@ public class ApiService {
             }
             JSONObject jsonResponse = new JSONObject(response.toString());
             int totalCount = jsonResponse.getInt("totalCount");
-            System.out.println("Total Count: " + totalCount);
+            System.out.println("=====총 데이터 값은 " + totalCount + "개 입니다.=====");
             return totalCount;
         } finally {
             connection.disconnect();
