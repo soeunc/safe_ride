@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>자전거 대여소 정보(테스트 페이지)</title>
+</head>
+<body>
+
+<!-- 대여소 정보 출력 -->
+<h1>자전거 대여소 정보</h1>
+<div th:if="${results1}">
+  <ul>
+    <li th:each="result : ${results1}" th:text="${result}"></li>
+  </ul>
+</div>
+
+<h1>대여 가능 자전거 정보</h1>
+<div th:if="${results2}">
+  <ul>
+    <li th:each="result : ${results2}" th:text="${result}"></li>
+  </ul>
+</div>
+
+<!--<h1>실시간 자전거 대여/반납 정보</h1>-->
+<!--<div th:if="${results3}">-->
+<!--  <ul>-->
+<!--    <li th:each="result : ${results3}" th:text="${result}"></li>-->
+<!--  </ul>-->
+<!--</div>-->
+</body>
+</html>

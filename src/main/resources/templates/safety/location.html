@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>사고 다발 지역 정보</title>
+</head>
+<body>
+<form action="/public-bicycle/search" method="post">
+  <label for="sido">시도:</label>
+  <input type="text" id="sido" name="sido">
+  <label for="sigun">시군구:</label>
+  <input type="text" id="sigun" name="sigun">
+  <label for="eup">읍면동:</label>
+  <input type="text" id="eup" name="eup">
+  <button type="submit">검색</button>
+</form>
+
+<h1>자전거 대여소 정보</h1>
+
+<div th:if="${location}">
+  <ul>
+    <li th:each="result : ${location}" th:text="${result}"></li>
+  </ul>
+</div>
+
+</body>
+</html>

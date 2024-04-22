@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>주소 API</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+      function init() {
+          var url = location.href;
+          var confmKey = $("input[name=confmKey]").val();
+          var resultType = "1";
+          var inputYn = $("input[name=inputYn]").val();
+
+          if (inputYn !== "Y") {
+              var form = document.getElementById("form");
+              form.confmKey.value = confmKey;
+              form.returnUrl.value = url;
+              form.resultType.value = resultType;
+              form.action = "https://business.juso.go.kr/addrlink/addrLinkUrl.do";
+              form.submit();
+          } else {
+              opener.jusoCallBack($("input[name=roadFullAddr]").val(), $("input[name=roadAddrPart1]").val());
+
+              window.close();
+          }
+      }
+  </script>
+</head>
+<body onload="init();">
+<form id="form" method="post">
+  <input type="hidden" name="confmKey" th:value="${confmKey}"/>
+  <input type="hidden" name="returnUrl" value=""/>
+  <input type="hidden" name="resultType" value=""/>
+  <input type="hidden" name="roadFullAddr" th:value="${roadFullAddr}"/>
+  <input type="hidden" name="roadAddrPart1" th:value="${roadAddrPart1}"/>
+</form>
+<input type="hidden" name="inputYn" th:value="${inputYn}"/>
+</body>
+</html>

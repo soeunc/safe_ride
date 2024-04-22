@@ -38,20 +38,25 @@ public class WebSecurityConfig {
                                         "/safe-ride",//메인페이지
                                         "/safe-ride/login",//로그인
                                         "/safe-ride/join",//회원가입
+                                        "/safety-direction/**",
+
                                         //템플릿 관련
                                         "/css/**",
                                         "/js/**",
                                         "/fonts/**",
-                                        "/img/**"
+                                        "/img/**",
+                                        // 대여소 정보 관련 (테스트)
+                                        "/public-bicycle/**",
+                                        "/public-bicycle-test/**"
                                 )
                                 // 이 경로에 도달할 수 있는 사람에 대한 설정(모두)
                                 .permitAll()
-//                                //익명사용자 접근 허가
-//                                .requestMatchers(
-//                                    "/safe-ride/login",//로그인
-//                                    "/safe-ride/join"//회원가입
-//                                )
-//                                .anonymous()
+                                //익명사용자 접근 허가
+                                .requestMatchers(
+                                    "/safe-ride/login",//로그인
+                                    "/safe-ride/join"//회원가입
+                                )
+                                .anonymous()
                                 //인증된 사용자 접근 허가
                                 .requestMatchers(
                                         "/safe-ride/logout",//로그아웃
@@ -59,6 +64,30 @@ public class WebSecurityConfig {
                                         "/safe-ride/myprofile/update",//회원정보 수정
                                         "/safe-ride/myprofile/delete",//회원정보 삭제
                                         "/safe-ride/myprofile/create-today"//오늘 기록 입력
+                                )
+                                .authenticated()
+                                // 커뮤니티 - 게시글
+                                .requestMatchers(
+                                        "/article", // 전체 글 조회
+                                        "/article/create", // 게시글 생성
+                                        "/article/filter", // 도시 응답
+                                        "/article/{id}", // 게시글 상세 조회
+                                        "/article/{id}/edit", // 게시글 수정
+                                        "/article/{id}/delete", // 게시글 삭제
+                                        "/city"
+                                )
+                                .authenticated()
+                                // 커뮤니티 - 매칭글
+                                .requestMatchers(
+                                        "/matching/list", // 전체 매칭글 조회
+                                        "/matching/create", // 매칭글 생성
+                                        "/matching/{id}", // 매칭글 상세 조회
+                                        "/matching/{id}/edit", // 매칭글 수정
+                                        "/matching/{id}/delete", // 매칭글 삭제
+                                        "/matching/{id}/apply" ,// 매칭글 상세 조회
+                                        "/matching/{matchingId}/accept/{applicationId}", // 매칭글
+                                        "/matching/{matchingId}/reject/{applicationId}", // 매칭글
+                                        "/matching/{matchingId}/cancel-application"
                                 )
                                 .authenticated()
 

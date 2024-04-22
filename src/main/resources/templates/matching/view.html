@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <style>
+      .hidden {
+          display: none;
+      }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="post-details">
+    <div>
+      <p th:text="${matching.comment}" style="word-wrap: break-word;"></p>
+    </div>
+  </div>
+
+  <!-- 매칭 상태가 ACCEPTED일 경우 매칭이 성사되었다는 메시지 표시 -->
+  <div th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
+    <h4>매칭 신청</h4>
+    <p>매칭이 성사가 완료 되었습니다^^</p>
+  </div>
+
+  <!-- 매칭 상태가 ACCEPTED가 아닌 경우에 매칭 신청 관련 요소들을 표시 -->
+  <div th:unless="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
+    <button id="applyButton" class="apply-button">매칭 신청</button>
+    <!-- 매칭 신청 폼 -->
+    <div id="applicationForm" class="hidden">
+      <form th:action="@{'/matching/' + ${matching.id} + '/apply'}" method="post">
+        <input type="hidden" name="matchingId" th:value="${matching.id}">
+        <label for="message">신청 메시지:</label>
+        <textarea id="message" name="message" rows="4" cols="50"></textarea><br>
+        <button type="submit" class="submit-button">신청하기</button>
+      </form>
+    </div>
+    <!-- 매칭 신청 목록 토글 버튼 -->
+    <button id="toggleApplicationsButton">매칭 신청 목록</button>
+    <!-- 매칭 신청 목록 -->
+    <!-- 매칭 신청 목록 -->
+    <div id="applicationsList" class="hidden">
+      <ul>
+        <li th:each="apply : ${applications}">
+          <span th:text="${apply.id}"></span>
+          <span th:text="${apply.message}"></span>
+          <!-- 작성자와 현재 사용자가 동일한 경우에만 매칭 신청에 대한 수락, 거절 및 취소 버튼을 표시 -->
+          <div th:if="${matching.member.id == currentUser.id}">
+            <form th:action="@{'/matching/' + ${matching.id} + '/accept/' + ${apply.id}}" method="post">
+              <button type="submit" class="accept-button">수락</button>
+            </form>
+            <form th:action="@{'/matching/' + ${matching.id} + '/reject/' + ${apply.id}}" method="post">
+              <button type="submit" class="reject-button">거절</button>
+            </form>
+          </div>
+          <div th:if="${apply.applicant.id == currentUser.id}">
+            <!-- 매칭 신청에 대한 취소 버튼 -->
+            <form th:action="@{'/matching/' + ${matching.id} + '/cancel-application'}" method="post">
+              <input type="hidden" name="applicationId" th:value="${apply.id}">
+              <button type="submit" class="cancel-button">신청 취소</button>
+            </form>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<a th:href="@{'/matching/' + ${matching.id} + '/edit'}" class="edit-button">수정</a>
+<a href="/matching/list">홈으로</a> <br>
+<form th:action="@{'/matching/' + ${matching.id} + '/delete'}" method="post" id="deleteForm">
+  <button type="submit" onclick="confirmDelete()" class="delete-button">삭제</button>
+</form>
+
+<!-- 알림창 -->
+<div id="notification" class="hidden"></div>
+
+<script>
+    // 게시글 삭제 시 확인창
+    function confirmDelete() {
+        // 사용자에게 확인을 받기 위한 알림창 표시
+        if (confirm("정말로 삭제하시겠습니까?")) {
+            // '확인' 버튼이 클릭된 경우 폼 제출
+            document.getElementById("deleteForm").submit();
+        } else {
+            // '취소' 버튼이 클릭된 경우 아무 작업도 하지 않음
+            return false;
+        }
+    }
+
+    // 알림창 표시 함수
+    function showNotification(message) {
+        var notification = document.getElementById("notification");
+        notification.innerHTML = message;
+        notification.classList.remove("hidden");
+        // 3초 후에 알림창 숨김
+        setTimeout(function() {
+            notification.classList.add("hidden");
+        }, 3000);
+    }
+
+    // 매칭 신청 폼을 토글하는 함수
+    function toggleApplicationForm() {
+        var form = document.getElementById("applicationForm");
+        form.classList.toggle("hidden");
+    }
+
+    // 매칭 신청 버튼 클릭 시 매칭 신청 폼을 토글 및 알림창 표시
+    document.getElementById("applyButton").addEventListener("click", function(event) {
+        toggleApplicationForm();
+        // 여기서 매칭 신청이 성공했는지 여부를 확인하고 알림창을 표시합니다.
+        // 아래의 코드를 사용자가 요청한 응답 결과에 맞게 수정하십시오.
+        // 예를 들어, 자신의 매칭글에 매칭 신청을 할 수 없는 경우와 중복 매칭 신청이 불가능한 경우에도 알림창이 표시되어야 합니다.
+        showNotification("매칭 신청이 성공적으로 완료되었습니다."); // 매칭 신청 성공 메시지
+        event.preventDefault(); // 폼 제출 방지
+    });
+
+    // 매칭 신청 목록 토글 함수
+    function toggleApplicationsList() {
+        var list = document.getElementById("applicationsList");
+        list.classList.toggle("hidden");
+    }
+
+    // 매칭 신청 목록 버튼에 이벤트 리스너 추가
+    document.getElementById("toggleApplicationsButton").addEventListener("click", toggleApplicationsList);
+
+</script>
+</body>
+</html>

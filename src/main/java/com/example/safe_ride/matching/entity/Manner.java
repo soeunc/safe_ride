@@ -1,5 +1,6 @@
 package com.example.safe_ride.matching.entity;
 
+import com.example.safe_ride.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,10 +18,9 @@ public class Manner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long matchingArticled; // 매칭 신청 아이디
-    private Long score;            // 평가 점수
+    @OneToOne
+    private Member member;          // 매칭글 작성자(리뷰 하는 사람)
+    private Long matchingArticleId; // 매칭 신청한 아이디(리뷰 받은 사람)
+    private int score;             // 평가 점수
     private String comment;        // 리뷰 코멘트
-    private Long reviewId;         // 리뷰한 사람 Id
-    private Long reviewerId;       // 리뷰 받은 사람 Id
-
 }

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>자전거 대여소 정보</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+      var pop;
+
+      function goPopup() {
+          pop = window.open("/public-bicycle/jusoPopup", "pop", "width=570, height=420, scrollbars=yes");
+      }
+
+      function jusoCallBack(roadFullAddr, roadAddrPart1) {
+          console.log("도로명 주소: " + roadAddrPart1);
+          console.log("전체 주소: " + roadFullAddr);
+          document.getElementById('roadFullAddr').value = roadFullAddr;
+          document.getElementById('roadAddrPart1').value = roadAddrPart1;
+          document.getElementById('addressForm').submit();
+      }
+  </script>
+</head>
+<body>
+<h1>도로명 주소 검색</h1>
+<button onclick="goPopup();">🔎 도로명주소 검색</button>
+<form id="addressForm" action="/public-bicycle" method="post">
+  <input type="hidden" id="roadFullAddr" name="roadFullAddr">
+  <input type="hidden" id="roadAddrPart1" name="roadAddrPart1">
+</form>
+
+<h1>도로명 주소 테스트 결과</h1>
+<div>
+  <p>전체 주소: <span th:text="${roadFullAddr}"></span></p>
+  <p>도로명 주소: <span th:text="${roadAddrPart1}"></span></p>
+  <p>도로명 주소 상세주소 제외: <span th:text="${doroJuso}"></span></p>
+  <p>시도: <span th:text="${sido}"></span></p>
+  <p>지자체코드: <span th:text="${lcgvmnInstCd}"></span></p>
+</div>
+
+<!-- 대여소 정보 출력 -->
+<h1>자전거 대여소 정보</h1>
+<div th:if="${results1}">
+  <ul>
+    <li th:each="result : ${results1}" th:text="${result}"></li>
+  </ul>
+</div>
+
+</body>
+</html>
