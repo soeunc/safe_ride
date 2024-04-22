@@ -5,6 +5,7 @@ import com.example.safe_ride.locationInfo.dto.StationAndBicycleInfo;
 import com.example.safe_ride.locationInfo.dto.StationInfo;
 import com.example.safe_ride.locationInfo.service.LocationInfoService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -28,6 +29,7 @@ public class LocationInfoController {
     // 메인 페이지
     @GetMapping("/public-bicycle")
     public String showForm(Model model) {
+        model.addAttribute("isSearched", false);
         model.addAttribute("combinedInfo", new ArrayList<>());
         return "/locationInfo/LocationInfo";
     }
@@ -39,8 +41,11 @@ public class LocationInfoController {
             String roadFullAddr,
             @RequestParam
             String roadAddrPart1,
-            Model model
+            Model model,
+            HttpSession session
     ) throws IOException {
+        // 기존 세션 데이터 삭제
+        session.removeAttribute("combinedInfo");
 
         String lcgvmnInstCd = locationInfoService.getAddressCode(roadAddrPart1);
         String doroJuso = locationInfoService.getDoroJuso(roadAddrPart1);
@@ -53,11 +58,42 @@ public class LocationInfoController {
             combinedInfo.add(new StationAndBicycleInfo(station, bicycle));
         }
 
+
+
+        session.setAttribute("combinedInfo", combinedInfo);
+        model.addAttribute("isSearched", true);
         model.addAttribute("doroJuso", doroJuso);
         model.addAttribute("combinedInfo", combinedInfo);
 
         return "/locationInfo/LocationInfo";
     }
+
+    // 대여소 상세보기 팝업 페이지
+    @GetMapping("/public-bicycle/{id}")
+    public String stationDetails(
+            @PathVariable("id")
+            String stationId,
+            Model model,
+            HttpSession session
+    ) {
+        List<StationAndBicycleInfo> combinedInfo = (List<StationAndBicycleInfo>) session.getAttribute("combinedInfo");
+
+        StationAndBicycleInfo selectedInfo = combinedInfo.stream()
+                .filter(info -> stationId.equals(info.getStationInfo().getRntstnId()))
+                .findFirst()
+                .orElse(null);
+
+        if (selectedInfo != null)  log.info("selectedInfo의 rntstnId: " + selectedInfo.getStationInfo().getRntstnId());
+        else log.info("세션에 selectedInfo가 존재하지 않습니다.");
+
+        String targetStationId = selectedInfo.getStationInfo().getRntstnId();
+
+        log.info("target station Id : " + targetStationId );
+        model.addAttribute("targetStationId", targetStationId);
+        model.addAttribute("selectedInfo", selectedInfo.getStationInfo());
+        return "/locationInfo/stationDetailPopup";
+    }
+
 
     // 주소 API 호출
     @RequestMapping(value = {"/public-bicycle/jusoPopup"})
