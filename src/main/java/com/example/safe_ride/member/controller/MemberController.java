@@ -2,11 +2,7 @@ package com.example.safe_ride.member.controller;
 
 import com.example.safe_ride.facade.AuthenticationFacade;
 import com.example.safe_ride.member.dto.JoinDto;
-import com.example.safe_ride.member.dto.MemberDto;
-import com.example.safe_ride.member.entity.CustomMemberDetails;
 import com.example.safe_ride.member.dto.LoginDto;
-import com.example.safe_ride.member.dto.UpdateDto;
-import com.example.safe_ride.member.entity.Authority;
 import com.example.safe_ride.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,6 +86,16 @@ public class MemberController {
         msg = "회원가입 되었습니다 ^^.";
         redirectAttributes.addFlashAttribute("msg", msg);
         return "redirect:/safe-ride/login";
+    }
+
+    //아이디 중복확인
+    @PostMapping("/duplicateCkForId")
+    @ResponseBody
+    public int duplicateCkForId(
+            @RequestParam("userId")
+            String userId
+    ){
+        return memberService.duplicateCkForId(userId);
     }
 
 }

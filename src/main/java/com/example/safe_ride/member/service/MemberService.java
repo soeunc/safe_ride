@@ -114,4 +114,14 @@ public class MemberService {
                 .build();
         return badgeRepo.save(badge);
     }
+
+    public int duplicateCkForId(String userId){
+        Optional<Member> optionalMember = memberRepo.findByUserId(userId);
+
+        if (optionalMember.isPresent()){
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 }

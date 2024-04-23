@@ -49,7 +49,8 @@ public class WebSecurityConfig {
                                         // 대여소 정보 관련 (테스트)
                                         "/public-bicycle/**",
                                         "/public-bicycle-test/**",
-                                        "/error"
+                                        "/error",
+                                        "/safe-ride/duplicateCkForId"//아이디 중복확인
                                 )
                                 // 이 경로에 도달할 수 있는 사람에 대한 설정(모두)
                                 .permitAll()

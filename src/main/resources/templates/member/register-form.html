@@ -41,8 +41,9 @@
                   <h1 class="text-center mb-5">회원가입</h1>
                   <form action="/safe-ride/join" method="post" id="registerForm">
                     <div class="form-floating mb-3">
-                      <input class="form-control" id="userId" name="userId" type="text" maxlength="30" required placeholder="아이디 입력">
-                      <button class="btn btn-danger btn" id="duplicateCkForId">아이디 중복확인</button>
+                      <input class="form-control" id="userId" name="userId" type="text" onkeyup="idValidCk()" maxlength="20" required placeholder="아이디 입력">
+                      <button class="btn btn-info" id="duplicateCkForId" onclick="duplicateCkForIdFnc()">아이디 중복확인</button>
+                      <span id="idCkMsg"></span>
                       <label for="userId">아이디</label>
                     </div>
                     <div class="form-floating mb-3">
@@ -50,11 +51,13 @@
                       <label for="userName">이름</label>
                     </div>
                     <div class="form-floating mb-3">
-                      <input class="form-control" id="password" name="password" type="password" maxlength="30" required placeholder="비밀번호 입력">
+                      <input class="form-control" id="password" name="password" type="password" onkeyup="passwordMatchCkFnc()" maxlength="20" required placeholder="비밀번호 입력">
                       <label for="password">패스워드</label>
                     </div>
                     <div class="form-floating mb-3">
-                      <input class="form-control" id="passwordCk" name="passwordCk" type="password" maxlength="30" required placeholder="비밀번호 확인">
+                      <input class="form-control" id="passwordCk" name="passwordCk" type="password" maxlength="20" required placeholder="비밀번호 확인">
+                      <button class="btn btn-info" id="passwordMatchCk">패스워드 일치여부 확인</button>
+                      <span id="passwordCkMsg"></span>
                       <label for="passwordCk">패스워드 확인</label>
                     </div>
                     <div class="form-floating mb-3">
@@ -101,17 +104,117 @@
       alert(alertMsg);
     }
   }
-
-  //submit 버튼 클릭
+  //아이디 정규식 체크용 flag변수
+  let idCk = false;
+  //아이디 중복확인용 flag변수
+  let idDuplicateCk = false;
+  //패스워드 정규식 체크용 flag변수
+  let passwordCk = false;
+  //패스워드 중복확인용 flag변수
+  let passwordMatchCk = false;
+  //submit 버튼
   let submitBtn = document.querySelector("#sign-in-button");
+  //패스워드 일치여부 확인 버튼
+  let passwordMatchBtn = document.querySelector("#passwordMatchCk");
+  //아이디 정규식
+  function idValidCk() {
+    //영문자로 시작하는 영문자 또는 숫자 6~20자
+    const regExp = /^[a-z]+[a-z0-9]{5,19}$/g;
+    let userId = $('#userId').val(); // id값
+    let idCkMsg = $('#idCkMsg');
+    if (!regExp.test(userId)){
+        idCkMsg.text("사용불가능합니다!(영문자시작 6~20자 이내)");
+        idCkMsg.css('color', "red");
+        idCk = false;
+    } else {
+      idCkMsg.text("사용가능합니다!!");
+      idCkMsg.css('color', "blue");
+      idCk = true;
+    }
+  }
+  //비밀번호 정규식
+  function passwordMatchCkFnc() {
+    //영어 숫자 조합 8자리 이상~25자 이하
+    const regExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/;
+    let password = $('#password').val();
+    let passwordCkMsg = $('#passwordCkMsg');
+    if (!regExp.test(password)){
+      passwordCkMsg.text("영어 숫자 조합 8~20자 이내로 해주세요!");
+      passwordCkMsg.css('color', "red");
+      passwordCk = false;
+    } else {
+      passwordCkMsg.text("사용가능합니다!!");
+      passwordCkMsg.css('color', "blue");
+      passwordCk = true;
+    }
+  }
 
-  submitBtn.addEventListener('click', function (event) {
+  function duplicateCkForIdFnc(){
+    let userId = $('#userId').val(); // id값
+    if(userId.trim()===''){
+      alert('아이디를 입력해주세요!');
+    } else {
+      $.ajax({
+        type : "POST",
+        url : "/safe-ride/duplicateCkForId",
+        data : {
+          userId : userId
+        },
+        success : function (cnt){
+          if (cnt===1){ // id가 이미 존재한다면
+            alert("사용 불가능한 아이디입니다.");
+            idDuplicateCk = false;
+          } else if(cnt===0) {
+            alert("사용 가능합니다.");
+            idDuplicateCk = true;
+          } else {
+            alert("에러가 발생했습니다.")
+          }
+        },
+        error:function (error){
+          alert("에러가 발생했습니다. 새로고침해주세요!" + error);
+        }
+      });
+    }
+  }
+
+
+
+  //패스워드 일치여부 확인
+  passwordMatchBtn.addEventListener('click', function (event) {
     //비밀번호 체크
     let password = document.querySelector("#password").value;
     let passwordCk = document.querySelector("#passwordCk").value;
-    if (password !== passwordCk){
+    if (password !== passwordCk || password === '' || passwordCk === ''){
       event.preventDefault();
-      alert("패스워드를 확인해주세요! ^^");
+      alert("패스워드가 일치하지 않습니다!");
+      passwordMatchCk = false;
+    } else {
+      alert("패스워드가 일치합니다! ^^");
+      passwordMatchCk = true;
+    }
+  });
+  //submit 시 입력값 체크
+  submitBtn.addEventListener('click', function (event) {
+    //비밀번호 정규식 체크 여부 확인
+    if (passwordCk !== true){
+      event.preventDefault();
+      alert("올바른 비밀번호인지 확인해주세요!")
+    }
+    //비밀번호 일치 체크 여부 확인
+    if (passwordMatchCk !== true){
+      event.preventDefault();
+      alert("비밀번호 일치 체크를 진행해주세요!")
+    }
+    //아이디 중복체크 여부 확인
+    if (idDuplicateCk !== true){
+      event.preventDefault();
+      alert("아이디 중복체크를 진행해주세요!")
+    }
+    //아이디 정규식 체크 여부 확인
+    if (idCk !== true){
+      event.preventDefault();
+      alert("올바른 아이디인지 확인해주세요!")
     }
   });
 
@@ -170,6 +273,8 @@
 
 
 </script>
+<!--ajax-->
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
 </body>
 </html>
