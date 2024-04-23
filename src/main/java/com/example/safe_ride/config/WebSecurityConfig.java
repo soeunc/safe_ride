@@ -50,6 +50,8 @@ public class WebSecurityConfig {
                                         "/public-bicycle/**",
                                         "/public-bicycle-test/**",
                                         "/error",
+
+                                        //회원가입 관련
                                         "/safe-ride/duplicateCkForId",//아이디 중복확인
                                         "/safe-ride/duplicateCkForNickname",//닉네임 중복확인
                                         "/safe-ride/duplicateCkForEmail"//이메일 중복확인
