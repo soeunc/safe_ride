@@ -17,37 +17,34 @@
     <main class="content">
       <!--👇여기에 내용 넣어주시면 됩니다👇-->
       <div class="container mt-4">
-        <div th:if="${page.content.isEmpty()}">
-          <p>작성된 게시글이 없습니다.</p>
-        </div>
-        <div th:unless="${page.content.isEmpty()}">
-          <label for="metropolitanCity">광역자치구:</label>
-          <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
-            <option value="">광역자치구를 선택하세요</option>
-            <!-- 서버에서 받은 광역자치구 목록을 여기에 추가 -->
-            <th:block th:each="city : ${metropolitanCities}">
-              <option th:value="${city}" th:text="${city}"></option>
-            </th:block>
+        <!-- 광역자치구 선택 드롭다운 메뉴 -->
+        <form action="#" th:action="@{/article}" method="get">
+          <select name="metropolitanCity" id="metropolitanCity" onchange="this.form.submit()">
+            <option value="">전체</option>
+            <option th:each="city : ${metropolitanCities}"
+                    th:value="${city}"
+                    th:text="${city}"
+                    th:selected="${city == selectedMetropolitanCity}"></option>
           </select>
-
-          <label for="city">시군구:</label>
-          <select id="city" name="city" onchange="fetchFilteredArticles()">
-            <option value="">시군구를 선택하세요</option>
-            <!-- 선택된 광역자치구에 따라 서버에서 받은 시군구 목록을 여기에 추가 -->
-            <th:block th:each="city : ${cities}">
-              <option th:value="${city}" th:text="${city}"></option>
-            </th:block>
+          <!-- 선택한 광역자치구에 따라 해당 도시 목록을 보여주는 드롭다운 메뉴 -->
+          <select name="city" id="city">
+            <option value="">전체</option>
+            <option th:each="city : ${cities}"
+                    th:value="${city}"
+                    th:text="${city}"
+                    th:selected="${city == selectedCity}"></option>
           </select>
+          <button type="submit">검색</button>
+        </form>
 
-          <div id="articleContainer" class="post-box">
-            <div class="article_details" th:each="article : ${page.content}">
-              <a th:href="@{/article/{id}(id=${article.id})}">
-                <h3 th:text="${article.title}"></h3>
-              </a>
-              <span>작성일자: <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
-              <span>조회수: <span th:text="${article.hit}"></span></span>
-              <br>
-            </div>
+        <div id="articleContainer" class="post-box">
+          <div class="article_details" th:each="article : ${page.content}">
+            <a th:href="@{/article/{id}(id=${article.id})}">
+              <h3 th:text="${article.title}"></h3>
+            </a>
+            <span>작성일자: <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
+            <span>조회수: <span th:text="${article.hit}"></span></span>
+            <br>
           </div>
         </div>
         <br>

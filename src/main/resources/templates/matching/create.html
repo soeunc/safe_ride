@@ -19,23 +19,29 @@
 
         <form action="/matching/create" method="post">
 
-          <label for="comment">내용:</label><br>
-          <textarea id="comment" name="comment"></textarea><br>
+          <label for="title">제목:</label>
+          <input type="text" name="title" id="title" required> <br>
 
-          <label for="metropolitanCity">Metropolitan City:</label><br>
+          <label for="ridingTime">라이딩 시간:</label><br>
+          <input type="datetime-local" id="ridingTime" name="ridingTime" required><br>
+
+          <label for="metropolitanCity">광역자치구:</label><br>
           <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
             <option value="">광역자치구를 선택하시오.</option>
             <option th:each="city : ${metropolitanCities}" th:value="${city}" th:text="${city}"></option>
           </select><br>
 
-          <label for="city">도시를 선택하시오:</label><br>
+          <label for="city">도시:</label><br>
           <select id="city" name="city">
             <option value="">도시를 선택하시오</option>
           </select><br>
 
+          <label for="comment">라이딩 코스 소개:</label><br>
+          <textarea id="comment" name="comment"></textarea><br>
+
           <button type="submit">작성</button>
         </form>
-        <a href="/templates/articlees/article">뒤로 가기</a> <br>
+        <a href="/matching/list" >뒤로 가기</a> <br>
       </div>
       <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
     </main>

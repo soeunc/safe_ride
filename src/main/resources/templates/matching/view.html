@@ -21,14 +21,17 @@
       <div class="container mt-4">
         <div class="post-details">
           <div>
-            <p th:text="${matching.comment}" style="word-wrap: break-word;"></p>
+            <h4 th:text="${matching.title}" style="word-wrap: break-word;"></h4>
+            <p><strong>라이딩 지역:</strong> <span th:text="${metropolitanCity}"></span> - <span th:text="${city}"></span></p>
+            <p><strong>라이딩 시간:</strong> <span th:text="${#temporals.format(matching.ridingTime, 'MM월 dd일 EEEE HH:mm')}"></span></p><br>
+            <strong>라이딩 코스 소개:</strong><p th:text="${matching.comment}" style="word-wrap: break-word;"></p> <br>
           </div>
         </div>
 
         <!-- 매칭 상태가 ACCEPTED일 경우 매칭이 성사되었다는 메시지 표시 -->
         <div th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
           <h4>매칭 신청</h4>
-          <p>매칭이 성사가 완료 되었습니다^^</p>
+          <p>매칭 완료 되었습니다^^</p>
         </div>
 
         <!-- 매칭 상태가 ACCEPTED가 아닌 경우에 매칭 신청 관련 요소들을 표시 -->
@@ -46,30 +49,39 @@
           <!-- 매칭 신청 목록 토글 버튼 -->
           <button id="toggleApplicationsButton">매칭 신청 목록</button>
           <!-- 매칭 신청 목록 -->
-          <!-- 매칭 신청 목록 -->
           <div id="applicationsList" class="hidden">
-            <ul>
-              <li th:each="apply : ${applications}">
-                <span th:text="${apply.id}"></span>
-                <span th:text="${apply.message}"></span>
-                <!-- 작성자와 현재 사용자가 동일한 경우에만 매칭 신청에 대한 수락, 거절 및 취소 버튼을 표시 -->
-                <div th:if="${matching.member.id == currentUser.id}">
-                  <form th:action="@{'/matching/' + ${matching.id} + '/accept/' + ${apply.id}}" method="post">
-                    <button type="submit" class="accept-button">수락</button>
-                  </form>
-                  <form th:action="@{'/matching/' + ${matching.id} + '/reject/' + ${apply.id}}" method="post">
-                    <button type="submit" class="reject-button">거절</button>
-                  </form>
-                </div>
-                <div th:if="${apply.applicant.id == currentUser.id}">
-                  <!-- 매칭 신청에 대한 취소 버튼 -->
-                  <form th:action="@{'/matching/' + ${matching.id} + '/cancel-application'}" method="post">
-                    <input type="hidden" name="applicationId" th:value="${apply.id}">
-                    <button type="submit" class="cancel-button">신청 취소</button>
-                  </form>
-                </div>
-              </li>
-            </ul>
+            <table>
+              <thead>
+              <tr>
+                <th>신청자</th>
+                <th>신청 메시지</th>
+                <th>동작</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="apply : ${applications}">
+                <td th:text="${apply.applicant.nickname}"></td>
+                <td th:text="${apply.message}"></td>
+                <td>
+                  <div th:if="${matching.member.id == currentUser.id}">
+                    <form th:action="@{'/matching/' + ${matching.id} + '/accept/' + ${apply.id}}" method="post">
+                      <button type="submit" class="accept-button">수락</button>
+                    </form>
+                    <form th:action="@{'/matching/' + ${matching.id} + '/reject/' + ${apply.id}}" method="post">
+                      <button type="submit" class="reject-button">거절</button>
+                    </form>
+                    <button th:href="@{'/matching/' + ${matching.id} + '/applicantInfo/' + ${apply.id}}">유저 정보</button>
+                  </div>
+                  <div th:if="${apply.applicant.id == currentUser.id}">
+                    <form th:action="@{'/matching/' + ${matching.id} + '/cancel-application'}" method="post">
+                      <input type="hidden" name="applicationId" th:value="${apply.id}">
+                      <button type="submit" class="cancel-button">신청 취소</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
