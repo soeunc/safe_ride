@@ -1,7 +1,7 @@
 package com.example.safe_ride.safe.service;
 
 import com.example.safe_ride.safe.entity.AccidentInfo;
-import com.example.safe_ride.safe.entity.SchoolZoneAccInfo;
+import com.example.safe_ride.safe.entity.SchoolZoneInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -192,7 +192,7 @@ public class ApiService {
             }
             JSONObject jsonResponse = new JSONObject(response.toString());
             int totalCount = jsonResponse.getInt("totalCount");
-            System.out.println("=====총 데이터 값은 " + totalCount + "개 입니다.=====");
+            System.out.println("=====스쿨존 데이터는 총 " + totalCount + "개 입니다.=====");
             return totalCount;
         } finally {
             connection.disconnect();
@@ -215,7 +215,7 @@ public class ApiService {
     }
 
     // 스쿨존 사고다발지역 API 호출 메소드
-    public List<SchoolZoneAccInfo> schZonADataFromApi() {
+    public List<SchoolZoneInfo> schZonADataFromApi() {
         try {
             // 전체 데이터 개수 얻기
             int totalCount = schZoneTotalCount();
@@ -225,7 +225,7 @@ public class ApiService {
             int totalCalls = (int) Math.ceil((double) totalCount / numOfRows);
             log.info("totalCalls: {}", totalCalls);
 
-            List<SchoolZoneAccInfo> resultList = new ArrayList<>();
+            List<SchoolZoneInfo> resultList = new ArrayList<>();
 
             for (int pageNo = 1; pageNo <= totalCalls; pageNo++) {
                 String urlStr = buildSchZoneApi(numOfRows, pageNo);
@@ -247,7 +247,7 @@ public class ApiService {
                     }
                     in.close();
                     try {
-                        List<SchoolZoneAccInfo> parsedList = parsingSchZoneDate(response.toString());
+                        List<SchoolZoneInfo> parsedList = parsingSchZoneDate(response.toString());
                         resultList.addAll(parsedList);
                     } catch (JSONException e) {
                         log.error("JSON 파싱 중 오류 발생: {}", e.getMessage());
@@ -263,31 +263,31 @@ public class ApiService {
     }
 
     // 스쿨존 사고다발지역 데이터 파싱
-    public List<SchoolZoneAccInfo> parsingSchZoneDate(String jsonResponse) throws JSONException {
+    public List<SchoolZoneInfo> parsingSchZoneDate(String jsonResponse) throws JSONException {
         // JSON 응답 문자열 파싱
         JSONObject jsonObject = new JSONObject(jsonResponse);
         // 사고 정보 추출
         JSONArray items = jsonObject.getJSONObject("items").getJSONArray("item");
 
         // 스쿨존 사고다발지역 정보를 저장
-        List<SchoolZoneAccInfo> schoolZoneAccInfoList = new ArrayList<>();
+        List<SchoolZoneInfo> schoolZoneInfoList = new ArrayList<>();
         for (int i = 0; i < items.length(); i++) {
             JSONObject item = items.getJSONObject(i);
 
-            SchoolZoneAccInfo zoneAccInfo = new SchoolZoneAccInfo();
-            zoneAccInfo.setBjDongCode(item.getString("bjd_cd"));   // 법정동 코드
-            zoneAccInfo.setSidoSggNnm(item.getString("sido_sgg_nm")); // 지점의 시도시군구명
-            zoneAccInfo.setSpotNm(item.getString("spot_nm"));      // 사고가 발생한 시도 및 시군구 명칭
-            zoneAccInfo.setOccrrncCnt(item.getInt("occrrnc_cnt")); // 발생 건수
-            zoneAccInfo.setCasltCnt(item.getInt("caslt_cnt"));     // 사상자 수
-            zoneAccInfo.setDthDnvCnt(item.getInt("dth_dnv_cnt"));  // 사망자 수
-            zoneAccInfo.setSeDnvCnt(item.getInt("se_dnv_cnt"));    // 중상자 수
-            zoneAccInfo.setSlDnvCnt(item.getInt("sl_dnv_cnt"));    // 경상자 수
-            zoneAccInfo.setLoCrd(item.getString("lo_crd"));        // 경도(lnt)
-            zoneAccInfo.setLaCrd(item.getString("la_crd"));        // 위도(lat)
+            SchoolZoneInfo schoolZoneInfo = new SchoolZoneInfo();
+            schoolZoneInfo.setBjDongCode(item.getString("bjd_cd"));   // 법정동 코드
+            schoolZoneInfo.setSidoSggNnm(item.getString("sido_sgg_nm")); // 지점의 시도시군구명
+            schoolZoneInfo.setSpotNm(item.getString("spot_nm"));      // 사고가 발생한 시도 및 시군구 명칭
+            schoolZoneInfo.setOccrrncCnt(item.getInt("occrrnc_cnt")); // 발생 건수
+            schoolZoneInfo.setCasltCnt(item.getInt("caslt_cnt"));     // 사상자 수
+            schoolZoneInfo.setDthDnvCnt(item.getInt("dth_dnv_cnt"));  // 사망자 수
+            schoolZoneInfo.setSeDnvCnt(item.getInt("se_dnv_cnt"));    // 중상자 수
+            schoolZoneInfo.setSlDnvCnt(item.getInt("sl_dnv_cnt"));    // 경상자 수
+            schoolZoneInfo.setLoCrd(item.getString("lo_crd"));        // 경도(lnt)
+            schoolZoneInfo.setLaCrd(item.getString("la_crd"));        // 위도(lat)
 
-            schoolZoneAccInfoList.add(zoneAccInfo);
+            schoolZoneInfoList.add(schoolZoneInfo);
         }
-        return schoolZoneAccInfoList;
+        return schoolZoneInfoList;
     }
 }
