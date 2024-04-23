@@ -30,44 +30,45 @@ public class MemberService {
     private final MyPageService myPageService;
     private final BadgeRepo badgeRepo;
 
-    public MemberDto readMember(String userId){
+    public MemberDto readMember(String userId) {
         Member member = memberRepo.findByUserId(userId)
                 .orElseThrow(
-                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
                 );
         return MemberDto.fromEntity(member);
     }
+
     @Transactional
     public void updateMember(String userId, UpdateDto dto) {
 
         Member member = memberRepo.findByUserId(userId)
                 .orElseThrow(
-                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
                 );
         //비밀번호와 비밀번호 체크가 동일한가
-        if (!dto.getPassword().equals(dto.getPasswordCk())){
+        if (!dto.getPassword().equals(dto.getPasswordCk())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호와 비밀번호 체크가 일치하지 않습니다.");
         }
-        
+
         //null과 공백 체크 and 값이 변경되었다면
         if (!ObjectUtils.isEmpty(dto.getPassword()) &&
-            !dto.getPassword().equals(member.getPassword())){
+                !dto.getPassword().equals(member.getPassword())) {
             member.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
         if (!ObjectUtils.isEmpty(dto.getEmail()) &&
-            !dto.getEmail().equals(member.getEmail())){
+                !dto.getEmail().equals(member.getEmail())) {
             member.setEmail(dto.getEmail());
         }
         if (!ObjectUtils.isEmpty(dto.getNickName()) &&
-            !dto.getNickName().equals(member.getNickname())){
+                !dto.getNickName().equals(member.getNickname())) {
             member.setNickname(dto.getNickName());
         }
         if (!ObjectUtils.isEmpty(dto.getPhoneNumber()) &&
-            !dto.getPhoneNumber().equals(member.getPhoneNumber())){
+                !dto.getPhoneNumber().equals(member.getPhoneNumber())) {
             member.setPhoneNumber(dto.getPhoneNumber());
         }
         if (!ObjectUtils.isEmpty(dto.getBirthday()) &&
-            !dto.getBirthday().equals(member.getBirthday())){
+                !dto.getBirthday().equals(member.getBirthday())) {
             member.setBirthday(dto.getBirthday());
         }
 
@@ -76,17 +77,17 @@ public class MemberService {
     }
 
     //id찾기
-    public Long readMemberId(String userId){
+    public Long readMemberId(String userId) {
         Member member = memberRepo.findByUserId(userId)
                 .orElseThrow(
-                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
                 );
         return member.getId();
     }
 
     //회원가입
     @Transactional
-    public void join(JoinDto dto){
+    public void join(JoinDto dto) {
         manager.createUser(CustomMemberDetails.builder()
                 .userId(dto.getUserId())
                 .userName(dto.getUserName())
@@ -103,10 +104,10 @@ public class MemberService {
     //뱃지 생성
     //등급 뱃지 하나 추가(킥보드 등급)
     @Transactional
-    public Badge createBadge(String userId){
+    public Badge createBadge(String userId) {
         Member member = memberRepo.findByUserId(userId)
                 .orElseThrow(
-                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
                 );
         Badge badge = Badge.builder()
                 .member(member)
@@ -115,13 +116,32 @@ public class MemberService {
         return badgeRepo.save(badge);
     }
 
-    public int duplicateCkForId(String userId){
-        Optional<Member> optionalMember = memberRepo.findByUserId(userId);
+    //아이디 중복확인용
+    public int duplicateCkForId(String userId) {
+        //중복확인용
+        int isDuplicated = 0;
+        boolean isExist = memberRepo.existsByUserId(userId);
+        if (isExist)
+            isDuplicated = 1;
+        return isDuplicated;
+    }
 
-        if (optionalMember.isPresent()){
-            return 1;
-        } else {
-            return 0;
-        }
+    //닉네임 중복확인용
+    public int duplicateCkForNickname(String nickName) {
+        //중복확인용
+        int isDuplicated = 0;
+        boolean isExist = memberRepo.existsByNickname(nickName);
+        if (isExist)
+            isDuplicated = 1;
+        return isDuplicated;
+    }
+    //이메일 중복확인용
+    public int duplicateCkForEmail(String email) {
+        //중복확인용
+        int isDuplicated = 0;
+        boolean isExist = memberRepo.existsByEmail(email);
+        if (isExist)
+            isDuplicated = 1;
+        return isDuplicated;
     }
 }

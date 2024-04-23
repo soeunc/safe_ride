@@ -50,7 +50,9 @@ public class WebSecurityConfig {
                                         "/public-bicycle/**",
                                         "/public-bicycle-test/**",
                                         "/error",
-                                        "/safe-ride/duplicateCkForId"//아이디 중복확인
+                                        "/safe-ride/duplicateCkForId",//아이디 중복확인
+                                        "/safe-ride/duplicateCkForNickname",//닉네임 중복확인
+                                        "/safe-ride/duplicateCkForEmail"//이메일 중복확인
                                 )
                                 // 이 경로에 도달할 수 있는 사람에 대한 설정(모두)
                                 .permitAll()

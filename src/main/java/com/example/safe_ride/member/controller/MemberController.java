@@ -98,4 +98,24 @@ public class MemberController {
         return memberService.duplicateCkForId(userId);
     }
 
+    //닉네임 중복확인
+    @PostMapping("/duplicateCkForNickname")
+    @ResponseBody
+    public int duplicateCkForNickname(
+            @RequestParam("nickName")
+            String nickName
+    ){
+        return memberService.duplicateCkForNickname(nickName);
+    }
+
+    //닉네임 중복확인
+    @PostMapping("/duplicateCkForEmail")
+    @ResponseBody
+    public int duplicateCkForEmail(
+            @RequestParam("email")
+            String email
+    ){
+        return memberService.duplicateCkForEmail(email);
+    }
+
 }
