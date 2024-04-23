@@ -3,219 +3,219 @@
         lang="en" xmlns:sec="http://www.w3.org/1999/xhtml"
         xmlns:th="http://www.thymeleaf.org"
 >
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <head>
-    <meta charset="UTF-8">
+
+<head>
+    <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+    <!--👇여기에 기타 header 넣어주시면 됩니다👇-->
     <style>
-        #topInfo{
+        #topInfo {
             height: 130px;
         }
+
         #riding-record {
             display: inline-block; /* 가로로 나열하기 위해 block레벨 요소를 inline-block레벨로 전환 */
             width: 33%; /* 영역 크기 지정 안해주면 inline 레벨처럼 내용물 만큼만 차지하기 때문에 크기 지정 */
             border: 2px solid aqua;
             background: orange;
         }
+
         #prifile-update {
             display: inline-block; /* 가로로 나열하기 위해 block레벨 요소를 inline-block레벨로 전환 */
             width: 50%; /* 영역 크기 지정 안해주면 inline 레벨처럼 내용물 만큼만 차지하기 때문에 크기 지정 */
             border: 2px solid aqua;
             background: orange;
         }
-        #introduce{
+
+        #introduce {
             display: inline-block;
         }
-        .badge-grade{
+
+        .badge-grade {
             width: 70px;
         }
-        #chart{
+
+        #chart {
             width: 800px;
             height: 400px;
         }
     </style>
-    <title>마이프로필</title>
+    <!--👆 여기에 기타 header 넣어주시면 됩니다 👆-->
 </head>
+
 <body>
-    <div id="topInfo">
-        <h1>My Profile</h1>
-        <h3 id="introduce">반갑습니다, <span sec:authentication="name"></span>님!</h3>
-        <span th:if="${#strings.equals(badges.getGrade(), 'QUICK_BOARD')}">
-            <img class="badge-grade" src="/img/badge/kickboard.png" >
-        </span>
-        <span th:if="${#strings.equals(badges.getGrade(), 'BYCICLE')}">
-            <img class="badge-grade" src="/img/badge/bicycle.png">
-        </span>
-        <span th:if="${#strings.equals(badges.getGrade(), 'SCOOTER')}">
-            <img class="badge-grade" src="/img/badge/scooter.png">
-        </span>
-        <span th:if="${#strings.equals(badges.getGrade(), 'MOTOR_CYCLE')}">
-            <img class="badge-grade" src="/img/badge/motorcycle.png">
-        </span>
+<div class="wrapper">
+    <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
 
-    </div>
-    <!--뱃지 넣기-->
-
-    <div id="container">
-    <!--라이딩 기록-->
-        <div id="riding-record">
-            <h2>라이딩 기록</h2>
-            <!--라이딩 기록이 없을 떄-->
-            <div th:if="${#strings.isEmpty(ridingRecord.getTotalRecord())}">
-                <h3>기록이 아직 없습니다!</h3>
+    <div class="main">
+        <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
+        <main>
+            <div class="container mt-4">
+                <!--👇여기에 내용 넣어주시면 됩니다👇-->
+                <div class="container mt-4">
+                    <div id="topInfo">
+                        <h1 id="introduce">반갑습니다, <span sec:authentication="name"></span>님!</h1>
+                        <span th:if="${#strings.equals(badges.getGrade(), 'QUICK_BOARD')}">
+                        <img class="badge-grade" src="/img/badge/kickboard.png">
+                        </span>
+                        <span th:if="${#strings.equals(badges.getGrade(), 'BYCICLE')}">
+                            <img class="badge-grade" src="/img/badge/bicycle.png">
+                        </span>
+                        <span th:if="${#strings.equals(badges.getGrade(), 'SCOOTER')}">
+                            <img class="badge-grade" src="/img/badge/scooter.png">
+                        </span>
+                        <span th:if="${#strings.equals(badges.getGrade(), 'MOTOR_CYCLE')}">
+                            <img class="badge-grade" src="/img/badge/motorcycle.png">
+                        </span>
+                    </div>
+                    <div id="container">
+                        <!--라이딩 기록-->
+                        <div id="riding-record">
+                            <h2>라이딩 기록</h2>
+                            <!--라이딩 기록이 없을 떄-->
+                            <div th:if="${#strings.isEmpty(ridingRecord.getTotalRecord())}">
+                                <h3>기록이 아직 없습니다!</h3>
+                            </div>
+                            <!--라이딩 기록이 존재한다면-->
+                            <div th:unless="${#strings.isEmpty(ridingRecord.getTotalRecord())}">
+                                <div id="total-record">
+                                    <h3>총 기록</h3>
+                                    <span>[[${ridingRecord.getTotalRecord()}]]km 탔어요! :)</span>
+                                </div>
+                                <div id="weekly-record">
+                                    <h3>주간 기록</h3>
+                                    <span>[[${ridingRecord.getWeeklyRecord()}]]km 탔어요! :)</span>
+                                </div>
+                                <!--오늘자 기록이 없을 떄-->
+                                <div th:if="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
+                                    <h4>오늘 기록이 아직 없습니다! 열심히 달려봐요! :)</h4>
+                                </div>
+                                <div th:unless="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
+                                    <h3>오늘 기록</h3>
+                                    <span>[[${ridingRecord.getTodayRecord()}]]km 탔어요! :)</span>
+                                </div>
+                            </div>
+                            <form action="/safe-ride/myprofile/create-today" method="post">
+                                <input id="today-record-input" name="todayRecord" type="number" required
+                                       placeholder="오늘 기록을 입력">
+                                <input type="submit" value="입력">
+                            </form>
+                        </div>
+                        <div id="chart">
+                            <canvas id="bar-chart"></canvas>
+                        </div>
+                        <!--프로필 수정-->
+                        <div id="prifile-update">
+                            <h2>프로필 수정</h2>
+                            <form action="/safe-ride/myprofile/update" method="post">
+                                <div>
+                                    <label for="password">비밀번호</label>
+                                    <input id="password" name="password" type="password" maxlength="30" placeholder="비밀번호 재설정">
+                                </div>
+                                <div>
+                                    <label for="passwordCk">비밀번호</label>
+                                    <input id="passwordCk" name="passwordCk" type="password" maxlength="30" placeholder="비밀번호 재설정 확인">
+                                </div>
+                                <div>
+                                    <label for="email">이메일</label>
+                                    <input id="email" name="email" type="text" maxlength="30" th:value="${member.email}">
+                                </div>
+                                <div>
+                                    <label for="nickName">닉네임</label>
+                                    <input id="nickName" name="nickName" type="text" maxlength="30" th:value="${member.nickname}">
+                                </div>
+                                <div>
+                                    <label for="phoneNumber">전화번호</label>
+                                    <input id="phoneNumber" name="phoneNumber" type="text" oninput="onInputPhone(this)" maxlength="13"
+                                           th:value="${member.getPhoneNumber()}">
+                                </div>
+                                <div>
+                                    <label for="birthday">생년월일</label>
+                                    <input id="birthday" name="birthday" type="text" oninput="onInputBirth(this)" maxlength="8"
+                                           th:value="${member.getBirthday()}">
+                                </div>
+                                <div>
+                                    <input type="submit" value="수정하기">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <form action="/safe-ride/logout">
+                        <input type="submit" value="로그아웃">
+                    </form>
+                    <a href="/safe-ride">홈으로</a>
+                </div>
+                <!--👆여기에 내용 넣어주시면 됩니다👆-->
             </div>
-            <!--라이딩 기록이 존재한다면-->
-            <div th:unless="${#strings.isEmpty(ridingRecord.getTotalRecord())}">
-                <div id="total-record">
-                    <h3>총 기록</h3>
-                    <span>[[${ridingRecord.getTotalRecord()}]]km 탔어요! :)</span>
-                </div>
-                <div id="weekly-record">
-                    <h3>주간 기록</h3>
-                    <span>[[${ridingRecord.getWeeklyRecord()}]]km 탔어요! :)</span>
-                </div>
-                <!--오늘자 기록이 없을 떄-->
-                <div th:if="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
-                    <h4>오늘 기록이 아직 없습니다! 열심히 달려봐요! :)</h4>
-                </div>
-                <div th:unless="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
-                    <h3>오늘 기록</h3>
-                    <span>[[${ridingRecord.getTodayRecord()}]]km 탔어요! :)</span>
-                </div>
-            </div>
-            <form action="/safe-ride/myprofile/create-today" method="post">
-                <input id="today-record-input" name="todayRecord" type="number" required placeholder="오늘 기록을 입력">
-                <input type="submit" value="입력">
-            </form>
-        </div>
-        <div id="chart">
-            <canvas id="bar-chart"></canvas>
-        </div>
-<!--        <div id="matching-record">-->
-<!--            <h3>매칭기록</h3>-->
-<!--            <table class="table">-->
-<!--                <thead>-->
-<!--                <tr>-->
-<!--                    <th scope="col">매칭 신청자 ID</th>-->
-<!--                    <th scope="col">평가 점수</th>-->
-<!--                    <th scope="col">리뷰 코멘트</th>-->
-<!--                    <th scope="col">리뷰 작성자 ID</th>-->
-<!--                    <th scope="col">리뷰 받은 사람 ID</th>-->
-<!--                </tr>-->
-<!--                </thead>-->
-<!--                <tbody th:if="${ridingRecord.getManner().id == null}">-->
-<!--                    <tr>-->
-<!--                        &lt;!&ndash;Matching&ndash;&gt;-->
-<!--                        <th scope="col" th:text="데이터없음"></th>-->
-<!--                    </tr>-->
-<!--                </tbody>-->
-<!--                <tbody th:unless="${ridingRecord.getManner().id == null}">-->
-<!--                <tr>-->
-<!--                    &lt;!&ndash;Matching&ndash;&gt;-->
-<!--                    <th scope="col" th:text="사용자1"></th>-->
-<!--                    <th scope="col" th:text="별다섯개"></th>-->
-<!--                    <th scope="col" th:text="재밌었습니다"></th>-->
-<!--                    <th scope="col" th:text="사용자1"></th>-->
-<!--                    <th scope="col" th:text="사용자2"></th>-->
-<!--                </tr>-->
-<!--                </tbody>-->
-<!--            </table>-->
-<!--        </div>-->
-
-    <!--프로필 수정-->
-        <div id="prifile-update">
-            <h2>프로필 수정</h2>
-            <form action="/safe-ride/myprofile/update" method="post">
-                <div>
-                  <label for="password">비밀번호</label>
-                  <input id="password" name="password" type="password" placeholder="비밀번호 재설정">
-                </div>
-                <div>
-                    <label for="passwordCk">비밀번호</label>
-                    <input id="passwordCk" name="passwordCk" type="password" placeholder="비밀번호 재설정 확인">
-                </div>
-                <div>
-                  <label for="email">이메일</label>
-                  <input id="email" name="email" type="text" th:value="${member.email}">
-                </div>
-                <div>
-                  <label for="nickName">닉네임</label>
-                  <input id="nickName" name="nickName" type="text" th:value="${member.nickname}">
-                </div>
-                <div>
-                  <label for="phoneNumber">전화번호</label>
-                  <input id="phoneNumber" name="phoneNumber" type="number" th:value="${member.getPhoneNumber()}">
-                </div>
-                <div>
-                  <label for="birthday">생년월일</label>
-                  <input id="birthday" name="birthday" type="number" th:value="${member.getBirthday()}">
-                </div>
-                <div>
-                    <input type="submit" value="수정하기">
-                </div>
-            </form>
-        </div>
+        </main>
+        <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
     </div>
-    <form action="/safe-ride/logout">
-      <input type="submit" value="로그아웃">
-    </form>
+</div>
 
-    <a href="/safe-ride">홈으로</a>
-    <!--chart.js-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-    <script th:inline="javascript">
+<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
+<script src="js/app.js"></script>
+<!--chart.js-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<script th:inline="javascript">
 
-        window.onload = function () {
-            //alert
-            const alertMsg = [[${msg}]];
+    window.onload = function () {
+        //alert
+        const alertMsg = [[${msg}]];
 
-            if (alertMsg){
-                alert(alertMsg);
+        if (alertMsg) {
+            alert(alertMsg);
+        }
+    }
+    const thisWeek = [[${ridingRecord.thisWeek}]];
+    const weeklyRecordList = [[${ridingRecord.weeklyRecordList}]];
+    new Chart(document.getElementById("bar-chart"), {
+        type: 'bar',
+        data: {
+            labels: [
+                thisWeek.at(0),
+                thisWeek.at(1),
+                thisWeek.at(2),
+                thisWeek.at(3),
+                thisWeek.at(4),
+                thisWeek.at(5),
+                thisWeek.at(6)],
+            datasets: [
+                {
+                    label: "Population (millions)",
+                    backgroundColor: ["#ff0000", "#ff7f27", "#ffd900", "#00db07", "#00b7ff", "#3700dc", "#a600ff"],
+                    data: [
+                        weeklyRecordList.at(0),
+                        weeklyRecordList.at(1),
+                        weeklyRecordList.at(2),
+                        weeklyRecordList.at(3),
+                        weeklyRecordList.at(4),
+                        weeklyRecordList.at(5),
+                        weeklyRecordList.at(6),
+                    ]
+                }
+            ]
+        },
+        options: {
+            legend: {display: false},
+            title: {
+                display: true,
+                text: '주간 라이딩 기록'
             }
         }
-        const thisWeek = [[${ridingRecord.thisWeek}]];
-        const weeklyRecordList = [[${ridingRecord.weeklyRecordList}]];
-        new Chart(document.getElementById("bar-chart"), {
-            type: 'bar',
-            data: {
-                labels: [
-                    thisWeek.at(0),
-                    thisWeek.at(1),
-                    thisWeek.at(2),
-                    thisWeek.at(3),
-                    thisWeek.at(4),
-                    thisWeek.at(5),
-                    thisWeek.at(6)],
-                datasets: [
-                    {
-                        label: "Population (millions)",
-                        backgroundColor: ["#ff0000", "#ff7f27","#ffd900","#00db07","#00b7ff","#3700dc","#a600ff"],
-                        data: [
-                            weeklyRecordList.at(0),
-                            weeklyRecordList.at(1),
-                            weeklyRecordList.at(2),
-                            weeklyRecordList.at(3),
-                            weeklyRecordList.at(4),
-                            weeklyRecordList.at(5),
-                            weeklyRecordList.at(6),
-                        ]
-                    }
-                ]
-            },
-            options: {
-                legend: { display: false },
-                title: {
-                    display: true,
-                    text: '주간 라이딩 기록'
-                }
-            }
-        });
-    </script>
-    <!--bootstrap-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-            crossorigin="anonymous">
-    </script>
+    });
 
+    //전화번호정규식
+    function onInputPhone(target) {
+        target.value = target.value
+            .replace(/[^0-9]/g, '')
+            .replace(/(^02.{0}|^01.{1}|[0-9]{3,4})([0-9]{3,4})([0-9]{4})/g, "$1-$2-$3");
+    }
+    //생년월일정규식
+    function onInputBirth(target) {
+        target.value = target.value
+            .replace(/[^0-9]/g, '')
+            .replace(/^(19[0-9][0-9]|20\d{2})(0[0-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$/);
+    }
+</script>
+<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
 </body>
 </html>

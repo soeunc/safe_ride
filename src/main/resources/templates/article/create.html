@@ -1,34 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Create Article</title>
+  <title>세이프라이드: 안전한 라이딩의 시작</title>
+  <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+  <!--👇여기에 header script 넣어주시면 됩니다👇-->
+
+  <!--👆여기에 header script 넣어주시면 됩니다👆-->
 </head>
+
 <body>
+<div class="wrapper">
+  <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
 
-<h1>게시글 작성</h1>
+  <div class="main">
+    <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
 
-<form th:action="@{/article/create}" method="post">
-  <label for="title">제목:</label><br>
-  <input type="text" id="title" name="title"><br>
+    <div class="main">
+      <main class="content">
+        <!--👇여기에 내용 넣어주시면 됩니다👇-->
+        <div class="container mt-4">
 
-  <label for="content">내용:</label><br>
-  <textarea id="content" name="content"></textarea><br>
+          <h1>게시글 작성</h1>
 
-  <label for="metropolitanCity">Metropolitan City:</label><br>
-  <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
-    <option value="">광역자치구를 선택하시오.</option>
-    <option th:each="city : ${metropolitanCities}" th:value="${city}" th:text="${city}"></option>
-  </select><br>
+          <form th:action="@{/article/create}" method="post">
+            <label for="title">제목:</label><br>
+            <input type="text" id="title" name="title"><br>
 
-  <label for="city">도시를 선택하시오:</label><br>
-  <select id="city" name="city">
-    <option value="">도시를 선택하시오</option>
-  </select><br>
+            <label for="content">내용:</label><br>
+            <textarea id="content" name="content"></textarea><br>
 
-  <button type="submit">작성</button>
-</form>
-<a href="/" >뒤로 가기</a> <br>
+            <label for="metropolitanCity">Metropolitan City:</label><br>
+            <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
+              <option value="">광역자치구를 선택하시오.</option>
+              <option th:each="city : ${metropolitanCities}" th:value="${city}" th:text="${city}"></option>
+            </select><br>
+
+            <label for="city">도시를 선택하시오:</label><br>
+            <select id="city" name="city">
+              <option value="">도시를 선택하시오</option>
+            </select><br>
+
+            <button type="submit">작성</button>
+          </form>
+          <a href="/" >뒤로 가기</a> <br>
+        </div>
+        <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
+      </main>
+
+      <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
+    </div>
+  </div>
+</div>
+</body>
+
+<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
 <script>
     function fetchCities() {
         var metropolitanCity = document.getElementById('metropolitanCity').value;
@@ -66,6 +92,7 @@
         xhr.send();
     }
 </script>
+<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
 
-</body>
+<script src="/js/app.js"></script> <!-- template -->
 </html>

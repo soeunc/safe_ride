@@ -1,6 +1,7 @@
 package com.example.safe_ride.locationInfo.service;
 
 import com.example.safe_ride.locationInfo.entity.LocationInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -9,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
+@Slf4j
 @Service
 public class DbLoader {
 
@@ -41,8 +43,7 @@ public class DbLoader {
                 pstmt.executeUpdate();
                 affectedRows ++;
             }
-            System.out.println("DB Path: " + conn.getMetaData().getURL());
-            System.out.println("Inserted rows: " + affectedRows);  // 삽입된 행의 수 출력
+            log.info("Inserted rows: " + affectedRows);  // 삽입된 행의 수 출력
             conn.commit();  // 변경사항 커밋
         } catch (Exception e) {
             e.printStackTrace();

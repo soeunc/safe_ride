@@ -1,81 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title></title>
+  <title>세이프라이드: 안전한 라이딩의 시작</title>
+  <th:block th:replace="~{common/header :: headerFragment}"></th:block>
   <style>
       .hidden {
           display: none;
       }
   </style>
 </head>
+
 <body>
-<div class="container">
-  <div class="post-details">
-    <div>
-      <p th:text="${matching.comment}" style="word-wrap: break-word;"></p>
-    </div>
-  </div>
+<div class="wrapper">
+  <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
+  <div class="main">
+    <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
+    <main class="content">
+      <!--👇여기에 내용 넣어주시면 됩니다👇-->
+      <div class="container mt-4">
+        <div class="post-details">
+          <div>
+            <p th:text="${matching.comment}" style="word-wrap: break-word;"></p>
+          </div>
+        </div>
 
-  <!-- 매칭 상태가 ACCEPTED일 경우 매칭이 성사되었다는 메시지 표시 -->
-  <div th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
-    <h4>매칭 신청</h4>
-    <p>매칭이 성사가 완료 되었습니다^^</p>
-  </div>
+        <!-- 매칭 상태가 ACCEPTED일 경우 매칭이 성사되었다는 메시지 표시 -->
+        <div th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
+          <h4>매칭 신청</h4>
+          <p>매칭이 성사가 완료 되었습니다^^</p>
+        </div>
 
-  <!-- 매칭 상태가 ACCEPTED가 아닌 경우에 매칭 신청 관련 요소들을 표시 -->
-  <div th:unless="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
-    <button id="applyButton" class="apply-button">매칭 신청</button>
-    <!-- 매칭 신청 폼 -->
-    <div id="applicationForm" class="hidden">
-      <form th:action="@{'/matching/' + ${matching.id} + '/apply'}" method="post">
-        <input type="hidden" name="matchingId" th:value="${matching.id}">
-        <label for="message">신청 메시지:</label>
-        <textarea id="message" name="message" rows="4" cols="50"></textarea><br>
-        <button type="submit" class="submit-button">신청하기</button>
+        <!-- 매칭 상태가 ACCEPTED가 아닌 경우에 매칭 신청 관련 요소들을 표시 -->
+        <div th:unless="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
+          <button id="applyButton" class="apply-button">매칭 신청</button>
+          <!-- 매칭 신청 폼 -->
+          <div id="applicationForm" class="hidden">
+            <form th:action="@{'/matching/' + ${matching.id} + '/apply'}" method="post">
+              <input type="hidden" name="matchingId" th:value="${matching.id}">
+              <label for="message">신청 메시지:</label>
+              <textarea id="message" name="message" rows="4" cols="50"></textarea><br>
+              <button type="submit" class="submit-button">신청하기</button>
+            </form>
+          </div>
+          <!-- 매칭 신청 목록 토글 버튼 -->
+          <button id="toggleApplicationsButton">매칭 신청 목록</button>
+          <!-- 매칭 신청 목록 -->
+          <!-- 매칭 신청 목록 -->
+          <div id="applicationsList" class="hidden">
+            <ul>
+              <li th:each="apply : ${applications}">
+                <span th:text="${apply.id}"></span>
+                <span th:text="${apply.message}"></span>
+                <!-- 작성자와 현재 사용자가 동일한 경우에만 매칭 신청에 대한 수락, 거절 및 취소 버튼을 표시 -->
+                <div th:if="${matching.member.id == currentUser.id}">
+                  <form th:action="@{'/matching/' + ${matching.id} + '/accept/' + ${apply.id}}" method="post">
+                    <button type="submit" class="accept-button">수락</button>
+                  </form>
+                  <form th:action="@{'/matching/' + ${matching.id} + '/reject/' + ${apply.id}}" method="post">
+                    <button type="submit" class="reject-button">거절</button>
+                  </form>
+                </div>
+                <div th:if="${apply.applicant.id == currentUser.id}">
+                  <!-- 매칭 신청에 대한 취소 버튼 -->
+                  <form th:action="@{'/matching/' + ${matching.id} + '/cancel-application'}" method="post">
+                    <input type="hidden" name="applicationId" th:value="${apply.id}">
+                    <button type="submit" class="cancel-button">신청 취소</button>
+                  </form>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <a th:href="@{'/matching/' + ${matching.id} + '/edit'}" class="edit-button">수정</a>
+      <a href="/matching/list">홈으로</a> <br>
+      <form th:action="@{'/matching/' + ${matching.id} + '/delete'}" method="post" id="deleteForm">
+        <button type="submit" onclick="confirmDelete()" class="delete-button">삭제</button>
       </form>
-    </div>
-    <!-- 매칭 신청 목록 토글 버튼 -->
-    <button id="toggleApplicationsButton">매칭 신청 목록</button>
-    <!-- 매칭 신청 목록 -->
-    <!-- 매칭 신청 목록 -->
-    <div id="applicationsList" class="hidden">
-      <ul>
-        <li th:each="apply : ${applications}">
-          <span th:text="${apply.id}"></span>
-          <span th:text="${apply.message}"></span>
-          <!-- 작성자와 현재 사용자가 동일한 경우에만 매칭 신청에 대한 수락, 거절 및 취소 버튼을 표시 -->
-          <div th:if="${matching.member.id == currentUser.id}">
-            <form th:action="@{'/matching/' + ${matching.id} + '/accept/' + ${apply.id}}" method="post">
-              <button type="submit" class="accept-button">수락</button>
-            </form>
-            <form th:action="@{'/matching/' + ${matching.id} + '/reject/' + ${apply.id}}" method="post">
-              <button type="submit" class="reject-button">거절</button>
-            </form>
-          </div>
-          <div th:if="${apply.applicant.id == currentUser.id}">
-            <!-- 매칭 신청에 대한 취소 버튼 -->
-            <form th:action="@{'/matching/' + ${matching.id} + '/cancel-application'}" method="post">
-              <input type="hidden" name="applicationId" th:value="${apply.id}">
-              <button type="submit" class="cancel-button">신청 취소</button>
-            </form>
-          </div>
-        </li>
-      </ul>
-    </div>
+
+      <!-- 알림창 -->
+      <div id="notification" class="hidden"></div>
+
+      <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
+    </main>
+
+    <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
+
   </div>
 </div>
+</body>
 
-<a th:href="@{'/matching/' + ${matching.id} + '/edit'}" class="edit-button">수정</a>
-<a href="/matching/list">홈으로</a> <br>
-<form th:action="@{'/matching/' + ${matching.id} + '/delete'}" method="post" id="deleteForm">
-  <button type="submit" onclick="confirmDelete()" class="delete-button">삭제</button>
-</form>
-
-<!-- 알림창 -->
-<div id="notification" class="hidden"></div>
-
+<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
 <script>
     // 게시글 삭제 시 확인창
     function confirmDelete() {
@@ -95,7 +112,7 @@
         notification.innerHTML = message;
         notification.classList.remove("hidden");
         // 3초 후에 알림창 숨김
-        setTimeout(function() {
+        setTimeout(function () {
             notification.classList.add("hidden");
         }, 3000);
     }
@@ -107,7 +124,7 @@
     }
 
     // 매칭 신청 버튼 클릭 시 매칭 신청 폼을 토글 및 알림창 표시
-    document.getElementById("applyButton").addEventListener("click", function(event) {
+    document.getElementById("applyButton").addEventListener("click", function (event) {
         toggleApplicationForm();
         // 여기서 매칭 신청이 성공했는지 여부를 확인하고 알림창을 표시합니다.
         // 아래의 코드를 사용자가 요청한 응답 결과에 맞게 수정하십시오.
@@ -126,5 +143,7 @@
     document.getElementById("toggleApplicationsButton").addEventListener("click", toggleApplicationsList);
 
 </script>
-</body>
+<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
+
+<script src="/js/app.js"></script> <!-- template -->
 </html>

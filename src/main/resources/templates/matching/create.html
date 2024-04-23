@@ -1,32 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Create Article</title>
+  <title>세이프라이드: 안전한 라이딩의 시작</title>
+  <th:block th:replace="~{common/header :: headerFragment}"></th:block>
 </head>
+
 <body>
+<div class="wrapper">
+  <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
+  <div class="main">
+    <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
+    <main class="content">
+      <!--👇여기에 내용 넣어주시면 됩니다👇-->
+      <div class="container mt-4">
 
-<h1>게시글 작성</h1>
+        <h1>게시글 작성</h1>
 
-<form action="/matching/create" method="post">
+        <form action="/matching/create" method="post">
 
-  <label for="comment">내용:</label><br>
-  <textarea id="comment" name="comment"></textarea><br>
+          <label for="comment">내용:</label><br>
+          <textarea id="comment" name="comment"></textarea><br>
 
-  <label for="metropolitanCity">Metropolitan City:</label><br>
-  <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
-    <option value="">광역자치구를 선택하시오.</option>
-    <option th:each="city : ${metropolitanCities}" th:value="${city}" th:text="${city}"></option>
-  </select><br>
+          <label for="metropolitanCity">Metropolitan City:</label><br>
+          <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
+            <option value="">광역자치구를 선택하시오.</option>
+            <option th:each="city : ${metropolitanCities}" th:value="${city}" th:text="${city}"></option>
+          </select><br>
 
-  <label for="city">도시를 선택하시오:</label><br>
-  <select id="city" name="city">
-    <option value="">도시를 선택하시오</option>
-  </select><br>
+          <label for="city">도시를 선택하시오:</label><br>
+          <select id="city" name="city">
+            <option value="">도시를 선택하시오</option>
+          </select><br>
 
-  <button type="submit">작성</button>
-</form>
-<a href="/templates/articlees/article" >뒤로 가기</a> <br>
+          <button type="submit">작성</button>
+        </form>
+        <a href="/templates/articlees/article">뒤로 가기</a> <br>
+      </div>
+      <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
+    </main>
+
+    <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
+  </div>
+</div>
+</body>
+
+<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
 <script>
     function fetchCities() {
         var metropolitanCity = document.getElementById('metropolitanCity').value;
@@ -35,14 +54,14 @@
 
         // AJAX 요청을 통해 선택된 광역자치구에 해당하는 도시 목록을 서버로부터 가져옴
         var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     var cities = JSON.parse(xhr.responseText);
 
                     // 도시 목록을 새로고침
                     citySelect.innerHTML = '';
-                    cities.forEach(function(city) {
+                    cities.forEach(function (city) {
                         var option = document.createElement('option');
                         option.value = city.city; // 도시명을 가져와야 함
                         option.textContent = city.city;
@@ -64,6 +83,7 @@
         xhr.send();
     }
 </script>
+<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
 
-</body>
+<script src="/js/app.js"></script> <!-- template -->
 </html>

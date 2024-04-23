@@ -3,6 +3,7 @@ package com.example.safe_ride;
 import com.example.safe_ride.locationInfo.entity.LocationInfo;
 import com.example.safe_ride.locationInfo.service.DbCsvReader;
 import com.example.safe_ride.locationInfo.service.DbLoader;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import java.sql.Statement;
 import java.util.List;
 
 // 프로그램 시작 시 address.csv를 불러오고 DB에 추가하는 클래스
+@Slf4j
 @Component
 public class DataInitializer {
 
@@ -34,7 +36,7 @@ public class DataInitializer {
                 // 데이터 로딩 로직
                 List<LocationInfo> addresses = new DbCsvReader().readCsvData("src/main/resources/address.csv");
                 dbLoader.insertData(addresses);
-                System.out.println("Data has been loaded!");
+                log.info("Data has been loaded!");
             }
         } catch (Exception e) {
             e.printStackTrace();

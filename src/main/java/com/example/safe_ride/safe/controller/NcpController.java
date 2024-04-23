@@ -46,9 +46,9 @@ public class NcpController {
         // 2-1. 필더링된 사고정보 가져오기
         safetyService.saveFilteredAccidentInfo(pointDto);
 
-        // 2-2. DB에 저장된 좌표 가져오기
+        // 2-2. DB에 저장된 좌표 및 정보 가져오기
         List<CoordinateDto> coordinates = safetyService.getCoordinates();
-        log.info("사고위치 좌표값 :{}", coordinates);
+        log.info("사고위치 정보 :{}", coordinates);
 
         // 사용자 위치 좌표 및 사고 좌표
         NcpInfoDto ncpInfoDto = new NcpInfoDto();

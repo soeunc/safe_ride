@@ -1,22 +1,46 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Filtered Articles</title>
+  <title>세이프라이드: 안전한 라이딩의 시작</title>
+  <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+  <!--👇여기에 header script 넣어주시면 됩니다👇-->
+  <!--👆여기에 header script 넣어주시면 됩니다👆-->
 </head>
 <body>
-<div>
-  <h1>Filtered Articles</h1>
-  <div id="articleContainer" class="post-box">
-    <div class="article_details" th:each="article : ${articles}">
-      <a th:href="@{/templates/article/{id}(id=${article.id})}">
-        <h3 th:text="${article.title}"></h3>
-      </a>
-      <span>작성일자: <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
-      <span>조회수: <span th:text="${article.hit}"></span></span>
-      <br>
-    </div>
+<div class="wrapper">
+  <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
+
+  <div class="main">
+    <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
+    <main class="content">
+      <!--👇여기에 내용 넣어주시면 됩니다👇-->
+      <div class="container mt-4">
+        <h1>Filtered Articles</h1>
+        <div id="articleContainer" class="post-box">
+          <div class="article_details" th:each="article : ${articles}">
+            <a th:href="@{/templates/article/{id}(id=${article.id})}">
+              <h3 th:text="${article.title}"></h3>
+            </a>
+            <span>작성일자: <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
+            <span>조회수: <span th:text="${article.hit}"></span></span>
+            <br>
+          </div>
+        </div>
+      </div>
+      <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
+    </main>
+
+    <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
   </div>
 </div>
 </body>
+
+<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
+<script>
+
+</script>
+<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
+
+<script src="/js/app.js"></script> <!-- template -->
 </html>

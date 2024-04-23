@@ -1,39 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <title>세이프라이드: 안전한 라이딩의 시작</title>
+  <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+
+  <!--👇여기에 header script 넣어주시면 됩니다👇-->
+
+  <!--👆여기에 header script 넣어주시면 됩니다👆-->
 </head>
+
 <body>
-<div class="main">
-  <div th:if="${page.content.isEmpty()}">
-    <p>작성된 매칭글이 없습니다.</p>
+<div class="wrapper">
+  <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
+  <div class="main">
+    <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
+
+    <main class="content">
+        <!--👇여기에 내용 넣어주시면 됩니다👇-->
+        <div class="container mt-4">
+
+          <div th:if="${page.content.isEmpty()}">
+            <p>작성된 매칭글이 없습니다.</p>
+          </div>
+          <div th:unless="${page.content.isEmpty()}">
+            <div id="articleContainer" class="post-box">
+              <div class="article_details" th:each="matching : ${page.content}">
+                <a th:href="@{/matching/{id}(id=${matching.id})}">
+                  <h3 th:text="${matching.comment}"></h3>
+                </a>
+                <span>작성일자: <span th:text="${#dates.format(matching.createTime, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
+                <p th:text="${matching.status}"></p>
+              </div>
+            </div>
+          </div>
+          <br>
+          <a href="/matching/create">매칭 구하기</a> <br>
+        </div>
+        <div class="footer">
+          <!-- 페이지네이션 링크 추가 -->
+          <div th:if="${page.totalPages > 1}" class="pagination">
+            <div>
+              <a th:each="i : ${#numbers.sequence(0, page.totalPages-1)}"
+                 th:href="@{'/matching?page=' + ${i}}"
+                 th:class="${i == page.number} ? 'active'">
+                <span th:text="${i + 1}"></span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
+      </main>
+
+    <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
   </div>
-  <div th:unless="${page.content.isEmpty()}">
-    <div id="articleContainer" class="post-box">
-      <div class="article_details" th:each="matching : ${page.content}">
-        <a th:href="@{/matching/{id}(id=${matching.id})}">
-          <h3 th:text="${matching.comment}"></h3>
-        </a>
-        <span>작성일자: <span th:text="${#dates.format(matching.createTime, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
-        <p th:text="${matching.status}"></p>
-      </div>
-    </div>
   </div>
-  <br>
-  <a href="/matching/create">매칭 구하기</a> <br>
-</div>
-<div class="footer">
-  <!-- 페이지네이션 링크 추가 -->
-  <div th:if="${page.totalPages > 1}" class="pagination">
-    <div>
-      <a th:each="i : ${#numbers.sequence(0, page.totalPages-1)}"
-         th:href="@{'/matching?page=' + ${i}}"
-         th:class="${i == page.number} ? 'active'">
-        <span th:text="${i + 1}"></span>
-      </a>
-    </div>
-  </div>
-</div>
 </body>
+
+<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
+<script>
+
+</script>
+<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
+
+<script src="/js/app.js"></script> <!-- template -->
 </html>
