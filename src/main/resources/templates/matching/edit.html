@@ -19,19 +19,19 @@
       <div class="container mt-4">
         <h1>Edit Matching</h1>
         <form action="#" method="post">
-          <!--  <label for="title">제목:</label><br>-->
-          <!--  <input type="text" id="title" name="title" th:value="${matching.title}"><br>-->
-          <label for="comment">내용:</label>
+          <label for="title">제목:</label><br>
+          <input type="text" id="title" name="title" th:value="${matching.title}"><br>
+          <label for="ridingTime">라이딩 시간:</label><br>
+          <input type="datetime-local" id="ridingTime" name="ridingTime" required><br>
+          <label for="comment">라이딩 코스 소개:</label>
           <textarea name="comment" id="comment" rows="6" required th:text="${matching.comment}"></textarea><br>
           <label for="metropolitanCity">광역 자치구:</label><br>
           <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
-            <option th:each="city : ${metropolitanCities}" th:value="${city}" th:text="${city}"
-                    th:selected="${city == matching.metropolitanCity}"></option>
+            <option th:each="city : ${metropolitanCities}" th:value="${city}" th:text="${city}" th:selected="${city == matching.metropolitanCity}"></option>
           </select><br>
           <label for="city">도시:</label><br>
           <select id="city" name="city">
-            <option th:each="city : ${cities}" th:value="${city}" th:text="${city}"
-                    th:selected="${city == matching.city}"></option>
+            <option th:each="city : ${cities}" th:value="${city}" th:text="${city}" th:selected="${city == matching.city}"></option>
           </select><br>
           <input type="submit" value="Submit">
         </form>

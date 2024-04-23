@@ -30,11 +30,4 @@ public class MatchingApplication {
     @Enumerated(EnumType.STRING)
     private MatchingStatus status;          // 승인 상태
 
-    public void accept() {
-        this.status = MatchingStatus.ACCEPTED;
-    }
-
-    public void reject() {
-        this.status = MatchingStatus.REJECTED;
-    }
 }

@@ -1,12 +1,15 @@
 package com.example.safe_ride.matching.controller;
 
 import com.example.safe_ride.article.entity.Region;
+import com.example.safe_ride.article.repository.RegionRepository;
 import com.example.safe_ride.article.service.RegionService;
 import com.example.safe_ride.matching.dto.MatchingApplicationDto;
 import com.example.safe_ride.matching.dto.MatchingDto;
 import com.example.safe_ride.matching.entity.MatchingApplication;
 import com.example.safe_ride.matching.entity.MatchingStatus;
+import com.example.safe_ride.matching.service.MatchingApplicationService;
 import com.example.safe_ride.matching.service.MatchingService;
+import com.example.safe_ride.member.dto.MemberDto;
 import com.example.safe_ride.member.entity.Member;
 import com.example.safe_ride.member.repo.MemberRepo;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +36,8 @@ public class MatchingController {
     private final MatchingService matchingService;
     private final RegionService regionService;
     private final MemberRepo memberRepository;
+    private final MatchingApplicationService matchingApplicationService;
+    private final RegionRepository regionRepository;
     // 매칭글 생성 페이지 이동
     @GetMapping("/create")
     public String createMatchingForm(Model model) {
@@ -50,37 +57,74 @@ public class MatchingController {
 
     // 매칭글 생성 처리
     @PostMapping("/create")
-    public String createMatching(@ModelAttribute MatchingDto matchingDto) {
+    public String createMatching(@ModelAttribute MatchingDto matchingDto, @RequestParam("ridingTime") String ridingTimeString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        LocalDateTime ridingTime = LocalDateTime.parse(ridingTimeString, formatter);
+        matchingDto.setRidingTime(ridingTime);
+
         Long regionId = regionService.getRegionIdByMetropolitanCityAndCity(matchingDto.getMetropolitanCity(), matchingDto.getCity());
         matchingDto.setRegionId(regionId);
         Long newId = matchingService.createMatching(matchingDto).getId();
         return String.format("redirect:/matching/%d", newId);
     }
 
-    // 매칭글 상세 조회 페이지
+    // 매칭 상세 조회 페이지
     @GetMapping("/{id}")
     public String viewMatching(@PathVariable Long id, Model model) {
         MatchingDto matchingDto = matchingService.getMatchingById(id);
-        List<MatchingApplication> applications = matchingService.getApplicationsByMatchingId(id);
+        List<MatchingApplication> applications = matchingApplicationService.getApplicationsByMatchingId(id);
         // 현재 사용자 정보를 모델에 추가
         Member currentUser = getUserEntity();
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("matching", matchingDto);
         model.addAttribute("applications", applications);
+
+        // 매칭 엔티티에서 regionId 가져오기
+        Long regionId = matchingDto.getRegionId();
+        // regionId를 사용하여 Region 엔티티 조회
+        Region region = regionRepository.findById(regionId)
+                .orElseThrow(() -> new IllegalArgumentException("Region not found with id: " + regionId));
+        // Metropolitan city와 city 값을 모델에 추가
+        model.addAttribute("metropolitanCity", region.getMetropolitanCity());
+        model.addAttribute("city", region.getCity());
+
         return "matching/view";
     }
 
 
-    // 모든 매칭글 조회 페이지
     @GetMapping("/list")
-    public String homePage(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+    public String homePage(@RequestParam(name = "page", defaultValue = "0") int page,
+                           @RequestParam(name = "metropolitanCity", required = false) String metropolitanCity,
+                           @RequestParam(name = "city", required = false) String city, // 추가: 도시 파라미터
+                           Model model) {
         // 페이지네이션에 사용할 페이지 크기
         int pageSize = 12;
-        Page<MatchingDto> matchingDtoPage = matchingService.readPage(PageRequest.of(page, pageSize));
+        Page<MatchingDto> matchingDtoPage;
+
+        if (metropolitanCity != null && !metropolitanCity.isEmpty()) {
+            List<Region> cities = regionService.getCitiesByMetropolitanCity(metropolitanCity);
+            List<String> cityNames = cities.stream().map(Region::getCity).collect(Collectors.toList());
+            model.addAttribute("cities", cityNames);
+            if (city != null && !city.isEmpty()) {
+                matchingDtoPage = matchingService.readPageByMetropolitanCityAndCity(PageRequest.of(page, pageSize), metropolitanCity, city); // 수정: 도시 파라미터 추가
+            } else {
+                matchingDtoPage = matchingService.readPageByMetropolitanCity(PageRequest.of(page, pageSize), metropolitanCity);
+            }
+        } else {
+            // 광역자치구가 선택되지 않은 경우 모든 매칭글 조회
+            matchingDtoPage = matchingService.readPage(PageRequest.of(page, pageSize));
+        }
+
         model.addAttribute("page", matchingDtoPage);
+        model.addAttribute("selectedMetropolitanCity", metropolitanCity);
+
+        // 전체 광역자치구 목록을 가져와 모델에 추가
+        List<String> metropolitanCities = regionService.getAllMetropolitanCities();
+        model.addAttribute("metropolitanCities", metropolitanCities);
 
         return "matching/matchingList";
     }
+
 
     // 매칭글 수정
     @GetMapping("/{id}/edit")
@@ -118,7 +162,7 @@ public class MatchingController {
     // 매칭 신청 처리
     @PostMapping("/{id}/apply")
     public String applyForMatching(@PathVariable Long id, @ModelAttribute MatchingApplicationDto applicationDto) {
-        matchingService.applyForMatching(id, applicationDto);
+        matchingApplicationService.applyForMatching(id, applicationDto);
         return "redirect:/matching/" + id; //
     }
 
@@ -140,7 +184,7 @@ public class MatchingController {
             // 매칭 상태 업데이트
             matchingService.updateMatching(matchingId, matchingDto);
             // 매칭글 신청 ID 가져오기
-            matchingService.acceptMatchingApplication(applicationId); // 매칭 신청 ID를 전달하여 거절 처리
+            matchingApplicationService.acceptMatchingApplication(applicationId); // 매칭 신청 ID를 전달하여 거절 처리
         } else {
             // 매칭글 작성자가 아닌 경우에는 권한이 없다는 메시지를 보여줄 수 있습니다.
             // 혹은 다른 처리 방법을 선택할 수도 있습니다.
@@ -164,7 +208,7 @@ public class MatchingController {
         // 매칭글 작성자와 현재 로그인한 사용자가 같은 경우에만 거절 처리
         if(currentUser.getId().equals(matchingAuthorId)) {
             // 매칭글 신청 ID 가져오기
-            matchingService.rejectMatchingApplication(applicationId); // 매칭 신청 ID를 전달하여 거절 처리
+            matchingApplicationService.rejectMatchingApplication(applicationId); // 매칭 신청 ID를 전달하여 거절 처리
         } else {
             // 매칭글 작성자가 아닌 경우에는 권한이 없다는 메시지를 보여줄 수 있습니다.
             // 혹은 다른 처리 방법을 선택할 수도 있습니다.
@@ -188,11 +232,41 @@ public class MatchingController {
         // 현재 사용자 정보 가져오기
         Member currentUser = getUserEntity();
         // 매칭 신청 조회
-        MatchingApplication application = matchingService.getApplicationById(matchingId, currentUser.getId());
+        MatchingApplication application = matchingApplicationService.getApplicationById(matchingId, currentUser.getId());
         // 매칭 신청이 존재하고 상태가 PENDING이면 취소 처리
         if (application != null ) {
-            matchingService.cancelMatchingApplication(application);
+            matchingApplicationService.cancelMatchingApplication(application);
         }
         return "redirect:/matching/" + application.getMatching().getId();
     }
+
+    @GetMapping("/{matchingId}/applicantInfo/{applicationId}")
+    public String viewApplicantInfo(@PathVariable Long matchingId,
+                                    @PathVariable Long applicationId,
+                                    Model model) throws AccessDeniedException {
+        // 현재 로그인한 사용자 정보 가져오기
+        Member currentUser = getUserEntity();
+        // 해당 매칭의 작성자 정보 가져오기
+        MatchingDto matchingDto = matchingService.getMatchingById(matchingId);
+        Long matchingAuthorId = matchingDto.getMember().getId();
+
+        // 매칭글 작성자와 현재 로그인한 사용자가 같은 경우에만 처리
+        if (currentUser.getId().equals(matchingAuthorId)) {
+            // 매칭 신청자의 정보 가져오기
+            MatchingApplicationDto applicationDto = matchingApplicationService.getMatchingApplicationDtoById(applicationId);
+            // 매칭 신청자의 멤버 정보 가져오기
+            MemberDto applicantDto = applicationDto.getApplicant();
+
+            // 모델에 신청자의 정보 추가
+            model.addAttribute("applicant", applicantDto);
+        } else {
+            // 매칭글 작성자가 아닌 경우에는 권한이 없다는 메시지를 보여줄 수 있습니다.
+            // 혹은 다른 처리 방법을 선택할 수도 있습니다.
+            throw new AccessDeniedException("매칭글 작성자만 신청자 정보를 볼 수 있습니다.");
+        }
+
+        return "/matching/applicantInfo";
+    }
+
+
 }
