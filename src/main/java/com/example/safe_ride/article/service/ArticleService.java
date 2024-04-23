@@ -122,4 +122,20 @@ public class ArticleService {
                 .collect(Collectors.toList());
     }
 
+    public Page<ArticleDto> filterArticlesByRegion(Pageable pageable, String metropolitanCity, String city) {
+        // 선택된 광역자치구와 도시에 해당하는 Region ID 가져오기
+        Long regionId = regionService.getRegionIdByMetropolitanCityAndCity(metropolitanCity, city);
+
+        // 해당 Region ID를 리스트에 담아서 findByRegionIdIn 메서드에 전달
+        return articleRepository.findByRegionIdIn(pageable, List.of(regionId))
+                .map(ArticleDto::fromEntity);
+    }
+
+    public Page<ArticleDto> filterArticlesByMetropolitanCity(Pageable pageable, String metropolitanCity) {
+        List<Region> cities = regionService.getCitiesByMetropolitanCity(metropolitanCity);
+        List<Long> regionIds = cities.stream().map(Region::getId).collect(Collectors.toList());
+        Page<Article> articlePage = articleRepository.findByRegionIdIn(pageable, regionIds);
+        return articlePage.map(ArticleDto::fromEntity);
+    }
+
 }

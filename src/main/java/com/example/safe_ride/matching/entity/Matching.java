@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -25,6 +26,12 @@ public class Matching {
 
 
     @Setter
+    private String title;
+
+    @Setter
+    private LocalDateTime ridingTime; // 라이딩 시간
+
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_id")
     private Region region;
@@ -37,12 +44,5 @@ public class Matching {
     @OneToMany(mappedBy = "matching", cascade = CascadeType.ALL)
     private List<MatchingApplication> applications;
 
-    public void accept() {
-        this.status = MatchingStatus.ACCEPTED;
-    }
-
-    public void reject() {
-        this.status = MatchingStatus.REJECTED;
-    }
 }
 

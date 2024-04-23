@@ -3,11 +3,14 @@ package com.example.safe_ride.locationInfo.controller;
 import com.example.safe_ride.locationInfo.dto.BicycleInfo;
 import com.example.safe_ride.locationInfo.dto.StationAndBicycleInfo;
 import com.example.safe_ride.locationInfo.dto.StationInfo;
+import com.example.safe_ride.locationInfo.service.GeoLocationService;
 import com.example.safe_ride.locationInfo.service.LocationInfoService;
+import com.example.safe_ride.safe.dto.PointDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -58,12 +60,19 @@ public class LocationInfoController {
             combinedInfo.add(new StationAndBicycleInfo(station, bicycle));
         }
 
-
-
         session.setAttribute("combinedInfo", combinedInfo);
         model.addAttribute("isSearched", true);
         model.addAttribute("doroJuso", doroJuso);
         model.addAttribute("combinedInfo", combinedInfo);
+
+        return "/locationInfo/LocationInfo";
+    }
+
+    // 위치 제출 후 메인 페이지 (위도 경도)
+    @PostMapping("/public-bicycle/point")
+    public String pointData(
+    ) throws IOException {
+
 
         return "/locationInfo/LocationInfo";
     }
@@ -121,7 +130,20 @@ public class LocationInfoController {
         return "/locationInfo/jusoPopup";
     }
 
-    // geolocation
+    // 위도 경도 가져와서 모든 데이터를 세션에 저장
+    @PostMapping("/public-bicycle/getUserPosition")
+    public ResponseEntity<?> receiveUserLocation(
+            @RequestBody
+            Map<String, Double> payload
+    ) {
+        double lat = payload.get("latitude");
+        double lot = payload.get("longitude");
 
+        com.example.safe_ride.safe.dto.PointDto point = new PointDto(lat, lot);
+        String lcgvmnInstCd = locationInfoService.getTransBjDongCode(point).getBjDongCode();
+//        String position = locationInfoService.get;
+
+        return ResponseEntity.ok().build();
+    }
 
 }

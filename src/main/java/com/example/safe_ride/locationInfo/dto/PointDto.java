@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class CurrentLocationDto {
+public class PointDto {
     private Double lat;
     private Double lng;
 

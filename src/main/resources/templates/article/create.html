@@ -30,13 +30,13 @@
             <label for="content">내용:</label><br>
             <textarea id="content" name="content"></textarea><br>
 
-            <label for="metropolitanCity">Metropolitan City:</label><br>
+            <label for="metropolitanCity">광역자치구:</label><br>
             <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
               <option value="">광역자치구를 선택하시오.</option>
               <option th:each="city : ${metropolitanCities}" th:value="${city}" th:text="${city}"></option>
             </select><br>
 
-            <label for="city">도시를 선택하시오:</label><br>
+            <label for="city">도시:</label><br>
             <select id="city" name="city">
               <option value="">도시를 선택하시오</option>
             </select><br>

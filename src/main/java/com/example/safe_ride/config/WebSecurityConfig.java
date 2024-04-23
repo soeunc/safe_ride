@@ -92,9 +92,11 @@ public class WebSecurityConfig {
                                         "/matching/{id}/edit", // 매칭글 수정
                                         "/matching/{id}/delete", // 매칭글 삭제
                                         "/matching/{id}/apply" ,// 매칭글 상세 조회
-                                        "/matching/{matchingId}/accept/{applicationId}", // 매칭글
-                                        "/matching/{matchingId}/reject/{applicationId}", // 매칭글
-                                        "/matching/{matchingId}/cancel-application"
+                                        "/matching/{matchingId}/accept/{applicationId}", // 매칭 신청 수락
+                                        "/matching/{matchingId}/reject/{applicationId}", // 매칭 신청 거절
+                                        "/matching/{matchingId}/cancel-application", // 신청자가 자기 매칭 신청 취소
+                                        "/matching/{matchingId}/reject/{applicationId}", // 매칭 신청 유저 정보
+                                        "/matching/{matchingId}/applicantInfo/{applicationId}" // 매칭 신청 유저 정보
                                 )
                                 .authenticated()
 

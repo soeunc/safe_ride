@@ -1,14 +1,12 @@
 package com.example.safe_ride.safe.controller;
 
-import com.example.safe_ride.safe.dto.CoordinateDto;
-import com.example.safe_ride.safe.dto.NcpInfoDto;
-import com.example.safe_ride.safe.dto.NaviWithQueryDto;
-import com.example.safe_ride.safe.dto.PointDto;
+import com.example.safe_ride.safe.dto.*;
 import com.example.safe_ride.safe.service.NcpService;
 import com.example.safe_ride.safe.service.SafetyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,10 +28,10 @@ public class NcpController {
         return service.locateAddress(dto);
     }
 
-    // TODO 폼에서 주소를 입력하는 곳이 사용자가 편리하지 않은 방식이다. 다른 방법으로 한번 생각해볼 필요 있음.
     @PostMapping("/check")
     public ResponseEntity<?> locateAddress(
-            @RequestBody NaviWithQueryDto dto
+            @RequestBody NaviWithQueryDto dto,
+            Model model
     ) {
         // 1. 사용자 위치 데이터 받기
         PointDto pointDto = service.locateAddress(dto);
@@ -45,16 +43,21 @@ public class NcpController {
         // 2. 데이터 정보 불러오기
         // 2-1. 필더링된 사고정보 가져오기
         safetyService.saveFilteredAccidentInfo(pointDto);
+        safetyService.saveFilteredSchoolZoneAccInfo(pointDto);
 
-        // 2-2. DB에 저장된 좌표 가져오기
+        // 2-2. DB에 저장된 좌표 및 정보 가져오기
         List<CoordinateDto> coordinates = safetyService.getCoordinates();
-        log.info("사고위치 좌표값 :{}", coordinates);
+        List<SchoolZoneInfoDto> schoolZoneInfoList = safetyService.getSchoolZoneInfo();
+        model.addAttribute("school", schoolZoneInfoList);
+        log.info("사고위치 정보 :{}", coordinates);
+        log.info("스쿨존 사고 정보: {}", schoolZoneInfoList);
 
         // 사용자 위치 좌표 및 사고 좌표
         NcpInfoDto ncpInfoDto = new NcpInfoDto();
         ncpInfoDto.setLng(pointDto.getLng());
         ncpInfoDto.setLat(pointDto.getLat());
         ncpInfoDto.setAccidentCoordinates(coordinates);
+        ncpInfoDto.setSchoolZoneInfo(schoolZoneInfoList);
 
         return ResponseEntity.ok(ncpInfoDto);
     }
