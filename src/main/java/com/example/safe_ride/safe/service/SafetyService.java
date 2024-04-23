@@ -159,17 +159,21 @@ public class SafetyService {
     // db에 저장된 좌표 가져오기
     public List<SchoolZoneInfoDto> getSchoolZoneInfo() {
         List<SchoolZoneInfoDto> list = new ArrayList<>();
-        String sql = "SELECT sido_sgg_nnm, occrrnc_cnt, dth_dnv_cnt FROM school_zone_info";
+        // spot_nm를 넣어야될꺼 같다.
+        String sql = "SELECT sido_sgg_nnm, spot_nm, occrrnc_cnt, dth_dnv_cnt, lo_crd, la_crd FROM school_zone_info";
 
         try (Connection conn = DriverManager.getConnection(URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     String sidoSggNnm = rs.getString("sido_sgg_nnm");
+                    String spotNm = rs.getString("spot_nm");
+                    String lng = rs.getString("lo_crd");
+                    String lat = rs.getString("la_crd");
                     String occrrncCnt = rs.getString("occrrnc_cnt");
                     String dthDnvCnt = rs.getString("dth_dnv_cnt");
 
-                    list.add(new SchoolZoneInfoDto(sidoSggNnm, occrrncCnt, dthDnvCnt));
+                    list.add(new SchoolZoneInfoDto(spotNm, lng, lat, occrrncCnt, dthDnvCnt, sidoSggNnm));
                 }
             }
         } catch (SQLException e) {

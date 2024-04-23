@@ -16,5 +16,5 @@ public class NcpInfoDto {
     private Double lng;
     private String bjDongCode;
     private List<CoordinateDto> accidentCoordinates;
-    private List<SchoolZoneInfoDto> schoolZoneInfos;
+    private List<SchoolZoneInfoDto> schoolZoneInfo;
 }
