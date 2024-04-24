@@ -1,7 +1,7 @@
 package com.example.safe_ride.locationInfo.service;
 
 import com.example.safe_ride.locationInfo.dto.GeoLocationNcpResponse;
-import com.example.safe_ride.locationInfo.dto.PointDto;
+import com.example.safe_ride.safe.dto.PointDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
