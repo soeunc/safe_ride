@@ -81,7 +81,9 @@ public class WebSecurityConfig {
                                         "/article/{id}", // 게시글 상세 조회
                                         "/article/{id}/edit", // 게시글 수정
                                         "/article/{id}/delete", // 게시글 삭제
-                                        "/city"
+                                        "/city", // 도시 목록 불러오기
+                                        "/article/{articleId}/comment", // 댓글 생성
+                                        "/article/{articleId}/comment/{commentId}/delete" // 댓글 삭제
                                 )
                                 .authenticated()
                                 // 커뮤니티 - 매칭글

@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>세이프라이드: 안전한 라이딩의 시작</title>
-  <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=kp0utn2vxk"></script>
-  <!--👇여기에 header script 넣어주시면 됩니다👇-->
+  <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+  <style>
 
-  <!--👆여기에 header script 넣어주시면 됩니다👆-->
+  </style>
 </head>
+
 
 <body>
 <div class="wrapper">
@@ -23,6 +24,8 @@
           <input type="text" id="title" name="title" th:value="${matching.title}"><br>
           <label for="ridingTime">라이딩 시간:</label><br>
           <input type="datetime-local" id="ridingTime" name="ridingTime" required><br>
+          <label for="kilometer">예상 거리:</label><br>
+          <input type="text" id="kilometer" name="kilometer" th:value="${matching.kilometer}"><br>
           <label for="comment">라이딩 코스 소개:</label>
           <textarea name="comment" id="comment" rows="6" required th:text="${matching.comment}"></textarea><br>
           <label for="metropolitanCity">광역 자치구:</label><br>
