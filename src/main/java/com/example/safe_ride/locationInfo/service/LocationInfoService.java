@@ -9,12 +9,14 @@ import com.example.safe_ride.safe.dto.rgeocoding.RGeoNcpResponse;
 import com.example.safe_ride.safe.dto.rgeocoding.RGeoResponseDto;
 import com.example.safe_ride.safe.dto.rgeocoding.RGoCode;
 import com.example.safe_ride.safe.service.NcpMapApiService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -206,7 +208,7 @@ public class LocationInfoService {
     }
 
     // 위치 좌표에 대한 대여소 결과 리스트 반환
-    public List<StationInfo> fetchPointData(Double lat, Double lng, String apiUrl, String lcgvmnInstCd, String fromCrtrYmd, String toCrtrYmd) throws IOException {
+    public List<StationInfo> fetchPointData(Double lat, Double lot, String apiUrl, String lcgvmnInstCd, String fromCrtrYmd, String toCrtrYmd) throws IOException {
         // map 초기화
         mapManager.clearMap();
         // totalCount 기반 동적 데이터 생성
@@ -239,7 +241,7 @@ public class LocationInfoService {
                         response.append(line);
                     }
                     // 페이지 데이터를 파싱하여 결과 리스트에 추가
-                    List<StationInfo> pointResults = filterStationsByPoint(lat, lng, response.toString());
+                    List<StationInfo> pointResults = filterStationsByPoint(lat, lot, response.toString());
                     if (!pointResults.isEmpty()) {
                         allResults.addAll(pointResults);
                     } else {
@@ -439,13 +441,15 @@ public class LocationInfoService {
     }
 
     // 입력받은 좌표의 법정동코드 확인
-    // reverse grocode를 사용해서 좌표를 입력받아 법정동 코드를 반환하는 메서드
-    public RGeoResponseDto getTransBjDongCode(PointDto point) {
+    // reverse grocode를 사용해서 좌표를 입력받아 결과값을 세션으로 반환하는 메서드
+    public RGeoResponseDto setTransBjDongCode(PointDto point) {
         Map<String, Object> params = new HashMap<>();
         params.put("coords", point.toQueryValue());
         params.put("orders", "legalcode"); // 법정동으로 변환 작업
         params.put("output", "json");
+        log.info("coords : {}", params.get("coords"));
         RGeoNcpResponse response = mapApiService.reversGeocode(params);
+        log.info("response : {}", response);
         RGoCode code = response.getResults()
                 .get(0)
                 .getCode();
@@ -459,5 +463,4 @@ public class LocationInfoService {
         else transBjDongCode = bjDongCode;
         return new RGeoResponseDto(transBjDongCode.trim());
     }
-
 }
