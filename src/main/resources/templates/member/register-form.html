@@ -39,7 +39,7 @@
               <div class="row gx-5 justify-content-center">
                 <div class="col-lg-8 col-xl-6">
                   <h1 class="text-center mb-5">회원가입</h1>
-                  <form action="/safe-ride/join" method="post" id="registerForm">
+                  <form id="registerForm" onsubmit="return false">
                     <div class="form-floating mb-3">
                       <input class="form-control" id="userId" name="userId" type="text" onkeyup="idValidCk()" maxlength="20" required placeholder="아이디 입력">
                       <button class="btn btn-info" id="duplicateCkForId" onclick="duplicateCkForIdFnc()">아이디 중복확인</button>
@@ -83,7 +83,7 @@
                       <span id="birthdayMsg"></span>
                       <label for="birthday">생년월일</label>
                     </div>
-                    <div class="d-grid"><button class="btn btn-primary btn-lg" id="submitBtn" type="submit">Submit</button></div>
+                    <div class="d-grid"><button class="btn btn-primary btn-lg" id="submitBtn" type="button">Submit</button></div>
                     <div style="margin-top: 16px; text-align: right"><a href="/safe-ride/login">로그인</a></div>
                   </form>
                 </div>
@@ -113,8 +113,124 @@
   }
 
   //폼 제출
-  $(document).ready(function() {
-    $('#registerForm').submit(function (event){
+//  $(document).ready(function() {
+
+  //아이디 정규식 체크용 flag변수
+  let idCk = false;
+  //아이디 중복확인용 flag변수
+  let idDuplicateCk = false;
+  //패스워드 정규식 체크용 flag변수
+  let passwordCk = false;
+  //패스워드 중복확인용 flag변수
+  let passwordMatchCk = false;
+  //닉네임 정규식 체크용 flag변수
+  let nicknameCk = false;
+  //닉네임 중복확인용 flag 변수
+  let nicknameDuplicateCk = false;
+  //이메일 정규식 체크용 flag변수
+  let emailCk = false;
+  //이메일 중복확인용 flag 변수
+  let emailDuplicateCk = false;
+  //이름 정규식 체크용 flag변수
+  let userNameCk = false;
+  //생년월일 정규식 체크용 flag변수
+  let birthdayCk = false;
+  //전화번호 정규식 체크용 flag변수
+  let phoneNumberCk = false;
+
+  //아이디 중복확인
+    function duplicateCkForIdFnc(){
+      let userId = $('#userId').val(); // id값
+      if(userId.trim()===''){
+        alert('아이디를 입력해주세요!');
+      } else {
+        $.ajax({
+          type : "POST",
+          url : "/safe-ride/duplicateCkForId",
+          data : {
+            userId : userId
+          },
+          success : function (result){
+            if (result===1){ // id가 이미 존재한다면
+              alert("사용 불가능한 아이디입니다.");
+              idDuplicateCk = false;
+            } else if(result===0) {
+              alert("사용 가능합니다.");
+              idDuplicateCk = true;
+            } else {
+              alert("에러가 발생했습니다.")
+            }
+          },
+          error:function (error){
+            alert("에러가 발생했습니다. 새로고침해주세요!" + error);
+          }
+        });
+      }
+    }
+
+    //닉네임 중복확인
+    function duplicateCkForNicknameFnc(){
+      let nickName = $('#nickName').val();
+      if(nickName.trim()===''){
+        alert('닉네임을 입력해주세요!');
+      } else {
+        $.ajax({
+          type : "POST",
+          url : "/safe-ride/duplicateCkForNickname",
+          data : {
+            nickName : nickName
+          },
+          success : function (result){
+            if (result===1){ // 닉네임이 이미 존재한다면
+              alert("사용 불가능한 닉네임입니다.");
+              nicknameDuplicateCk = false;
+            } else if(result===0) {
+              alert("사용 가능합니다.");
+              nicknameDuplicateCk = true;
+            } else {
+              alert("에러가 발생했습니다.")
+            }
+          },
+          error:function (error){
+            alert("에러가 발생했습니다. 새로고침해주세요!" + error);
+          }
+        });
+      }
+    }
+
+    //이메일 중복확인
+    function duplicateCkForEmailFnc(){
+
+      let email = $('#email').val();
+      if(email.trim()===''){
+        alert('이메일을 입력해주세요!');
+      } else {
+        $.ajax({
+          type : "POST",
+          url : "/safe-ride/duplicateCkForEmail",
+          data : {
+            email : email
+          },
+          success : function (result){
+            if (result===1){ // 이메일이 이미 존재한다면
+              alert("사용 불가능한 이메일입니다.");
+              emailDuplicateCk = false;
+            } else if(result===0) {
+              alert("사용 가능합니다.");
+              emailDuplicateCk = true;
+            } else {
+              alert("에러가 발생했습니다.")
+            }
+          },
+          error:function (error){
+            alert("에러가 발생했습니다. 새로고침해주세요!" + error);
+          }
+        });
+      }
+    }
+
+    //회원가입 버튼 클릭 시 동작
+    $('#submitBtn').click(function (event){
       //기본 폼 제출 방지
       event.preventDefault();
       const userIdVal = $('#userId').val();
@@ -136,56 +252,43 @@
               birthdayVal.trim()===''
       ){
         alert("비어있는 값이 있는지 확인해주세요!");
-        return;
-      }
-      //비밀번호 정규식 체크 여부 확인
-      if (passwordCk !== true){
-        alert("올바른 비밀번호인지 확인해주세요!")
-        return;
-      }
-      //비밀번호 일치 체크 여부 확인
-      if (passwordMatchCk !== true){
-        alert("비밀번호 일치 체크를 진행해주세요!")
-        return;
-      }
-      //아이디 중복체크 여부 확인
-      if (idDuplicateCk !== true){
-        alert("아이디 중복체크를 진행해주세요!")
-        return;
       }
       //아이디 정규식 체크 여부 확인
-      if (idCk !== true){
+      else if (idCk !== true){
         alert("올바른 아이디인지 확인해주세요!")
-        return;
       }
-      //닉네임 중복체크 여부 확인
-      if (nicknameDuplicateCk !== true){
-        alert("닉네임 중복체크를 진행해주세요!")
-        return;
+      //아이디 중복체크 여부 확인
+      else if (idDuplicateCk !== true){
+        alert("아이디 중복체크를 진행해주세요!")
       }
-      if (nicknameCk !== true){
-        alert("올바른 닉네임인지 확인해주세요!")
-        return;
-      }
-      if (emailDuplicateCk!==true){
-        alert("이메일 중복체크를 진행해주세요!")
-        return;
-      }
-      if (emailCk !== true){
-        alert("올바른 이메일인지 확인해주세요!")
-        return;
-      }
-      if (userNameCk !== true){
+      else if (userNameCk !== true){
         alert("올바른 이름인지 확인해주세요!")
-        return;
       }
-      if (phoneNumberCk !== true){
+      //비밀번호 정규식 체크 여부 확인
+      else if (passwordCk !== true){
+        alert("올바른 비밀번호인지 확인해주세요!")
+      }
+      //비밀번호 일치 체크 여부 확인
+      else if (passwordMatchCk !== true){
+        alert("비밀번호 일치 체크를 진행해주세요!")
+      }
+      else if (emailCk !== true){
+        alert("올바른 이메일인지 확인해주세요!")
+      }
+      else if (emailDuplicateCk!==true){
+        alert("이메일 중복체크를 진행해주세요!")
+      }
+      else if (nicknameCk !== true){
+        alert("올바른 닉네임인지 확인해주세요!")
+      }
+      else if (nicknameDuplicateCk !== true){
+        alert("닉네임 중복체크를 진행해주세요!")
+      }
+      else if (phoneNumberCk !== true){
         alert("올바른 전화번호인지 확인해주세요!")
-        return;
       }
-      if (birthdayCk !== true){
+      else if (birthdayCk !== true){
         alert("올바른 생년월일인지 확인해주세요!")
-        return;
       } else {
 
         const formData = {
@@ -214,32 +317,8 @@
         });
       }
     });
-  });
+//  });
 
-  //아이디 정규식 체크용 flag변수
-  let idCk = false;
-  //아이디 중복확인용 flag변수
-  let idDuplicateCk = false;
-  //패스워드 정규식 체크용 flag변수
-  let passwordCk = false;
-  //패스워드 중복확인용 flag변수
-  let passwordMatchCk = false;
-  //닉네임 정규식 체크용 flag변수
-  let nicknameCk = false;
-  //닉네임 중복확인용 flag 변수
-  let nicknameDuplicateCk = false;
-  //이메일 정규식 체크용 flag변수
-  let emailCk = false;
-  //이메일 중복확인용 flag 변수
-  let emailDuplicateCk = false;
-  //이름 정규식 체크용 flag변수
-  let userNameCk = false;
-  //생년월일 정규식 체크용 flag변수
-  let birthdayCk = false;
-  //전화번호 정규식 체크용 flag변수
-  let phoneNumberCk = false;
-  //submit 버튼
-  let submitBtn = document.querySelector("#submitBtn");
 
   //아이디 정규식
   function idValidCk() {
@@ -343,8 +422,6 @@
     }
   }
   //생년월일 정규식
-
-
   function birthdayVaildFnc() {
     const regExp = /^(19[0-9][0-9]|20\d{2})(0[0-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$/;
 
@@ -361,96 +438,7 @@
       birthdayCk = true;
     }
   }
-  //아이디 중복확인
-  function duplicateCkForIdFnc(){
-    let userId = $('#userId').val(); // id값
-    if(userId.trim()===''){
-      alert('아이디를 입력해주세요!');
-    } else {
-      $.ajax({
-        type : "POST",
-        url : "/safe-ride/duplicateCkForId",
-        data : {
-          userId : userId
-        },
-        success : function (result){
-          if (result===1){ // id가 이미 존재한다면
-            alert("사용 불가능한 아이디입니다.");
-            idDuplicateCk = false;
-          } else if(result===0) {
-            alert("사용 가능합니다.");
-            idDuplicateCk = true;
-          } else {
-            alert("에러가 발생했습니다.")
-          }
-        },
-        error:function (error){
-          alert("에러가 발생했습니다. 새로고침해주세요!" + error);
-        }
-      });
-    }
-  }
 
-  //닉네임 중복확인
-  function duplicateCkForNicknameFnc(){
-    let nickName = $('#nickName').val();
-    if(nickName.trim()===''){
-      alert('닉네임을 입력해주세요!');
-    } else {
-      $.ajax({
-        type : "POST",
-        url : "/safe-ride/duplicateCkForNickname",
-        data : {
-          nickName : nickName
-        },
-        success : function (result){
-          if (result===1){ // 닉네임이 이미 존재한다면
-            alert("사용 불가능한 닉네임입니다.");
-            nicknameDuplicateCk = false;
-          } else if(result===0) {
-            alert("사용 가능합니다.");
-            nicknameDuplicateCk = true;
-          } else {
-            alert("에러가 발생했습니다.")
-          }
-        },
-        error:function (error){
-          alert("에러가 발생했습니다. 새로고침해주세요!" + error);
-        }
-      });
-    }
-  }
-
-  //이메일 중복확인
-  function duplicateCkForEmailFnc(){
-
-    let email = $('#email').val();
-    if(email.trim()===''){
-      alert('이메일을 입력해주세요!');
-    } else {
-      $.ajax({
-        type : "POST",
-        url : "/safe-ride/duplicateCkForEmail",
-        data : {
-          email : email
-        },
-        success : function (result){
-          if (result===1){ // 이메일이 이미 존재한다면
-            alert("사용 불가능한 이메일입니다.");
-            emailDuplicateCk = false;
-          } else if(result===0) {
-            alert("사용 가능합니다.");
-            emailDuplicateCk = true;
-          } else {
-            alert("에러가 발생했습니다.")
-          }
-        },
-        error:function (error){
-          alert("에러가 발생했습니다. 새로고침해주세요!" + error);
-        }
-      });
-    }
-  }
 
   //패스워드 일치여부 확인
   function passwordMatchCkFnc() {
@@ -466,93 +454,8 @@
     }
   }
 
-  // //submit 시 입력값 체크
-  // submitBtn.addEventListener('click', function (event) {
-  //   const userIdVal = $('#userId').val();
-  //   const userNameVal = $('#userName').val();
-  //   const passwordVal = $('#password').val();
-  //   const passwordCkVal = $('#passwordCk').val();
-  //   const emailVal = $('#email').val();
-  //   const nickNameVal = $('#nickName').val();
-  //   const phoneNumberVal = $('#phoneNumber').val();
-  //   const birthdayVal = $('#birthday').val();
-  //   if (userIdVal.trim()==='' ||
-  //       userNameVal.trim()===''||
-  //       passwordVal.trim()===''||
-  //       passwordCkVal.trim()===''||
-  //       emailVal.trim()===''||
-  //       nickNameVal.trim()===''||
-  //       phoneNumberVal.trim()===''||
-  //       birthdayVal.trim()===''
-  //   ){
-  //     event.preventDefault();
-  //     alert("비어있는 값이 있는지 확인해주세요!");
-  //     return;
-  //   }
-  //   //비밀번호 정규식 체크 여부 확인
-  //   if (passwordCk !== true){
-  //     event.preventDefault();
-  //     alert("올바른 비밀번호인지 확인해주세요!")
-  //     return;
-  //   }
-  //   //비밀번호 일치 체크 여부 확인
-  //   if (passwordMatchCk !== true){
-  //     event.preventDefault();
-  //     alert("비밀번호 일치 체크를 진행해주세요!")
-  //     return;
-  //   }
-  //   //아이디 중복체크 여부 확인
-  //   if (idDuplicateCk !== true){
-  //     event.preventDefault();
-  //     alert("아이디 중복체크를 진행해주세요!")
-  //     return;
-  //   }
-  //   //아이디 정규식 체크 여부 확인
-  //   if (idCk !== true){
-  //     event.preventDefault();
-  //     alert("올바른 아이디인지 확인해주세요!")
-  //     return;
-  //   }
-  //   //닉네임 중복체크 여부 확인
-  //   if (nicknameDuplicateCk !== true){
-  //     event.preventDefault();
-  //     alert("닉네임 중복체크를 진행해주세요!")
-  //     return;
-  //   }
-  //   if (nicknameCk !== true){
-  //     event.preventDefault();
-  //     alert("올바른 닉네임인지 확인해주세요!")
-  //     return;
-  //   }
-  //   if (emailDuplicateCk!==true){
-  //     event.preventDefault();
-  //     alert("이메일 중복체크를 진행해주세요!")
-  //     return;
-  //   }
-  //   if (emailCk !== true){
-  //     event.preventDefault();
-  //     alert("올바른 이메일인지 확인해주세요!")
-  //     return;
-  //   }
-  //   if (userNameCk !== true){
-  //     event.preventDefault();
-  //     alert("올바른 이름인지 확인해주세요!")
-  //     return;
-  //   }
-  //   if (phoneNumberCk !== true){
-  //     event.preventDefault();
-  //     alert("올바른 전화번호인지 확인해주세요!")
-  //     return;
-  //   }
-  //   if (birthdayCk !== true){
-  //     event.preventDefault();
-  //     alert("올바른 생년월일인지 확인해주세요!")
-  //     return;
-  //   }
-  //
-  // });
-
 </script>
 <!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
+<script src="/js/app.js"></script>
 </body>
 </html>

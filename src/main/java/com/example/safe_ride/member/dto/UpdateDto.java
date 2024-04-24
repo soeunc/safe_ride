@@ -11,8 +11,6 @@ import lombok.*;
 public class UpdateDto {
     private String password;
     private String passwordCk;
-    private String email;
     private String nickName;
     private String phoneNumber;
-    private String birthday;
 }

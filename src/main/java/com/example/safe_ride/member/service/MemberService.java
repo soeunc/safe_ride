@@ -37,7 +37,7 @@ public class MemberService {
                 );
         return MemberDto.fromEntity(member);
     }
-
+    //회원정보 수정
     @Transactional
     public void updateMember(String userId, UpdateDto dto) {
 
@@ -49,15 +49,10 @@ public class MemberService {
         if (!dto.getPassword().equals(dto.getPasswordCk())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호와 비밀번호 체크가 일치하지 않습니다.");
         }
-
         //null과 공백 체크 and 값이 변경되었다면
         if (!ObjectUtils.isEmpty(dto.getPassword()) &&
                 !dto.getPassword().equals(member.getPassword())) {
             member.setPassword(passwordEncoder.encode(dto.getPassword()));
-        }
-        if (!ObjectUtils.isEmpty(dto.getEmail()) &&
-                !dto.getEmail().equals(member.getEmail())) {
-            member.setEmail(dto.getEmail());
         }
         if (!ObjectUtils.isEmpty(dto.getNickName()) &&
                 !dto.getNickName().equals(member.getNickname())) {
@@ -66,10 +61,6 @@ public class MemberService {
         if (!ObjectUtils.isEmpty(dto.getPhoneNumber()) &&
                 !dto.getPhoneNumber().equals(member.getPhoneNumber())) {
             member.setPhoneNumber(dto.getPhoneNumber());
-        }
-        if (!ObjectUtils.isEmpty(dto.getBirthday()) &&
-                !dto.getBirthday().equals(member.getBirthday())) {
-            member.setBirthday(dto.getBirthday());
         }
 
         memberRepo.save(member);
