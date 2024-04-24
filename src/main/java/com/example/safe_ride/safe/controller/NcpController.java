@@ -30,8 +30,7 @@ public class NcpController {
 
     @PostMapping("/check")
     public ResponseEntity<?> locateAddress(
-            @RequestBody NaviWithQueryDto dto,
-            Model model
+            @RequestBody NaviWithQueryDto dto
     ) {
         // 1. 사용자 위치 데이터 받기
         PointDto pointDto = service.locateAddress(dto);
@@ -48,7 +47,6 @@ public class NcpController {
         // 2-2. DB에 저장된 좌표 및 정보 가져오기
         List<CoordinateDto> coordinates = safetyService.getCoordinates();
         List<SchoolZoneInfoDto> schoolZoneInfoList = safetyService.getSchoolZoneInfo();
-        model.addAttribute("school", schoolZoneInfoList);
         log.info("사고위치 정보 :{}", coordinates);
         log.info("스쿨존 사고 정보: {}", schoolZoneInfoList);
 
