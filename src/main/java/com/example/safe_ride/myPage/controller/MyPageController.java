@@ -1,6 +1,7 @@
 package com.example.safe_ride.myPage.controller;
 
 import com.example.safe_ride.facade.AuthenticationFacade;
+import com.example.safe_ride.member.dto.JoinDto;
 import com.example.safe_ride.member.dto.MemberDto;
 import com.example.safe_ride.member.dto.UpdateDto;
 import com.example.safe_ride.member.entity.Member;
@@ -8,14 +9,12 @@ import com.example.safe_ride.member.service.MemberService;
 import com.example.safe_ride.myPage.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 //라이딩기록과 매칭기록을 마이페이지에 보여준다.
@@ -48,14 +47,16 @@ public class MyPageController {
     }
     //마이페이지 수정
     @PostMapping("/update")
-    public String updateProfile(
+    @ResponseBody
+    public ResponseEntity<UpdateDto> updateProfile(
+            @RequestBody
             UpdateDto dto,
             RedirectAttributes redirectAttributes
     ) {
         memberService.updateMember(authFacade.getAuth().getName(), dto);
         msg = "수정되었습니다.^^";
         redirectAttributes.addFlashAttribute("msg", msg);
-        return "redirect:/safe-ride/myprofile";
+        return ResponseEntity.ok().body(dto);
     }
     //오늘 주행기록 입력
     @PostMapping("/create-today")

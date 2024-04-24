@@ -104,41 +104,53 @@
                             <canvas id="bar-chart"></canvas>
                         </div>
                         <!--프로필 수정-->
-                        <div id="prifile-update">
-                            <h2>프로필 수정</h2>
-                            <form action="/safe-ride/myprofile/update" method="post">
-                                <div>
-                                    <label for="password">비밀번호</label>
-                                    <input id="password" name="password" type="password" maxlength="30" placeholder="비밀번호 재설정">
+                        <section class="py-5">
+                            <div class="container px-5">
+                                <!-- login form-->
+                                <div class="bg-light rounded-3 py-5 px-4 px-md-5 mb-5">
+                                    <div class="row gx-5 justify-content-center">
+                                        <div class="col-lg-8 col-xl-6">
+                                            <h2 class="text-center mb-5">회원정보 수정</h2>
+                                            <form id="updateForm" onsubmit="return false">
+                                                <div class="form-floating mb-3">
+                                                    <input class="form-control" id="password" name="password" type="password" onkeyup="passwordValidCkFnc()" maxlength="20" required placeholder="비밀번호 입력">
+                                                    <label for="password">패스워드</label>
+                                                </div>
+                                                <div class="form-floating mb-3">
+                                                    <input class="form-control" id="passwordCk" name="passwordCk" type="password" maxlength="20" required placeholder="비밀번호 확인">
+                                                    <button class="btn btn-info" id="passwordMatchCk" onclick="passwordMatchCkFnc()">패스워드 일치여부 확인</button>
+                                                    <span id="passwordCkMsg"></span>
+                                                    <label for="passwordCk">패스워드 확인</label>
+                                                </div>
+                                                <div class="form-floating mb-3">
+                                                    <input class="form-control" id="email" name="email" type="text" th:value="${member.email}" maxlength="30" disabled>
+                                                    <label for="email">이메일</label>
+                                                </div>
+                                                <div class="form-floating mb-3">
+                                                    <input class="form-control" id="nickName" name="nickName" type="text" th:value="${member.nickname}" onkeyup="nickNameValidFunc()" maxlength="30">
+                                                    <button class="btn btn-info" id="duplicateCkForNickname" onclick="duplicateCkForNicknameFnc()">닉네임 중복확인</button>
+                                                    <span id="nickNameCkMsg"></span>
+                                                    <label for="nickName">닉네임</label>
+                                                </div>
+                                                <div class="form-floating mb-3">
+                                                    <input class="form-control" id="phoneNumber" name="phoneNumber" type="text" th:value="${member.phoneNumber}" onkeyup="phoneNumberVaildFnc()" maxlength="11">
+                                                    <span id="phoneNumberMsg"></span>
+                                                    <label for="phoneNumber">전화번호</label>
+                                                </div>
+                                                <div class="form-floating mb-3 date_item">
+                                                    <input class="form-control" id="birthday" name="birthday" th:value="${member.getBirthday()}" maxlength="8" disabled>
+                                                    <label for="birthday">생년월일</label>
+                                                </div>
+                                                <div class="d-grid"><button class="btn btn-primary btn-lg" id="submitBtn" type="button">Submit</button></div>
+                                            </form>
+                                        </div>
+                                    </div>
+
                                 </div>
-                                <div>
-                                    <label for="passwordCk">비밀번호</label>
-                                    <input id="passwordCk" name="passwordCk" type="password" maxlength="30" placeholder="비밀번호 재설정 확인">
-                                </div>
-                                <div>
-                                    <label for="email">이메일</label>
-                                    <input id="email" name="email" type="text" maxlength="30" th:value="${member.email}">
-                                </div>
-                                <div>
-                                    <label for="nickName">닉네임</label>
-                                    <input id="nickName" name="nickName" type="text" maxlength="30" th:value="${member.nickname}">
-                                </div>
-                                <div>
-                                    <label for="phoneNumber">전화번호</label>
-                                    <input id="phoneNumber" name="phoneNumber" type="text" oninput="onInputPhone(this)" maxlength="13"
-                                           th:value="${member.getPhoneNumber()}">
-                                </div>
-                                <div>
-                                    <label for="birthday">생년월일</label>
-                                    <input id="birthday" name="birthday" type="text" oninput="onInputBirth(this)" maxlength="8"
-                                           th:value="${member.getBirthday()}">
-                                </div>
-                                <div>
-                                    <input type="submit" value="수정하기">
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                            </div>
+                        </section>
+
+
                     <form action="/safe-ride/logout">
                         <input type="submit" value="로그아웃">
                     </form>
@@ -152,6 +164,8 @@
 </div>
 
 <!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
+<!--ajax-->
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <!--chart.js-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 <script th:inline="javascript">
@@ -201,19 +215,187 @@
             }
         }
     });
+    const myNickName = [[${member.nickname}]];
+    const myPhoneNumber = [[${member.phoneNumber}]];
 
+    //패스워드 정규식 체크용 flag변수
+    let passwordCk = false;
+    //패스워드 중복확인용 flag변수
+    let passwordMatchCk = false;
+    //닉네임 정규식 체크용 flag변수
+    let nicknameCk = false;
+    //닉네임 중복확인용 flag 변수
+    let nicknameDuplicateCk = false;
+    //전화번호 정규식 체크용 flag변수
+    let phoneNumberCk = false;
+
+    //닉네임 중복확인
+    function duplicateCkForNicknameFnc(){
+        let nickName = $('#nickName').val();
+        //본인의 닉네임이라면
+        if (myNickName === nickName){
+            alert("사용 가능합니다.");
+            nicknameDuplicateCk = true;
+        } else if(nickName.trim()===''){
+            alert('닉네임을 입력해주세요!');
+        } else {
+            $.ajax({
+                type : "POST",
+                url : "/safe-ride/duplicateCkForNickname",
+                data : {
+                    nickName : nickName
+                },
+                success : function (result){
+                    if (result===1){ // 닉네임이 이미 존재한다면
+                        alert("사용 불가능한 닉네임입니다.");
+                        nicknameDuplicateCk = false;
+                    } else if(result===0) {
+                        alert("사용 가능합니다.");
+                        nicknameDuplicateCk = true;
+                    } else {
+                        alert("에러가 발생했습니다.")
+                    }
+                },
+                error:function (error){
+                    alert("에러가 발생했습니다. 새로고침해주세요!" + error);
+                }
+            });
+        }
+    }
+    //비밀번호 정규식
+    function passwordValidCkFnc() {
+        //영어 숫자 조합 8자리 이상~25자 이하
+        const regExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/;
+        let password = $('#password').val();
+        let passwordCkMsg = $('#passwordCkMsg');
+        if (!regExp.test(password)){
+            passwordCkMsg.text("영어 숫자 조합 8~20자 이내로 해주세요!");
+            passwordCkMsg.css('color', "red");
+            passwordCk = false;
+        } else {
+            passwordCkMsg.text("사용가능합니다!!");
+            passwordCkMsg.css('color', "blue");
+            passwordCk = true;
+        }
+    }
+    //닉네임 정규식
+    function nickNameValidFunc(){
+        //영문 대/소문자나 한글로 시작. 영문 대/소문자와 한글, 숫자를 사용할 수 있으며
+        const regExp =/^[ㄱ-ㅎ가-힣a-zA-Z0-9]{2,10}$/;
+        //2~10사이의 길이
+
+        let nickName = $('#nickName').val();
+        let nickNameCkMsg = $('#nickNameCkMsg');
+        if (!regExp.test(nickName)){
+            nickNameCkMsg.text("2~10자 이내로 해주세요!(특수문자불가)");
+            nickNameCkMsg.css('color', "red");
+            nicknameCk = false;
+        } else {
+            nickNameCkMsg.text("사용가능합니다!!");
+            nickNameCkMsg.css('color', "blue");
+            nicknameCk = true;
+        }
+    }
     //전화번호정규식
-    function onInputPhone(target) {
-        target.value = target.value
-            .replace(/[^0-9]/g, '')
-            .replace(/(^02.{0}|^01.{1}|[0-9]{3,4})([0-9]{3,4})([0-9]{4})/g, "$1-$2-$3");
+    function phoneNumberVaildFnc() {
+        const regExp = /^01([0|1|6|7|8|9]?)-?([0-9]{3,4})-?([0-9]{4})$/;
+
+        let phoneNumber = $('#phoneNumber').val();
+        let phoneNumberMsg = $('#phoneNumberMsg');
+
+        if (!regExp.test(phoneNumber)){
+            phoneNumberMsg.text("전화번호를 확인해주세요!");
+            phoneNumberMsg.css('color', "red");
+            phoneNumberCk = false;
+        } else {
+            phoneNumberMsg.text("사용가능합니다!!");
+            phoneNumberMsg.css('color', "blue");
+            phoneNumberCk = true;
+        }
     }
-    //생년월일정규식
-    function onInputBirth(target) {
-        target.value = target.value
-            .replace(/[^0-9]/g, '')
-            .replace(/^(19[0-9][0-9]|20\d{2})(0[0-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$/);
+    //패스워드 일치여부 확인
+    function passwordMatchCkFnc() {
+        //비밀번호 체크
+        let password = document.querySelector("#password").value;
+        let passwordCk = document.querySelector("#passwordCk").value;
+        if (password !== passwordCk || password === '' || passwordCk === ''){
+            alert("패스워드가 일치하지 않습니다!");
+            passwordMatchCk = false;
+        } else {
+            alert("패스워드가 일치합니다! ^^");
+            passwordMatchCk = true;
+        }
     }
+
+    //수정 버튼 클릭 시 동작
+    $('#submitBtn').click(function (event){
+        //기본 폼 제출 방지
+        event.preventDefault();
+
+        const passwordVal = $('#password').val();
+        const passwordCkVal = $('#passwordCk').val();
+        const emailVal = $('#email').val();
+        const nickNameVal = $('#nickName').val();
+        const phoneNumberVal = $('#phoneNumber').val();
+        const birthdayVal = $('#birthday').val();
+
+        //본인 닉네임이라면 닉네임 정규식 체크 여부 패스
+        if (nickNameVal === myNickName){
+            nicknameCk = true;
+        }
+        //본인 전화번호라면 닉네임 정규식 체크 여부 패스
+        if (phoneNumberVal === myPhoneNumber){
+            phoneNumberCk = true;
+        }
+
+
+        if (
+            passwordVal.trim()===''||
+            passwordCkVal.trim()===''||
+            emailVal.trim()===''||
+            nickNameVal.trim()===''||
+            passwordCkVal.trim()===''||
+            birthdayVal.trim()===''
+        ){
+            alert("비어있는 값이 있는지 확인해주세요!");
+        } else if (passwordCk !== true){
+            alert("올바른 비밀번호인지 확인해주세요!")
+        }
+        //비밀번호 일치 체크 여부 확인
+        else if (passwordMatchCk !== true){
+            alert("비밀번호 일치 체크를 진행해주세요!")
+        }
+        else if (nicknameCk !== true){
+            alert("올바른 닉네임인지 확인해주세요!")
+        }
+        else if (nicknameDuplicateCk !== true){
+            alert("닉네임 중복체크를 진행해주세요!")
+        }
+        else if (phoneNumberCk !== true){
+            alert("올바른 전화번호인지 확인해주세요!")
+        } else {
+            const formData = {
+                password: passwordVal,
+                passwordCk: passwordCkVal,
+                nickName: nickNameVal,
+                phoneNumber : phoneNumberVal,
+            };
+
+            $.ajax({
+                type : "POST",
+                url : "/safe-ride/myprofile/update",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success : function (result){
+                    alert("수정되었습니다!");
+                    window.location.href = "/safe-ride/myprofile";
+                },
+                error:function (error){
+                    alert("에러가 발생했습니다." + error);
+                }
+            });
+        }
+    });
 </script>
 <!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
 </body>
