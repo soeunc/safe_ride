@@ -4,155 +4,184 @@
   <meta charset="UTF-8">
   <title>세이프라이드: 안전한 라이딩의 시작</title>
   <th:block th:replace="~{common/header :: headerFragment}"></th:block>
-  <!--👇여기에 header script 넣어주시면 됩니다👇-->
-
-  <!--👆여기에 header script 넣어주시면 됩니다👆-->
 </head>
+<style>
+    .post-box {
+        margin-top: 20px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed; /* 테이블 너비 고정 */
+    }
+
+    .table th, .table td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-overflow: ellipsis; /* 넘치는 텍스트를 말줄임표로 처리 */
+        white-space: nowrap; /* 공백 문자를 무시하고 한 줄에 텍스트를 표시 */
+        overflow: hidden; /* 내용이 넘치면 숨김 처리 */
+    }
+
+    .table td p, .table td span { /* <p>와 <span> 요소에 대해서도 동일한 스타일을 적용 */
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%; /* 부모 요소인 td에 맞추어 너비 설정 */
+        display: block; /* 블록 레벨 요소로 만들어 줄바꿈 방지 */
+    }
+
+    .table td p {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        margin: 0;
+        font-size: 16px;
+    }
+
+    .table td p a {
+        text-decoration: none;
+        color: #333;
+    }
+
+    .table td p a:hover {
+        color: #007bff;
+    }
+
+    .table th {
+        writing-mode: horizontal-tb;
+        transform: none;
+        white-space: nowrap;
+    }
+
+    .table th:first-child {
+        width: 60%;
+        text-align: center; /* 제목 열의 가운데 정렬 */
+    }
+
+    .table td:nth-child(2) {
+        width: 20%; /* 작성일자 영역의 너비를 20%로 조정 */
+    }
+
+    .table td:nth-child(3) {
+        width: 12%; /* 작성자, 조회수 영역의 너비를 각각 8%로 조정 */
+    }
+    .table td:nth-child(4) {
+        width: 8%; /* 작성자, 조회수 영역의 너비를 각각 8%로 조정 */
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .table tbody tr:hover {
+        background-color: #ddd;
+    }
+    .create-button {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .create-button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Pagination Styles */
+    .pagination {
+        text-align: center;
+        margin-top: 20px;
+        clear: both; /* Float 해제 */
+    }
+
+
+    .pagination a {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #f0f0f0;
+        color: #333;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+    .pagination a.active {
+        background-color: #ff6f61;
+        color: #fff;
+    }
+
+</style>
+
 <body>
 <div class="wrapper">
   <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
-
   <div class="main">
     <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
     <main class="content">
-      <!--👇여기에 내용 넣어주시면 됩니다👇-->
       <div class="container mt-4">
-        <!-- 광역자치구 선택 드롭다운 메뉴 -->
+        <h5>지역별로 검색</h5>
         <form action="#" th:action="@{/article}" method="get">
           <select name="metropolitanCity" id="metropolitanCity" onchange="this.form.submit()">
             <option value="">전체</option>
-            <option th:each="city : ${metropolitanCities}"
-                    th:value="${city}"
-                    th:text="${city}"
-                    th:selected="${city == selectedMetropolitanCity}"></option>
+            <option th:each="city : ${metropolitanCities}" th:value="${city}" th:text="${city}" th:selected="${city == selectedMetropolitanCity}"></option>
           </select>
-          <!-- 선택한 광역자치구에 따라 해당 도시 목록을 보여주는 드롭다운 메뉴 -->
           <select name="city" id="city">
             <option value="">전체</option>
-            <option th:each="city : ${cities}"
-                    th:value="${city}"
-                    th:text="${city}"
-                    th:selected="${city == selectedCity}"></option>
+            <option th:each="city : ${cities}" th:value="${city}" th:text="${city}" th:selected="${city == selectedCity}"></option>
           </select>
           <button type="submit">검색</button>
         </form>
 
-        <div id="articleContainer" class="post-box">
-          <div class="article_details" th:each="article : ${page.content}">
-            <a th:href="@{/article/{id}(id=${article.id})}">
-              <h3 th:text="${article.title}"></h3>
-            </a>
-            <span>작성일자: <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
-            <span>조회수: <span th:text="${article.hit}"></span></span>
-            <br>
-          </div>
+        <div class="post-box">
+          <table class="table">
+            <thead>
+            <tr>
+              <th>제목</th>
+              <th>작성일자</th>
+              <th>작성자</th>
+              <th>조회수</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="article : ${page.content}">
+              <td>
+                <a th:href="@{/article/{id}(id=${article.id})}">
+                  <p th:text="${article.title}"></p>
+                </a>
+              </td>
+              <td>
+                <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+              </td>
+              <td>
+                <span th:text="${article.member.nickname}"></span>
+              </td>
+              <td>
+                <span th:text="${article.hit}"></span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
-        <br>
-        <a href="/article/create">글 작성</a> <br>
       </div>
+      <button class="create-button" onclick="location.href='/article/create'">글 작성</button>
       <div class="footer">
-        <!-- 페이지네이션 링크 추가 -->
         <div th:if="${page.totalPages > 1}" class="pagination">
-          <div>
-            <a th:each="i : ${#numbers.sequence(0, page.totalPages-1)}"
-               th:href="@{'/article?page=' + ${i}}"
-               th:class="${i == page.number} ? 'active'">
-              <span th:text="${i + 1}"></span>
-            </a>
-          </div>
+          <a th:each="i : ${#numbers.sequence(0, page.totalPages-1)}" th:href="@{'/article?page=' + ${i}}" th:class="${i == page.number} ? 'active'">
+            <span th:text="${i + 1}"></span>
+          </a>
         </div>
       </div>
-      <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
     </main>
-
     <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
   </div>
 </div>
 </body>
-
-<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
-<script>
-    function fetchCities() {
-        var metropolitanCity = document.getElementById('metropolitanCity').value;
-        var citySelect = document.getElementById('city');
-
-        // AJAX 요청을 통해 선택된 광역자치구에 해당하는 도시 목록을 서버로부터 가져옴
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    var cities = JSON.parse(xhr.responseText);
-
-                    // 도시 목록을 새로고침
-                    citySelect.innerHTML = '';
-                    cities.forEach(function (city) {
-                        var option = document.createElement('option');
-                        option.value = city.city; // 도시명을 가져와야 함
-                        option.textContent = city.city;
-                        citySelect.appendChild(option);
-                    });
-
-                    // 도시를 선택하면 자동으로 필터링된 게시글 가져오기
-                    fetchFilteredArticles();
-                } else {
-                    console.error('Failed to fetch cities');
-                }
-            }
-        };
-
-        xhr.open('GET', '/city?metropolitanCity=' + metropolitanCity);
-        xhr.send();
-    }
-
-    function fetchFilteredArticles() {
-        var metropolitanCity = document.getElementById('metropolitanCity').value;
-        var city = document.getElementById('city').value;
-
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    // 필터링된 게시글을 화면에 업데이트
-                    var filteredArticles = JSON.parse(xhr.responseText);
-                    var articleContainer = document.getElementById('articleContainer');
-                    articleContainer.innerHTML = ''; // 기존 게시글 삭제
-
-                    // 필터링된 게시글을 화면에 추가
-                    filteredArticles.forEach(function (article) {
-                        var articleDiv = document.createElement('div');
-                        articleDiv.classList.add('article_details');
-
-                        var titleLink = document.createElement('a');
-                        titleLink.href = '/article/' + article.id;
-                        titleLink.textContent = article.title;
-
-                        var createdAtSpan = document.createElement('span');
-                        // 작성일시를 Date 객체로 파싱
-                        var createdAt = new Date(article.createdAt);
-                        // 원하는 형식으로 작성일시 포맷팅
-                        var formattedCreatedAt = `${createdAt.getFullYear()}-${(createdAt.getMonth() + 1).toString().padStart(2, '0')}-${createdAt.getDate().toString().padStart(2, '0')} ${createdAt.getHours().toString().padStart(2, '0')}:${createdAt.getMinutes().toString().padStart(2, '0')}`;
-                        createdAtSpan.textContent = formattedCreatedAt;
-
-                        var hitSpan = document.createElement('span');
-                        hitSpan.textContent = article.hit;
-
-                        articleDiv.appendChild(titleLink);
-                        articleDiv.appendChild(createdAtSpan);
-                        articleDiv.appendChild(hitSpan);
-
-                        articleContainer.appendChild(articleDiv);
-                    });
-                } else {
-                    console.error('Failed to fetch filtered articles');
-                }
-            }
-        };
-
-        xhr.open('GET', '/article/filter?metropolitanCity=' + metropolitanCity + '&city=' + city);
-        xhr.send();
-    }
-</script>
-<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
-
-<script src="/js/app.js"></script> <!-- template -->
+<script src="/js/app.js"></script>
 </html>

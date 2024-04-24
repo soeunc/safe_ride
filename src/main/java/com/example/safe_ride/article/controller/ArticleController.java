@@ -3,13 +3,20 @@ package com.example.safe_ride.article.controller;
 import com.example.safe_ride.article.dto.ArticleDto;
 import com.example.safe_ride.article.entity.Region;
 import com.example.safe_ride.article.service.ArticleService;
+import com.example.safe_ride.article.service.CommentService;
 import com.example.safe_ride.article.service.RegionService;
+import com.example.safe_ride.member.entity.Member;
+import com.example.safe_ride.member.repo.MemberRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,9 +24,11 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/article")
 @RequiredArgsConstructor
-public class ArticleController {
+public class    ArticleController {
     public final ArticleService articleService;
     public final RegionService regionService;
+    public final CommentService commentService;
+    public final MemberRepo memberRepository;
 
     // 게시글 페이지 이동
     @GetMapping("/create")
@@ -52,9 +61,19 @@ public class ArticleController {
     @GetMapping("/{id}")
     public String viewArtilce(@PathVariable Long id, Model model) {
         ArticleDto article = articleService.readOne(id);
+        Member currentUser = getUserEntity();
+        model.addAttribute("currentUser", currentUser);
         model.addAttribute("article", article);
-
+        model.addAttribute("comment", commentService.commentByArticle(id));
         return "/article/view";
+    }
+
+    private Member getUserEntity() {
+        UserDetails userDetails =
+                (UserDetails) (SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+
+        return memberRepository.findByUserName(userDetails.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping

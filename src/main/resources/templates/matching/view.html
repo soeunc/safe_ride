@@ -25,6 +25,7 @@
             <p><strong>라이딩 지역:</strong> <span th:text="${metropolitanCity}"></span> - <span th:text="${city}"></span></p>
             <p><strong>라이딩 시간:</strong> <span th:text="${#temporals.format(matching.ridingTime, 'MM월 dd일 EEEE HH:mm')}"></span></p><br>
             <strong>라이딩 코스 소개:</strong><p th:text="${matching.comment}" style="word-wrap: break-word;"></p> <br>
+            <p><strong>예상 거리 :</strong> <span th:text="${matching.kilometer}"></span></p>
           </div>
         </div>
 

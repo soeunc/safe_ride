@@ -1,6 +1,7 @@
 package com.example.safe_ride.article.dto;
 
 import com.example.safe_ride.article.entity.Article;
+import com.example.safe_ride.member.dto.MemberDto;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -20,6 +21,7 @@ public class ArticleDto {
     private String metropolitanCity; // 광역자치구
     private String city; // 도시
     private Long regionId; // Region 객체 대신 ID만 사용
+    private MemberDto member; // 작성자 정보를 MemberDto로 변경
 
     public static ArticleDto fromEntity(Article entity) {
         return ArticleDto.builder()
@@ -32,6 +34,7 @@ public class ArticleDto {
                 .metropolitanCity(entity.getRegion().getMetropolitanCity())
                 .city(entity.getRegion().getCity())
                 .regionId(entity.getRegion().getId()) // Region 객체의 ID 사용
+                .member(MemberDto.fromEntity(entity.getMember())) // MemberDto로 변경
                 .build();
     }
 

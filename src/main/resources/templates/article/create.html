@@ -7,6 +7,68 @@
   <!--👇여기에 header script 넣어주시면 됩니다👇-->
 
   <!--👆여기에 header script 넣어주시면 됩니다👆-->
+
+  <style>
+
+      .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          background-color: #fff;
+          padding: 20px;
+          border-radius: 5px;
+          box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+          margin-bottom: 20px;
+          font-size: 24px;
+      }
+
+      label {
+          font-weight: bold;
+      }
+
+      input[type="text"],
+      textarea {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
+          box-sizing: border-box;
+      }
+
+      select {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
+          box-sizing: border-box;
+      }
+
+      button {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 3px;
+          cursor: pointer;
+      }
+
+      button:hover {
+          background-color: #0056b3;
+      }
+
+      a {
+          color: #007bff;
+          text-decoration: none;
+      }
+
+      a:hover {
+          text-decoration: underline;
+      }
+  </style>
 </head>
 
 <body>
@@ -28,7 +90,7 @@
             <input type="text" id="title" name="title"><br>
 
             <label for="content">내용:</label><br>
-            <textarea id="content" name="content"></textarea><br>
+            <textarea id="content" name="content" rows="6"></textarea><br>
 
             <label for="metropolitanCity">광역자치구:</label><br>
             <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
@@ -43,7 +105,7 @@
 
             <button type="submit">작성</button>
           </form>
-          <a href="/" >뒤로 가기</a> <br>
+          <a href="/article">뒤로 가기</a> <br>
         </div>
         <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
       </main>

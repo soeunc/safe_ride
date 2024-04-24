@@ -5,11 +5,17 @@ import com.example.safe_ride.article.entity.Article;
 import com.example.safe_ride.article.entity.Region;
 import com.example.safe_ride.article.repository.ArticleRepository;
 import com.example.safe_ride.article.repository.RegionRepository;
+import com.example.safe_ride.member.entity.Member;
+import com.example.safe_ride.member.repo.MemberRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -23,10 +29,14 @@ public class ArticleService {
     public final ArticleRepository articleRepository;
     public final RegionRepository regionRepository;
     public final RegionService regionService;
+    public final MemberRepo memberRepository;
 
 
     // 게시글 생성
     public ArticleDto createArticle(ArticleDto dto) {
+
+        Member currentUser = getUserEntity();
+
         // 게시글에 선택된 지역 정보 가져오기
         if (dto.getMetropolitanCity() == null || dto.getCity() == null) {
             throw new IllegalArgumentException("Metropolitan city and city must not be null");
@@ -42,6 +52,7 @@ public class ArticleService {
 
         // 게시글 생성
         Article article = Article.builder()
+                .member(currentUser)
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .hit(dto.getHit())
@@ -138,4 +149,11 @@ public class ArticleService {
         return articlePage.map(ArticleDto::fromEntity);
     }
 
+    private Member getUserEntity() {
+        UserDetails userDetails =
+                (UserDetails) (SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+
+        return memberRepository.findByUserName(userDetails.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
 }

@@ -24,12 +24,14 @@ public class Matching {
     @JoinColumn(name = "member_id")
     private Member member;          // 매칭글 작성자
 
-
     @Setter
     private String title;
 
     @Setter
     private LocalDateTime ridingTime; // 라이딩 시간
+
+    @Setter
+    private String kilometer;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)

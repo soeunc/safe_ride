@@ -22,6 +22,7 @@
         private String metropolitanCity; // 광역자치구
         private String city; // 도시
         private String title;
+        private String kilometer;
         private LocalDateTime ridingTime; // 라이딩 시간
         private String comment;         // 매칭 코멘트
         private Timestamp createTime;   // 작성 시간
@@ -35,6 +36,7 @@
                     .metropolitanCity(matching.getRegion().getMetropolitanCity())
                     .member(matching.getMember())
                     .title(matching.getTitle())
+                    .kilometer(matching.getKilometer())
                     .ridingTime(matching.getRidingTime())
                     .city(matching.getRegion().getCity())
                     .comment(matching.getComment())
