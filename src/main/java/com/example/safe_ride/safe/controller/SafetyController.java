@@ -26,6 +26,6 @@ public class SafetyController {
     // 메인 페이지 이동
     @GetMapping("/safety-direction")
     public String showAccidents() {
-        return "safety/safetyDirectionInfo";
+        return "/safetyDirectionInfo";
     }
 }
