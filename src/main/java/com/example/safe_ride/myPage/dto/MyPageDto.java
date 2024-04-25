@@ -23,7 +23,7 @@ public class MyPageDto {
     //이번주 날짜(일~토)
     private List<String> thisWeek;
     //주간 개별 기록
-    private List<Integer> weeklyRecordList;
+    private List<WeeklyRecordDto> weeklyRecordList;
 
 
     public static MyPageDto fromEntity(MyPage entity){
