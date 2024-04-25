@@ -8,7 +8,166 @@
       .hidden {
           display: none;
       }
+      .content {
+          display: flex;
+          justify-content: space-between; /* 요소들을 좌우로 정렬하고 간격을 동일하게 설정합니다. */
+      }
+      /* 컨테이너와 매칭 상대방 박스 스타일 */
+      .container, .matching {
+          width: 45%;
+          background-color: #f2f2f2;
+          height: 650px;
+          margin: auto;
+          margin-top: 24px;
+          padding: 20px;
+          text-align: center;
+          border-radius: 10px; /* 모서리를 둥글게 만듭니다. */
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* 그림자 효과 추가 */
+          overflow: auto; /* 내용이 넘칠 경우 스크롤 생성 */
+      }
+
+      .rounded-image.image-container {
+          width: 200px; /* 원하는 너비로 조절 */
+          height: 200px; /* 원하는 높이로 조절 */
+          border-radius: 50%;
+          overflow: hidden;
+          display: flex;
+          justify-content: center; /* 이미지를 수평 중앙으로 정렬합니다. */
+          align-items: center; /* 이미지를 수직 중앙으로 정렬합니다. */
+          margin: auto; /* 이미지 컨테이너를 가운데로 정렬합니다. */
+      }
+
+      /* 내부 이미지의 스타일 */
+      .rounded-image.image-container img {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: cover;
+      }
+
+      /* 버튼 스타일 */
+      .apply-button, .toggle-button, .submit-button, .edit-button, .delete-button, .accept-button, .reject-button, .cancel-button {
+          padding: 10px 20px;
+          font-size: 16px;
+          cursor: pointer;
+          border: none;
+          border-radius: 5px;
+          margin-top: 10px;
+      }
+
+      .apply-button, .toggle-button, .edit-button, .delete-button, .accept-button, .reject-button, .cancel-button {
+          background-color: #007bff;
+          color: white;
+      }
+
+      .submit-button {
+          background-color: #28a745;
+      }
+
+      /* 매칭 상태 메시지 스타일 */
+      .matching-message {
+          font-size: 18px;
+          color: #007bff;
+          font-weight: bold;
+          margin-bottom: 20px;
+      }
+
+      /* 매칭 신청 목록 테이블 스타일 */
+      #applicationsList table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+      }
+
+      #applicationsList th, #applicationsList td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+      }
+
+      #applicationsList th {
+          background-color: #f2f2f2;
+      }
+
+      #applicationsList tr:hover {
+          background-color: #f2f2f2;
+      }
+
+      /* 알림창 스타일 */
+      #notification {
+          position: fixed;
+          top: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: #28a745;
+          color: white;
+          padding: 10px 20px;
+          border-radius: 5px;
+          display: none;
+          z-index: 9999;
+      }
+
+      /* 애니메이션 효과 */
+      @keyframes fadeOut {
+          from {
+              opacity: 1;
+          }
+          to {
+              opacity: 0;
+          }
+      }
+
+      /* 알림창 표시 및 사라지는 애니메이션 */
+      .show-notification {
+          animation: fadeOut 3s ease-in-out;
+      }
+      /* rider-info 섹션을 위한 CSS 스타일링 */
+      .rider-info {
+          text-align: left; /* 텍스트를 왼쪽 정렬합니다. */
+          padding: 20px; /* 여백을 위해 패딩 추가 */
+      }
+
+      /* 닉네임 가운데 정렬 및 글씨 크기 조절 */
+      .nickname {
+          font-size: 20px; /* 폰트 크기를 줄입니다. */
+          font-weight: bold; /* 글씨를 굵게 만듭니다. */
+          text-align: center; /* 가운데 정렬합니다. */
+          margin-bottom: 10px; /* 아래쪽 여백을 추가합니다. */
+      }
+
+      .location,
+      .riding-time,
+      .riding-course,
+      .estimated-distance {
+          margin-top: 10px; /* 각 섹션 간 여백을 추가합니다. */
+      }
+
+      .estimated-distance {
+          margin-bottom: 20px; /* 마지막 섹션 아래에 여백을 더 추가합니다. */
+      }
+
+      /* rider-info 내의 강조 태그에 대한 스타일 */
+      .rider-info strong {
+          color: #007bff; /* 강조 태그의 색상을 변경합니다. */
+      }
+
+      /* rider-info 내의 문단에 대한 스타일 */
+      .rider-info p {
+          margin: 0; /* 문단의 기본 여백을 제거합니다. */
+      }
+
+      /* rider-info 내의 줄바꿈에 대한 스타일 */
+      .rider-info br {
+          display: none; /* 줄바꿈을 숨깁니다. */
+      }
+      .creation-date {
+          font-size: 12px; /* 작은 글씨로 크기 조정 */
+          color: #666; /* 회색으로 색상 지정 */
+          text-align: right; /* 우측 정렬 */
+          margin-top: 10px; /* 위쪽 여백 추가 */
+      }
+
   </style>
+
 </head>
 
 <body>
@@ -21,22 +180,62 @@
       <div class="container mt-4">
         <div class="post-details">
           <div>
-            <h4 th:text="${matching.title}" style="word-wrap: break-word;"></h4>
-            <p><strong>라이딩 지역:</strong> <span th:text="${metropolitanCity}"></span> - <span th:text="${city}"></span></p>
-            <p><strong>라이딩 시간:</strong> <span th:text="${#temporals.format(matching.ridingTime, 'MM월 dd일 EEEE HH:mm')}"></span></p><br>
-            <strong>라이딩 코스 소개:</strong><p th:text="${matching.comment}" style="word-wrap: break-word;"></p> <br>
-            <p><strong>예상 거리 :</strong> <span th:text="${matching.kilometer}"></span></p>
+            <div class="rounded-image image-container">
+              <img src="/img/bicycle.png" alt="" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+            </div>
+            <div style="text-align: center;">
+              <span class="nickname" th:text="${matching.member.nickname}"></span> <br>
+            </div>
+            <div class="rider-info"  style="margin-top: 20px">
+              <p class="location">
+                <strong>라이딩 지역:</strong>
+                <span th:text="${metropolitanCity}"></span> - <span th:text="${city}"></span>
+              </p>
+              <p class="riding-time">
+                <strong>라이딩 시간:</strong>
+                <span th:text="${#temporals.format(matching.ridingTime, 'MM월 dd일 EEEE HH:mm')}"></span>
+              </p>
+              <p class="riding-course">
+                <strong>라이딩 코스 소개:</strong> <br>
+                <span th:text="${matching.comment}" style="word-wrap: break-word;"></span>
+              </p>
+              <p class="estimated-distance">
+                <strong>예상 거리:</strong>
+                <span th:text="${matching.kilometer}"></span>
+              </p>
+            </div>
+          </div>
+          <div style="text-align: center;" th:if="${matching.member.id == currentUser.id}">
+            <a th:href="@{'/matching/' + ${matching.id} + '/edit'}" class="edit-button" style="margin-right: 3px;">수정</a>
+            <form th:action="@{'/matching/' + ${matching.id} + '/delete'}" method="post" id="deleteForm" style="display: inline-block;">
+              <button type="submit" onclick="confirmDelete()" class="delete-button" style="margin-right: 10px;">삭제</button>
+            </form>
           </div>
         </div>
-
+        <a href="/matching/list" style="display: block; margin-top: 10px; text-align: left;">뒤로가기</a>
+        <div class="creation-date">
+          <span>작성일자: <span th:text="${#dates.format(matching.createTime, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
+        </div>
+      </div>
+      <div class="matching">
+        <div class="post-details">
+          <div>
+            <div class="rounded-image image-container">
+              <img src="/img/findUser.png" alt="" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+            </div>
+            <br>
+          </div>
+        </div>
         <!-- 매칭 상태가 ACCEPTED일 경우 매칭이 성사되었다는 메시지 표시 -->
         <div th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
-          <h4>매칭 신청</h4>
-          <p>매칭 완료 되었습니다^^</p>
+          <h4>매칭 성사</h4>
+          <br>
+          <p>함께 달릴 라이더 매칭이 완료 되었습니다^^</p>
         </div>
 
         <!-- 매칭 상태가 ACCEPTED가 아닌 경우에 매칭 신청 관련 요소들을 표시 -->
         <div th:unless="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
+          <span>라이더 찾는 중...</span> <br>
           <button id="applyButton" class="apply-button">매칭 신청</button>
           <!-- 매칭 신청 폼 -->
           <div id="applicationForm" class="hidden">
@@ -56,7 +255,7 @@
               <tr>
                 <th>신청자</th>
                 <th>신청 메시지</th>
-                <th>동작</th>
+                <th> </th>
               </tr>
               </thead>
               <tbody>
@@ -71,7 +270,6 @@
                     <form th:action="@{'/matching/' + ${matching.id} + '/reject/' + ${apply.id}}" method="post">
                       <button type="submit" class="reject-button">거절</button>
                     </form>
-                    <button th:href="@{'/matching/' + ${matching.id} + '/applicantInfo/' + ${apply.id}}">유저 정보</button>
                   </div>
                   <div th:if="${apply.applicant.id == currentUser.id}">
                     <form th:action="@{'/matching/' + ${matching.id} + '/cancel-application'}" method="post">
@@ -86,12 +284,6 @@
           </div>
         </div>
       </div>
-
-      <a th:href="@{'/matching/' + ${matching.id} + '/edit'}" class="edit-button">수정</a>
-      <a href="/matching/list">홈으로</a> <br>
-      <form th:action="@{'/matching/' + ${matching.id} + '/delete'}" method="post" id="deleteForm">
-        <button type="submit" onclick="confirmDelete()" class="delete-button">삭제</button>
-      </form>
 
       <!-- 알림창 -->
       <div id="notification" class="hidden"></div>
@@ -142,7 +334,7 @@
         // 여기서 매칭 신청이 성공했는지 여부를 확인하고 알림창을 표시합니다.
         // 아래의 코드를 사용자가 요청한 응답 결과에 맞게 수정하십시오.
         // 예를 들어, 자신의 매칭글에 매칭 신청을 할 수 없는 경우와 중복 매칭 신청이 불가능한 경우에도 알림창이 표시되어야 합니다.
-        showNotification("매칭 신청이 성공적으로 완료되었습니다."); // 매칭 신청 성공 메시지
+        showNotification(""); // 매칭 신청 성공 메시지
         event.preventDefault(); // 폼 제출 방지
     });
 
