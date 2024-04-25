@@ -1,6 +1,16 @@
 let markers = [];
 let infoWindows = [];
 
+function showSpinner() {
+    document.getElementById('spinner').style.display = 'inline-block';
+    document.getElementById('button-text').style.display = 'none';
+}
+
+function hideSpinner() {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('button-text').style.display = 'inline-block';
+}
+
 // 지도 설정, 초기화
 function initMap() {
     let position = new naver.maps.LatLng(37.3595704, 127.105399);
@@ -26,6 +36,7 @@ function setupEventListeners(map) {
             alert('검색어를 입력하세요');
             return;
         }
+        showSpinner();
         fetchRouteData(query, map);
     });
 }
@@ -47,6 +58,7 @@ function fetchRouteData(query, map) {
         } else {
             alert('주소를 찾을 수 없습니다.');
         }
+        hideSpinner();
     });
 }
 
