@@ -18,6 +18,7 @@
     <main class="content">
       <!--👇여기에 내용 넣어주시면 됩니다👇-->
       <div class="container mt-4" style="position: relative;">
+        <h3>공영자전거 현황</h3>
         <div class="container">
           <div class="row">
             <!-- 첫 번째 카드 -->
@@ -139,133 +140,144 @@
 
 
     // 🚩좌표 관련 script
+
+    // positionPopup 호출
+    // document.getElementById('getPositionBtn').addEventListener('click', function() {
+    //     // 팝업 열기
+    //     window.open('/public-bicycle/positionPopup', 'locationConsent', 'width=400,height=300');
+    // });
     // 위치 가져와서 sendPositionToServer 실행
     document.addEventListener('DOMContentLoaded', function () {
-        var btn = document.getElementById('getPositionBtn');
-        btn.addEventListener('click', function () {
-            console.log('현재 위치 검색 버튼이 클릭되었습니다.');
+        // 위치 정보 요청 버튼 이벤트 리스너 설정
+        document.getElementById('getPositionBtn').addEventListener('click', function () {
+            // 로딩 화면 표시
+            document.getElementById('loading').style.display = 'block';
             navigator.geolocation.getCurrentPosition(function (position) {
                 console.log('위치 정보를 성공적으로 받았습니다.');
                 sendPositionToServer(position);
             }, showErrorMsg);
         });
-    });
 
-    // 서버로 좌표 데이터 보내기
-    function sendPositionToServer(position) {
-        var userLng = position.coords.longitude; // 경도
-        var userLat = position.coords.latitude; // 위도
-        console.log('경도 : ' + userLng);
-        console.log('위도 : ' + userLat);
+        // 에러 발생 시 처리
+        function showErrorMsg(error) {
+            var errorMessage = '';
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = "사용자가 위치 정보 제공을 거부했습니다.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = "위치 정보를 사용할 수 없습니다.";
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = "위치 정보를 가져오는 요청이 시간 초과되었습니다.";
+                    break;
+                default:
+                    errorMessage = "알 수 없는 오류가 발생했습니다.";
+                    break;
+            }
+            console.log(errorMessage);
+            document.getElementById('loading').style.display = 'none';  // 로딩 화면 숨김
+        }
 
-        fetch('/public-bicycle/getUserPosition', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                lng: userLng,
-                lat: userLat
-            })
-        })
-            .then(response => {
+        // 서버로 위치 데이터를 보내는 함수
+        function sendPositionToServer(position) {
+            var userLng = position.coords.longitude; // 경도
+            var userLat = position.coords.latitude; // 위도
+            console.log('경도 : ' + userLng);
+            console.log('위도 : ' + userLat);
+
+            fetch('/public-bicycle/getUserPosition', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    lng: userLng,
+                    lat: userLat
+                })
+            }).then(response => {
                 if (response.ok) {
                     window.location.reload(); // 응답 성공 시 페이지 새로 고침
                 } else {
                     console.error('서버로부터 응답을 받는데 실패했습니다.');
                 }
-            })
-            .catch(error => console.error('Error:', error));  // 오류 처리
-    }
-
-    function showErrorMsg(error) {
-        var errorMessage = '';
-        switch (error.code) {
-            case error.PERMISSION_DENIED:
-                errorMessage = "사용자가 위치 정보 제공을 거부했습니다.";
-                break;
-            case error.POSITION_UNAVAILABLE:
-                errorMessage = "위치 정보를 사용할 수 없습니다.";
-                break;
-            case error.TIMEOUT:
-                errorMessage = "위치 정보를 가져오는 요청이 시간 초과되었습니다.";
-                break;
-            default:
-                errorMessage = "알 수 없는 오류가 발생했습니다.";
-                break;
-        }
-        console.log(errorMessage);
-    }
-
-    //🗺️ 지도 관련 script
-    // 지도 생성 (초기값 : 리스트의 0번째 장소)
-    var defaultLng = [[${searchedLng}]];
-    var defaultLat = [[${searchedLat}]];
-
-    var mapOptions = {
-        center: new naver.maps.LatLng(defaultLat, defaultLng),
-        zoom: 17
-    };
-
-    var map = new naver.maps.Map('map', mapOptions);
-
-    // 기본 위치에 마커 추가
-
-    var defaultMarkerContent = '<img src="' + '/img/pin_default.png" alt="" ' +
-        'style="margin: 0px; padding: 0px; border: 0px solid transparent; display: block; max-width: none; max-height: none; ' +
-        '-webkit-user-select: none; position: absolute; width: 22px; height: 35px; left: 0px; top: 0px;">';
-
-    var defaultMarker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(defaultLat, defaultLng),
-        map: map,
-        icon: {
-            content: defaultMarkerContent,
-            size: new naver.maps.Size(22, 35),
-            anchor: new naver.maps.Point(11, 35)
+            }).catch(error => {
+                console.error('Error:', error);
+            }).finally(() => {
+                document.getElementById('loading').style.display = 'none';  // 응답 완료 후 로딩 화면 숨김
+            });
         }
     });
 
 
-    // 지도 마커 (위치, 사용가능 자전거 수량)
-    var stations = [[${combinedInfo}]];
-    stations.forEach(function (station) {
-        var bikeCount = station.bicycleInfo && station.bicycleInfo.bcyclTpkctNocs
-            ? station.bicycleInfo.bcyclTpkctNocs : 'X';
-        var markerContent =
-            '<div style="background-color: #007bff; ' +
-            'color: white; ' +
-            'width: 30px; ' +
-            'height: 30px; ' +
-            'line-height: 20px; ' +
-            'text-align: center; ' +
-            'border-radius: 50%; ' +
-            'font-size: 14px; ' +
-            'font-weight: bold; ' +
-            'border: 2px solid black;">'
-            + bikeCount
-            + '</div>';
-        var marker = new naver.maps.Marker({
-            position: new naver.maps.LatLng(station.stationInfo.lat, station.stationInfo.lot),
+        //🗺️ 지도 관련 script
+        // 지도 생성 (초기값 : 리스트의 0번째 장소)
+        var defaultLng = [[${searchedLng}]];
+        var defaultLat = [[${searchedLat}]];
+
+        var mapOptions = {
+            center: new naver.maps.LatLng(defaultLat, defaultLng),
+            zoom: 17
+        };
+
+        var map = new naver.maps.Map('map', mapOptions);
+
+
+        var defaultMarkerContent = '<img src="' + '/img/pin_default.png" alt="" ' +
+            'style="margin: 0px; padding: 0px; border: 0px solid transparent; display: block; max-width: none; max-height: none; ' +
+            '-webkit-user-select: none; position: absolute; width: 22px; height: 35px; left: 0px; top: 0px;">';
+
+        var defaultMarker = new naver.maps.Marker({
+            position: new naver.maps.LatLng(defaultLat, defaultLng),
             map: map,
             icon: {
-                content: markerContent,
-                size: new naver.maps.Size(30, 30),
-                anchor: new naver.maps.Point(15, 15)
+                content: defaultMarkerContent,
+                size: new naver.maps.Size(22, 35),
+                anchor: new naver.maps.Point(11, 35)
             }
         });
-    });
 
-    // 📄상세보기 팝업 관련 script
-    function showDetails(stationId) {
-        const encodedId = encodeURIComponent(stationId);
-        const url = `/public-bicycle/${encodedId}`;
-        window.open(url, "_blank", "width=500,height=600");
-    }
 
-    // ✂️세션 지우기 관련 script
-    window.onbeforeunload = function() {
-        navigator.sendBeacon("/public-bicycle/clearSession", JSON.stringify({}));
-    };
+        // 지도 마커 (위치, 사용가능 자전거 수량)
+        var stations = [[${combinedInfo}]];
+        stations.forEach(function (station) {
+            var bikeCount = station.bicycleInfo && station.bicycleInfo.bcyclTpkctNocs
+                ? station.bicycleInfo.bcyclTpkctNocs : 'X';
+            var markerContent =
+                '<div style="background-color: #007bff; ' +
+                'color: white; ' +
+                'width: 30px; ' +
+                'height: 30px; ' +
+                'line-height: 20px; ' +
+                'text-align: center; ' +
+                'border-radius: 50%; ' +
+                'font-size: 14px; ' +
+                'font-weight: bold; ' +
+                'border: 2px solid black;">'
+                + bikeCount
+                + '</div>';
+            var marker = new naver.maps.Marker({
+                position: new naver.maps.LatLng(station.stationInfo.lat, station.stationInfo.lot),
+                map: map,
+                icon: {
+                    content: markerContent,
+                    size: new naver.maps.Size(30, 30),
+                    anchor: new naver.maps.Point(15, 15)
+                }
+            });
+        });
+
+        // 📄상세보기 팝업 관련 script
+        function showDetails(stationId) {
+            const encodedId = encodeURIComponent(stationId);
+            const url = `/public-bicycle/${encodedId}`;
+            window.open(url, "_blank", "width=500,height=600");
+        }
+
+        // ✂️세션 지우기 관련 script
+        window.onbeforeunload = function () {
+            navigator.sendBeacon("/public-bicycle/clearSession", JSON.stringify({}));
+        };
 
 </script>
 <!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->

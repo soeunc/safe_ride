@@ -185,6 +185,12 @@ public class LocationInfoController {
         return "redirect:/public-bicycle";
     }
 
+    // 현재 위치 검색 동의 팝업 페이지
+    @GetMapping("/public-bicycle/positionPopup")
+    public String positionPopup() {
+        return "locationInfo/positionPopup"; // resources/templates 폴더 내의 positionPopup.html을 반환
+    }
+
     // 현재 위치 기준의 위도 경도 가져와서 탐색 후 세션에 저장
     @PostMapping("/public-bicycle/getUserPosition")
     public String receiveUserLocation(
