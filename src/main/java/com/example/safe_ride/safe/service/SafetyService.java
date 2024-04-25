@@ -25,7 +25,7 @@ public class SafetyService {
     public void saveAccidentInfo(List<AccidentInfo> accidentInfoList) {
         // 사용자 위치를 입력할 때마다 DB 새로 저장
         String deleteSql = "DELETE FROM accident_info";
-        String sql = "INSERT INTO accident_info (bjd_cd, spot_nm, occrrnc_cnt, caslt_cnt, dth_dnv_cnt, se_dnv_cnt, sl_dnv_cnt, geom_json, lo_crd, la_crd) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO accident_info (bj_dong_code, spot_nm, occrrnc_cnt, caslt_cnt, dth_dnv_cnt, se_dnv_cnt, sl_dnv_cnt, geom_json, lo_crd, la_crd) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(URL);
              // 기존 데이터 삭제를 위한 PreparedStatement

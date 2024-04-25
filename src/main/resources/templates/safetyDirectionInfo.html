@@ -13,23 +13,30 @@
   <div class="main">
     <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
     <main class="content">
-      <div class="container mt-4">
-        <h3>안전 지역 안내</h3>
+      <div class="container mt-2">
+        <h3>위험 지역 탐색</h3>
         <p>현재 위치를 기준으로 <strong style="color: #80b3ff">자전거 사고다발지역</strong>과
           <strong style="color: #80b3ff">스쿨존 사고다발지역</strong>을 표시합니다.
           <span class="small-text">(시/군/구 기준)</span>
         </p>
-        <div id="map" style="width:100%;height:400px;"></div>
-        <div class="search-container mb-3">
-          <br>
-          <div class="input-group mb-3 w-50">
-            <input id="search-input" class="form-control" type="text"
-                   placeholder="현재 위치를 지번, 도로명로 입력해주세요.(예. 잠실3동)">
-            &nbsp;&nbsp;&nbsp;
+        <div id="map" style="width:100%;height:450px;"></div>
+        <div class="search-container mt-4 mb-3">
+          <div class="input-group w-50">
+            <div style="width: 50%;">
+              <input id="search-input" class="form-control rounded-pill mb-1" type="text"
+                     placeholder="현재 위치를 입력하세요.">
+            </div> &nbsp;
             <div class="input-group-append">
-              <button id="find-route-to-address-btn" class="btn btn-primary" type="button">현재 위치 이동</button>
+              <button id="find-route-to-address-btn" class="btn btn-primary rounded-pill" type="button">
+                <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+                      style="display: none;"></span>
+                <span id="button-text">현재 위치 이동</span>
+              </button>
             </div>
           </div>
+          <small id="input-help-text" class="form-text text-muted">
+            &nbsp; 예시: "강서구 화곡동" 또는 "화곡동"
+          </small>
         </div>
       </div>
     </main>
@@ -39,7 +46,7 @@
 
 <script src="/js/app.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function(){
+    document.addEventListener('DOMContentLoaded', function () {
         let map = initMap();
         setupEventListeners(map);
     });
