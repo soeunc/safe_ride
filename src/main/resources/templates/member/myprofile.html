@@ -94,10 +94,10 @@
                                     <span>[[${ridingRecord.getTodayRecord()}]]km 탔어요! :)</span>
                                 </div>
                             </div>
-                            <form action="/safe-ride/myprofile/create-today" method="post">
-                                <input id="today-record-input" name="todayRecord" type="number" required
-                                       placeholder="오늘 기록을 입력">
-                                <input type="submit" value="입력">
+                            <form>
+                                <input id="todayRecordInput" name="todayRecord" type="number" required
+                                       placeholder="오늘 기록을 입력" maxlength="4">
+                                <button class="btn btn-primary btn" type="button" id="todaySubmit">오늘 기록 입력</button>
                             </form>
                         </div>
                         <div id="chart">
@@ -217,7 +217,7 @@
     });
     const myNickName = [[${member.nickname}]];
     const myPhoneNumber = [[${member.phoneNumber}]];
-
+    const todayRecord = [[${ridingRecord.getTodayRecord()}]];
     //패스워드 정규식 체크용 flag변수
     let passwordCk = false;
     //패스워드 중복확인용 flag변수
@@ -396,6 +396,34 @@
             });
         }
     });
+
+    //오늘 기록 입력
+    $('#todaySubmit').click(function (event){
+        event.preventDefault();
+        let todayRecordInput = $('#todayRecordInput').val();
+        //한번에 1000키로 이상을 타는 사람일때
+        if (todayRecord >= 1000 || todayRecordInput >= 1000){
+            alert("오늘자 입력 범위 초과입니다! :) (1000km까지 입력가능)")
+        } else {
+            const formData = {
+                todayRecord : todayRecord
+            };
+            $.ajax({
+                type : "POST",
+                url : "/safe-ride/myprofile/create-today",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success : function (result){
+                    alert("오늘 기록이 추가되었습니다.^^");
+                    window.location.href = "/safe-ride/myprofile";
+                },
+                error:function (error){
+                    alert("에러가 발생했습니다." + error);
+                }
+            });
+        }
+    });
+
 </script>
 <!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
 <script src="/js/app.js"></script>

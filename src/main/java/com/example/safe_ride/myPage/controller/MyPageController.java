@@ -6,6 +6,7 @@ import com.example.safe_ride.member.dto.MemberDto;
 import com.example.safe_ride.member.dto.UpdateDto;
 import com.example.safe_ride.member.entity.Member;
 import com.example.safe_ride.member.service.MemberService;
+import com.example.safe_ride.myPage.dto.TodayRecordDto;
 import com.example.safe_ride.myPage.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,17 +61,16 @@ public class MyPageController {
     }
     //오늘 주행기록 입력
     @PostMapping("/create-today")
-    public String createToday(
-            @RequestParam("todayRecord")
-            int todayRecord,
-            Model model,
+    public ResponseEntity<TodayRecordDto> createToday(
+            @RequestBody
+            TodayRecordDto dto,
             RedirectAttributes redirectAttributes
     ){
         Long memberId = memberService.readMemberId(authFacade.getAuth().getName());
-        myPageService.createToday(memberId, todayRecord);
+        myPageService.createToday(memberId, dto.getTodayRecord());
         msg = "오늘 기록이 추가되었습니다.^^";
         redirectAttributes.addFlashAttribute("msg", msg);
-        return "redirect:/safe-ride/myprofile";
+        return ResponseEntity.ok().body(dto);
     }
 
 
