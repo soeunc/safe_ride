@@ -88,10 +88,9 @@ public class ApiService {
             // 전체 데이터 개수 얻기
             int totalCount = fetchTotalCount();
             // 한 번에 요청할 데이터 수
-            int numOfRows = 100;
+            int numOfRows = 300;
             // 필요한 전체 API 호출 횟수 계산(총 3페이지)
             int totalCalls = (int) Math.ceil((double) totalCount / numOfRows);
-            log.info("totalCalls: {}", totalCalls);
 
             List<AccidentInfo> resultList = new ArrayList<>();
 
@@ -223,7 +222,6 @@ public class ApiService {
             int numOfRows = 100;
             // 필요한 전체 API 호출 횟수 계산
             int totalCalls = (int) Math.ceil((double) totalCount / numOfRows);
-            log.info("totalCalls: {}", totalCalls);
 
             List<SchoolZoneInfo> resultList = new ArrayList<>();
 
