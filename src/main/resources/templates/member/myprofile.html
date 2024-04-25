@@ -178,19 +178,20 @@
             alert(alertMsg);
         }
     }
-    const thisWeek = [[${ridingRecord.thisWeek}]];
+    //const thisWeek = [[${ridingRecord.thisWeek}]];
     const weeklyRecordList = [[${ridingRecord.weeklyRecordList}]];
     new Chart(document.getElementById("bar-chart"), {
         type: 'bar',
         data: {
             labels: [
-                thisWeek.at(0),
-                thisWeek.at(1),
-                thisWeek.at(2),
-                thisWeek.at(3),
-                thisWeek.at(4),
-                thisWeek.at(5),
-                thisWeek.at(6)
+                weeklyRecordList[0].createDate.split('T')[0],
+                weeklyRecordList[1].createDate.split('T')[0],
+                weeklyRecordList[2].createDate.split('T')[0],
+                weeklyRecordList[3].createDate.split('T')[0],
+                weeklyRecordList[4].createDate.split('T')[0],
+                weeklyRecordList[5].createDate.split('T')[0],
+                weeklyRecordList[6].createDate.split('T')[0],
+
             ],
             datasets: [
                 {
@@ -204,7 +205,6 @@
                         weeklyRecordList[4].todayRecord,
                         weeklyRecordList[5].todayRecord,
                         weeklyRecordList[6].todayRecord,
-
                     ]
                 }
             ]
@@ -408,7 +408,7 @@
             alert("오늘자 입력 범위 초과입니다! :) (1000km까지 입력가능)")
         } else {
             const formData = {
-                todayRecord : todayRecord
+                todayRecord : todayRecordInput
             };
             $.ajax({
                 type : "POST",

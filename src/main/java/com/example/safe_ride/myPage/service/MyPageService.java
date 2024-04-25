@@ -37,25 +37,39 @@ public class MyPageService {
         MyPageDto myPageDto = new MyPageDto();
         //memberId로 조회 시 데이터가 하나라도 있는가
         boolean isExist = myPageRepo.existsByMemberId(memberId);
-        if (!isExist) return myPageDto;
-
-        //오늘자 데이터가 있는지 확인
-        Optional<MyPage> optionalMyPage =
-                myPageRepo.findByMemberIdAndCreateDateAfter(
-                    memberId, LocalDate.now().atStartOfDay()
-                );
-        if (optionalMyPage.isPresent()) {
-            myPage = optionalMyPage.get();
-            myPageDto = MyPageDto.fromEntity(myPage);
-        }
-        //전체기록합산
-        myPageDto.setTotalRecord(findTotalRecord(memberId));
-        //주간기록합산
-        myPageDto.setWeeklyRecord(findWeeklyRecord(memberId));
         //이번주 날짜(일~토)
         myPageDto.setThisWeek(getThisWeekDayList());
-        //주간 개별 기록
-        myPageDto.setWeeklyRecordList(weeklyRecordListTotal(getThisWeekDayList(),findWeeklyRecordList(memberId)));
+
+        if (isExist) {
+            //오늘자 데이터가 있는지 확인
+            Optional<MyPage> optionalMyPage =
+                    myPageRepo.findByMemberIdAndCreateDateAfter(
+                        memberId, LocalDate.now().atStartOfDay()
+                    );
+            if (optionalMyPage.isPresent()) {
+                myPage = optionalMyPage.get();
+                myPageDto = MyPageDto.fromEntity(myPage);
+            }
+            //전체기록합산
+            myPageDto.setTotalRecord(findTotalRecord(memberId));
+            //주간기록합산
+            myPageDto.setWeeklyRecord(findWeeklyRecord(memberId));
+            //주간 개별 기록
+            myPageDto.setWeeklyRecordList(weeklyRecordListTotal(getThisWeekDayList(),findWeeklyRecordList(memberId)));
+        } else {
+            List<WeeklyRecordDto> weeklyRecordDtoList = new ArrayList<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+            for (int i = 0; i <myPageDto.getThisWeek().size() ; i++) {
+                WeeklyRecordDto dto = new WeeklyRecordDto();
+                String oneDay = myPageDto.getThisWeek().get(i) + " 00:00:00.000";
+                LocalDateTime localDateTime = LocalDateTime.parse(oneDay, formatter);
+                dto.setTodayRecord(0);
+                dto.setCreateDate(localDateTime);
+                weeklyRecordDtoList.add(dto);
+            }
+            myPageDto.setWeeklyRecordList(weeklyRecordDtoList);
+        }
+
 
         return myPageDto;
     }
