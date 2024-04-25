@@ -190,19 +190,21 @@
                 thisWeek.at(3),
                 thisWeek.at(4),
                 thisWeek.at(5),
-                thisWeek.at(6)],
+                thisWeek.at(6)
+            ],
             datasets: [
                 {
                     label: "Population (millions)",
                     backgroundColor: ["#ff0000", "#ff7f27", "#ffd900", "#00db07", "#00b7ff", "#3700dc", "#a600ff"],
                     data: [
-                        weeklyRecordList.at(0),
-                        weeklyRecordList.at(1),
-                        weeklyRecordList.at(2),
-                        weeklyRecordList.at(3),
-                        weeklyRecordList.at(4),
-                        weeklyRecordList.at(5),
-                        weeklyRecordList.at(6),
+                        weeklyRecordList[0].todayRecord,
+                        weeklyRecordList[1].todayRecord,
+                        weeklyRecordList[2].todayRecord,
+                        weeklyRecordList[3].todayRecord,
+                        weeklyRecordList[4].todayRecord,
+                        weeklyRecordList[5].todayRecord,
+                        weeklyRecordList[6].todayRecord,
+
                     ]
                 }
             ]
