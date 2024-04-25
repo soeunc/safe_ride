@@ -2,15 +2,12 @@ package com.example.safe_ride.member.controller;
 
 import com.example.safe_ride.facade.AuthenticationFacade;
 import com.example.safe_ride.member.dto.JoinDto;
-import com.example.safe_ride.member.dto.MemberDto;
-import com.example.safe_ride.member.entity.CustomMemberDetails;
 import com.example.safe_ride.member.dto.LoginDto;
-import com.example.safe_ride.member.dto.UpdateDto;
-import com.example.safe_ride.member.entity.Authority;
 import com.example.safe_ride.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -19,6 +16,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -78,7 +77,9 @@ public class MemberController {
     }
     //회원가입
     @PostMapping("/join")
-    public String signUp(
+    @ResponseBody
+    public ResponseEntity<JoinDto> signUp(
+            @RequestBody
             JoinDto dto,
             RedirectAttributes redirectAttributes
     ){
@@ -89,7 +90,37 @@ public class MemberController {
         memberService.createBadge(dto.getUserId());
         msg = "회원가입 되었습니다 ^^.";
         redirectAttributes.addFlashAttribute("msg", msg);
-        return "redirect:/safe-ride/login";
+        return ResponseEntity.ok().body(dto);
+    }
+
+    //아이디 중복확인
+    @PostMapping("/duplicateCkForId")
+    @ResponseBody
+    public int duplicateCkForId(
+            @RequestParam("userId")
+            String userId
+    ){
+        return memberService.duplicateCkForId(userId);
+    }
+
+    //닉네임 중복확인
+    @PostMapping("/duplicateCkForNickname")
+    @ResponseBody
+    public int duplicateCkForNickname(
+            @RequestParam("nickName")
+            String nickName
+    ){
+        return memberService.duplicateCkForNickname(nickName);
+    }
+
+    //이메일 중복확인
+    @PostMapping("/duplicateCkForEmail")
+    @ResponseBody
+    public int duplicateCkForEmail(
+            @RequestParam("email")
+            String email
+    ){
+        return memberService.duplicateCkForEmail(email);
     }
 
 }

@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SchoolZoneAccInfo {
+public class SchoolZoneInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

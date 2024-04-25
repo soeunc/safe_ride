@@ -1,6 +1,8 @@
 package com.example.safe_ride.myPage.repo;
 
+import com.example.safe_ride.myPage.dto.WeeklyRecordDto;
 import com.example.safe_ride.myPage.entity.QMyPage;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -49,11 +51,14 @@ public class MyPageRepoDsl {
 
     //날짜별 주간 라이딩 기록
     //일 -> 토 순서로 가져옴
-    public List<Integer> getWeeklyRecordList(Long memberId, LocalDateTime start, LocalDateTime end){
-        List<Integer> weeklyRecordList
+    public List<WeeklyRecordDto> getWeeklyRecordList(Long memberId, LocalDateTime start, LocalDateTime end){
+        List<WeeklyRecordDto> weeklyRecordList
                 = queryFactory
                 .select(
-                        qMyPage.todayRecord
+                        Projections.constructor(WeeklyRecordDto.class,
+                            qMyPage.todayRecord,
+                            qMyPage.createDate
+                        )
                 )
                 .from(qMyPage)
                 .where(

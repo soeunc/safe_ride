@@ -6,6 +6,62 @@
   <th:block th:replace="~{common/header :: headerFragment}"></th:block>
 
   <!--👇여기에 header script 넣어주시면 됩니다👇-->
+  <style>
+      table {
+          border-collapse: collapse;
+          width: 100%; /* 테이블을 부모 요소에 맞춰 전체 너비로 설정합니다. */
+          margin: 0rem auto;
+          box-shadow: 4px 4px 10px 0 rgba(0, 0, 0, 0.1);
+          background-color: white;
+      }
+
+      /* 테이블 행 */
+      th, td {
+          padding: 8px;
+          text-align: left;
+          border-bottom: 1px solid #ddd;
+          text-align: center;
+      }
+
+      th {
+          background-color: #1b1b1b;
+          color: #ddd;
+      }
+
+      /* 테이블 올렸을 때 */
+      tbody tr:hover {
+          background-color: #d3d3d3;
+          opacity: 0.9;
+          cursor: pointer;
+      }
+
+      /* 제목 셀 너비 늘리기 */
+      th:first-child {
+          width: 40%; /* 제목 셀의 너비를 40%로 설정합니다. */
+      }
+
+      /* 예상 거리 및 상태 셀 너비 줄이기 */
+      td:nth-child(2),
+      td:nth-child(4) {
+          width: 20%; /* 예상 거리 및 상태 셀의 너비를 20%로 설정합니다. */
+      }
+
+      .create-button {
+          display: inline-block;
+          padding: 8px 16px;
+          background-color: #007bff;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          text-decoration: none;
+      }
+
+      .create-button:hover {
+          background-color: #0056b3;
+      }
+
+  </style>
 
   <!--👆여기에 header script 넣어주시면 됩니다👆-->
 </head>
@@ -17,44 +73,80 @@
     <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
 
     <main class="content">
-        <!--👇여기에 내용 넣어주시면 됩니다👇-->
-        <div class="container mt-4">
+      <!--👇여기에 내용 넣어주시면 됩니다👇-->
+      <div class="container mt-4">
+        <h5>지역별로 검색</h5>
+        <form action="#" th:action="@{/matching/list}" method="get">
+          <select name="metropolitanCity" id="metropolitanCity" onchange="this.form.submit()">
+            <option value="">전체</option>
+            <option th:each="city : ${metropolitanCities}"
+                    th:value="${city}"
+                    th:text="${city}"
+                    th:selected="${city == selectedMetropolitanCity}"></option>
+          </select>
+          <!-- 선택한 광역자치구에 따라 해당 도시 목록을 보여주는 드롭다운 메뉴 -->
+          <select name="city" id="city">
+            <option value="">전체</option>
+            <option th:each="city : ${cities}"
+                    th:value="${city}"
+                    th:text="${city}"
+                    th:selected="${city == selectedCity}"></option>
+          </select>
+          <button type="submit">검색</button>
+        </form>
+        <br>
 
-          <div th:if="${page.content.isEmpty()}">
-            <p>작성된 매칭글이 없습니다.</p>
-          </div>
-          <div th:unless="${page.content.isEmpty()}">
-            <div id="articleContainer" class="post-box">
-              <div class="article_details" th:each="matching : ${page.content}">
+        <div id="articleContainer" class="post-box">
+          <table class="table">
+            <thead>
+            <tr>
+              <th>제목</th>
+              <th>예상 거리</th>
+              <th>라이딩 시작 시간</th>
+              <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="matching : ${page.content}">
+              <td>
                 <a th:href="@{/matching/{id}(id=${matching.id})}">
-                  <h3 th:text="${matching.comment}"></h3>
+                  <span th:text="${matching.title}"></span>
                 </a>
-                <span>작성일자: <span th:text="${#dates.format(matching.createTime, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
-                <p th:text="${matching.status}"></p>
-              </div>
-            </div>
-          </div>
-          <br>
-          <a href="/matching/create">매칭 구하기</a> <br>
+              </td>
+              <td>
+                <span th:text="${matching.kilometer}"></span>
+              </td>
+              <td>
+                <span th:text="${#temporals.format(matching.ridingTime, 'MM월 dd일 EEEE HH:mm')}"></span>
+              </td>
+              <td>
+                <span th:text="${matching.status}"></span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="footer">
-          <!-- 페이지네이션 링크 추가 -->
-          <div th:if="${page.totalPages > 1}" class="pagination">
-            <div>
-              <a th:each="i : ${#numbers.sequence(0, page.totalPages-1)}"
-                 th:href="@{'/matching?page=' + ${i}}"
-                 th:class="${i == page.number} ? 'active'">
-                <span th:text="${i + 1}"></span>
-              </a>
-            </div>
+        <br>
+        <button class="create-button" onclick="location.href='/matching/create'">매칭글 작성</button>
+      </div>
+      <div class="footer">
+        <!-- 페이지네이션 링크 추가 -->
+        <div th:if="${page.totalPages > 1}" class="pagination">
+          <div>
+            <a th:each="i : ${#numbers.sequence(0, page.totalPages-1)}"
+               th:href="@{'/matching/list?page=' + ${i} + '&metropolitanCity=' + ${selectedMetropolitanCity} + '&city=' + ${selectedCity}}"
+               th:class="${i == page.number} ? 'active'">
+              <span th:text="${i + 1}"></span>
+            </a>
           </div>
         </div>
-        <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
-      </main>
+      </div>
+      <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
+    </main>
 
     <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
   </div>
-  </div>
+</div>
 </body>
 
 <!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->

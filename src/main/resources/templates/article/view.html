@@ -6,6 +6,196 @@
   <th:block th:replace="~{common/header :: headerFragment}"></th:block>
   <!--👇여기에 header script 넣어주시면 됩니다👇-->
   <!--👆여기에 header script 넣어주시면 됩니다👆-->
+  <style>
+      /* 추가된 CSS */
+      .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          padding: 20px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          border-radius: 5px;
+          background-color: #fff;
+          display: flex;
+          flex-direction: column;
+          position: relative; /* Container for absolute positioning */
+      }
+      .post-details {
+          margin-top: 20px;
+      }
+      .edit-button {
+          display: inline-block;
+          margin-top: 10px;
+          padding: 8px 16px;
+          background-color: #007bff;
+          color: #fff;
+          text-decoration: none;
+          border-radius: 5px;
+      }
+      .edit-button:hover {
+          background-color: #0056b3;
+      }
+      .delete-button {
+          display: inline-block;
+          margin-top: 10px;
+          padding: 8px 16px;
+          background-color: #dc3545;
+          color: #fff;
+          text-decoration: none;
+          border-radius: 5px;
+          border: none;
+      }
+      .delete-button:hover {
+          background-color: #c82333;
+      }
+      /* 추가된 선 스타일 */
+      .title-divider {
+          border-top: 1px solid #000;
+          margin-top: 10px;
+          margin-bottom: 20px;
+      }
+      /* 테이블 스타일 */
+      .comment-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+      }
+
+      .comment-table th,
+      .comment-table td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+      }
+
+      .comment-table th {
+          background-color: #f2f2f2;
+      }
+
+      .comment-table tr:nth-child(even) {
+          background-color: #f2f2f2;
+      }
+
+      .comment-table tr:hover {
+          background-color: #f5f5f5;
+      }
+
+      .comment-table td button {
+          padding: 4px 8px;
+          background-color: #dc3545;
+          color: #fff;
+          border: none;
+          cursor: pointer;
+          border-radius: 3px;
+      }
+
+      .comment-table td button:hover {
+          background-color: #c82333;
+      }
+
+      /* main 영역과 댓글 영역의 레이아웃 조정 */
+      .main {
+          display: flex;
+      }
+
+      .content {
+          flex: 70%;
+      }
+
+      .comment-container {
+          flex: 30%;
+          margin-top: 50px;
+          margin-left: 20px; /* 간격 추가 */
+      }
+
+      /* 댓글 입력 폼 스타일 */
+      .comment-form {
+          margin-bottom: 20px;
+      }
+
+      .comment-form input[type="text"] {
+          width: 100%;
+          padding: 8px;
+          margin-top: 10px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          box-sizing: border-box;
+      }
+
+      .comment-form input[type="submit"] {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          text-decoration: none;
+          border-radius: 5px;
+          cursor: pointer;
+      }
+
+      .comment-form input[type="submit"]:hover {
+          background-color: #0056b3;
+      }
+
+      /* 댓글 테이블 스타일 */
+      .comment-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+      }
+
+      .comment-table th,
+      .comment-table td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+      }
+
+      .comment-table th {
+          background-color: #f2f2f2;
+          width: 20%; /* 작성자 칼럼 너비 */
+      }
+
+      .comment-table td:nth-child(2) {
+          width: 70%; /* 내용 칼럼 너비 */
+      }
+
+      .comment-table td:nth-child(3) {
+          width: 10%; /* 삭제 칼럼 너비 */
+      }
+
+      .comment-table tr:nth-child(even) {
+          background-color: #f2f2f2;
+      }
+
+      .comment-table tr:hover {
+          background-color: #f5f5f5;
+      }
+
+      .comment-table td button {
+          padding: 4px 8px;
+          background-color: #dc3545;
+          color: #fff;
+          border: none;
+          cursor: pointer;
+          border-radius: 3px;
+      }
+
+      .comment-table td button:hover {
+          background-color: #c82333;
+      }
+
+      /* Position the buttons at the bottom right */
+      .button-group {
+          position: absolute;
+          bottom: 10px;
+          right: 20px;
+          display: flex;
+          flex-direction: row;
+      }
+
+      .button-group > * {
+          margin-left: 10px; /* Add margin between buttons */
+      }
+  </style>
 </head>
 
 <body>
@@ -17,20 +207,60 @@
 
     <main class="content">
       <!--👇여기에 내용 넣어주시면 됩니다👇-->
-      <div class="container mt-4">
+      <div class="container">
         <h1 th:text="${article.title}"></h1>
+        <!-- 추가된 제목과 내용 사이의 선 -->
+        <div class="title-divider"></div>
         <div class="post-details">
           <div>
             <p th:text="${article.content}" style="word-wrap: break-word;"></p>
-            <span th:text="${article.hit}"></span>
+          </div>
+        </div>
+        <!-- Button group positioned at bottom right -->
+        <div class="button-group">
+          <a th:href="@{'/article/' + ${article.id} + '/edit'}" class="edit-button" th:if="${article.member.id == currentUser.id}">수정</a>
+          <a href="/article" class="edit-button">홈으로</a>
+          <div th:if="${article.member.id == currentUser.id}">
+          <form id="deleteForm" th:action="@{'/article/' + ${article.id} + '/delete'}" method="post">
+            <button type="submit" onclick="return confirmDelete()" class="delete-button" th:if="${article.member.id == currentUser.id}">삭제</button>
+          </form>
           </div>
         </div>
       </div>
-      <a th:href="@{'/article/' + ${article.id} + '/edit'}" class="edit-button">수정</a>
-      <a href="/article">홈으로</a> <br>
-      <form th:action="@{'/article/' + ${article.id} + '/delete'}" method="post">
-        <button type="submit" onclick="confirmDelete()" class="delete-button">삭제</button>
-      </form>
+      <!-- 댓글 섹션 -->
+      <!-- 수정된 댓글 부분 -->
+      <div class="comment-container">
+        <form th:action="@{/article/{articleId}/comment(articleId=${article.id})}" method="post" class="comment-form">
+          <input type="text" name="content" placeholder="댓글을 작성하세요.">
+          <input type="submit" value="댓글 작성">
+        </form>
+        <div class="comments">
+          <!-- 댓글을 테이블 형식으로 나타냄 -->
+          <table class="comment-table">
+            <thead>
+            <tr>
+              <th>작성자</th>
+              <th>내용</th>
+              <th>삭제</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- 댓글들을 테이블 행으로 나타냄 -->
+            <tr th:unless="${#lists.isEmpty(comment)}" th:each="cmt : ${comment}" class="comment">
+              <td th:text="${cmt.writer.nickname}">작성자</td> <!-- 작성자 이름으로 수정 -->
+              <td th:text="${cmt.content}">내용</td>
+              <td>
+                <div th:if="${cmt.writer.id == currentUser.id}">
+                <form th:action="@{/article/{articleId}/comment/{commentId}/delete(articleId=${article.id}, commentId=${cmt.id})}" method="post">
+                  <button type="submit" class="delete-button">댓글 삭제</button>
+                </form>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
       <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
     </main>
 
@@ -42,17 +272,7 @@
 
 <!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
 <script>
-    // 게시글 삭제 시 확인창
-    function confirmDelete() {
-        // 사용자에게 확인을 받기 위한 알림창 표시
-        if (confirm("정말로 삭제하시겠습니까?")) {
-            // '확인' 버튼이 클릭된 경우 폼 제출
-            document.getElementById("deleteForm").submit();
-        } else {
-            // '취소' 버튼이 클릭된 경우 아무 작업도 하지 않음
-            return false;
-        }
-    }
+
 </script>
 <!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
 

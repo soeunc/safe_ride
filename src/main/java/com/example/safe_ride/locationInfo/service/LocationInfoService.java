@@ -4,14 +4,21 @@ import com.example.safe_ride.locationInfo.dto.BicycleInfo;
 import com.example.safe_ride.locationInfo.dto.StationInfo;
 import com.example.safe_ride.locationInfo.entity.LocationInfo;
 import com.example.safe_ride.locationInfo.repo.LocationInfoRepo;
+import com.example.safe_ride.safe.dto.NaviWithQueryDto;
+import com.example.safe_ride.safe.dto.PointDto;
+import com.example.safe_ride.safe.dto.geocoding.GeoNcpResponse;
+import com.example.safe_ride.safe.dto.rgeocoding.RGeoNcpResponse;
+import com.example.safe_ride.safe.dto.rgeocoding.RGeoResponseDto;
+import com.example.safe_ride.safe.dto.rgeocoding.RGoCode;
+import com.example.safe_ride.safe.service.NcpMapApiService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.engine.XMLAttributeName;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,6 +42,7 @@ import java.util.stream.Collectors;
 public class LocationInfoService {
     private final LocationInfoRepo locationInfoRepo;
     private final StationMapManager mapManager;
+    private final NcpMapApiService mapApiService;
 
     private static final String BASE_URL = "https://apis.data.go.kr/B551982/pbdo"; // baseURL
     // Encoding 인증키
@@ -201,7 +209,56 @@ public class LocationInfoService {
         return allResults;
     }
 
-    // 필터링 하여 데이터 파싱 (대여소 현황)
+    // 위치 좌표에 대한 대여소 결과 리스트 반환
+    public List<StationInfo> fetchPointData(Double lng, Double lat, String apiUrl, String lcgvmnInstCd, String fromCrtrYmd, String toCrtrYmd) throws IOException {
+        // map 초기화
+        mapManager.clearMap();
+        // totalCount 기반 동적 데이터 생성
+        int totalCount = getTotalCntData(apiUrl, lcgvmnInstCd);
+        int numOfRows = 700;
+        // 필요한 전체 페이지 수 계산
+        int totalPages = (totalCount + numOfRows - 1) / numOfRows;
+
+        // 모든 결과를 저장할 List
+        List<StationInfo> allResults = new ArrayList<>();
+
+        // url로 http 응답 받아오기
+        for (int pageNo = 1; pageNo <= totalPages; pageNo++) {
+            String resultUrl = buildUrl(apiUrl, lcgvmnInstCd, fromCrtrYmd, toCrtrYmd, pageNo, numOfRows);
+
+            URL url = new URL(resultUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-type", "application/json");
+
+            int responseCode = connection.getResponseCode();
+            // 응답 상태가 좋으면 받아온 http를 읽고 문자열로 조합
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // try-with-resources문 :: 자동으로 버퍼리더 닫힘 (마지막 데이터 이후 오류 발생 문제)
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    String line;
+                    StringBuilder response = new StringBuilder();
+                    // 데이터 없을 때까지 반복
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    // 페이지 데이터를 파싱하여 결과 리스트에 추가
+                    List<StationInfo> pointResults = filterStationsByPoint(lng, lat, response.toString());
+                    if (!pointResults.isEmpty()) {
+                        allResults.addAll(pointResults);
+                    } else {
+                        log.info("페이지 " + pageNo + "에서 유효한 데이터가 없습니다.");
+                    }
+                }
+                // 응답 코드가 HTTP_OK가 아닌 경우 예외 처리
+            } else {
+                throw new IOException("서버 응답 오류 -> HTTP 상태 코드 : " + responseCode);
+            }
+        }
+        // 한 페이지당 파싱
+        return allResults;
+    }
+    // 주소를 기준으로 필터링 하여 데이터 파싱 (대여소 현황)
     public List<StationInfo> filterStationsByDoroJuso(String doroJuso, String jsonResponse) throws JSONException {
         JSONObject jsonObject = new JSONObject(jsonResponse);
         JSONArray items = jsonObject.getJSONObject("body").getJSONArray("item");
@@ -212,6 +269,24 @@ public class LocationInfoService {
 
             // 도로명 주소가 포함하는지 확인
             if (item.getString("roadNmAddr").contains(doroJuso)) {
+                FilteredResult.add(formatStation(item));
+                mapManager.updateMap(item.getString("rntstnId"), item);
+            }
+        }
+        return FilteredResult;
+    }
+
+    // 좌표를 기준으로 필터링 하여 데이터 파싱 (대여소 현황)
+    public List<StationInfo> filterStationsByPoint(double lng, double lat, String jsonResponse) throws JSONException {
+        JSONObject jsonObject = new JSONObject(jsonResponse);
+        JSONArray items = jsonObject.getJSONObject("body").getJSONArray("item");
+
+        List<StationInfo> FilteredResult = new ArrayList<>();
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject item = items.getJSONObject(i);
+
+            // 위도 경도가 반경안에 포함하는지 확인
+            if (isWithinRange(item, lng, lat)) {
                 FilteredResult.add(formatStation(item));
                 mapManager.updateMap(item.getString("rntstnId"), item);
             }
@@ -265,7 +340,7 @@ public class LocationInfoService {
         return results;
     }
 
-    // 필터링 된 데이터 문자열 생성
+    // 필터링 된 자전거 현황 데이터 문자열 생성
     public BicycleInfo formatBicycle(JSONObject item) throws JSONException {
         String lcgvmnInstCd = item.getString("lcgvmnInstCd");                       // 지자체 코드(1100000000)
         String lcgvmnInstNm = item.getString("lcgvmnInstNm");                       // 지자체명(서울특별시)
@@ -352,5 +427,71 @@ public class LocationInfoService {
                 .map(LocationInfo::getEupmyundong)
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    // 위치 관련 서비스
+    // 위도, 경도가 일정 범위 안에 있는지 (대략 2km) 확인
+    /**
+     * 위도 / 경도 1도 : 약 88.74km (서울 기준)
+     * 1(도) : 88.74 km = x(도) : 1km
+     * 1km : 약 0.009도 / 2km : 약 0.018도
+     */
+    public boolean isWithinRange(JSONObject item, double userLng, double userLat) {
+        double lot = item.getDouble("lot"); // 경도
+        double lat = item.getDouble("lat"); // 위도
+
+        double lotDistance = Math.abs(lot - userLng); //경도
+        double latDistance = Math.abs(lat - userLat); // 위도
+
+        // 위도 또는 경도 차이가 0.018도 이내인지 확인
+        return latDistance <= 0.018 && lotDistance <= 0.018;
+    }
+
+    // 입력받은 좌표의 법정동코드 확인
+    // reverse grocode를 사용해서 좌표를 입력받아 결과값을 세션으로 반환하는 메서드
+    public RGeoResponseDto setTransBjDongCode(PointDto point) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("coords", point.toQueryValue());
+        params.put("orders", "legalcode"); // 법정동으로 변환 작업
+        params.put("output", "json");
+        log.info("coords : {}", params.get("coords"));
+        RGeoNcpResponse response = mapApiService.reversGeocode(params);
+        log.info("response : {}", response);
+        RGoCode code = response.getResults()
+                .get(0)
+                .getCode();
+
+        String bjDongCode = code.getId();
+        String transBjDongCode = code.getId();
+
+        if (bjDongCode.startsWith("11"))  transBjDongCode = "1100000000";
+        else if (bjDongCode.startsWith("36")) transBjDongCode = "3611000000";
+        else if (bjDongCode.startsWith("30")) transBjDongCode = "3000000000";
+        else transBjDongCode = bjDongCode;
+
+        log.info("변환된 지자체코드 : {}", transBjDongCode);
+        return new RGeoResponseDto(transBjDongCode.trim());
+    }
+
+    // grocode를 사용해서 주소를 입력 받아서 좌표를 반환하는 메서드
+    public PointDto locateAddress(String roadAddrPart1) {
+        // 주소의 좌표 찾기
+        Map<String, Object> params = new HashMap<>();
+        params.put("query", roadAddrPart1);
+        params.put("page", 1);
+        params.put("count", 1);
+        GeoNcpResponse response = mapApiService.geocode(params);
+        log.info(response.toString());
+
+        if (response.getAddresses().isEmpty()) {
+            log.error("주소 검색 결과가 없습니다.");
+            return null; // 주소 검색 결과가 없을 경우
+        }
+
+        Double lat = Double.valueOf(response.getAddresses().get(0).getY());
+        Double lng = Double.valueOf(response.getAddresses().get(0).getX());
+
+        // 좌표 정보 반환
+        return new PointDto(lng, lat);
     }
 }

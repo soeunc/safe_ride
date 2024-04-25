@@ -5,7 +5,67 @@
   <title>세이프라이드: 안전한 라이딩의 시작</title>
   <th:block th:replace="~{common/header :: headerFragment}"></th:block>
   <!--👇여기에 header script 넣어주시면 됩니다👇-->
+  <style>
 
+      .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          background-color: #fff;
+          padding: 20px;
+          border-radius: 5px;
+          box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+          margin-bottom: 20px;
+          font-size: 24px;
+      }
+
+      label {
+          font-weight: bold;
+      }
+
+      input[type="text"],
+      textarea {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
+          box-sizing: border-box;
+      }
+
+      select {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
+          box-sizing: border-box;
+      }
+
+      button {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 3px;
+          cursor: pointer;
+      }
+
+      button:hover {
+          background-color: #0056b3;
+      }
+
+      a {
+          color: #007bff;
+          text-decoration: none;
+      }
+
+      a:hover {
+          text-decoration: underline;
+      }
+  </style>
   <!--👆여기에 header script 넣어주시면 됩니다👆-->
 </head>
 <body>
@@ -16,7 +76,7 @@
       <main class="content">
         <!--👇여기에 내용 넣어주시면 됩니다👇-->
         <div class="container mt-4">
-          <h1>Edit Article</h1>
+          <h1>게시글 수정</h1>
           <form action="#" method="post">
             <label for="title">제목:</label><br>
             <input type="text" id="title" name="title" th:value="${article.title}"><br>
@@ -30,8 +90,9 @@
             <select id="city" name="city">
               <option th:each="city : ${cities}" th:value="${city}" th:text="${city}" th:selected="${city == article.city}"></option>
             </select><br>
-            <input type="submit" value="Submit">
+            <input type="submit" value="수정">
           </form>
+          <a th:href="@{/article/{id}(id=${article.id})}">뒤로 가기</a>
 
         </div>
         <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
@@ -40,7 +101,6 @@
       <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
     </div>
   </div>
-</div>
 </body>
 
 <!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->

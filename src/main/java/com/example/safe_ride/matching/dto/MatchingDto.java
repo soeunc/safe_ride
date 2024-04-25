@@ -6,6 +6,7 @@
     import lombok.*;
 
     import java.sql.Timestamp;
+    import java.time.LocalDateTime;
     import java.util.Collections;
     import java.util.List;
     import java.util.stream.Collectors;
@@ -20,6 +21,9 @@
         private Member member;          // 매칭글 작성자
         private String metropolitanCity; // 광역자치구
         private String city; // 도시
+        private String title;
+        private String kilometer;
+        private LocalDateTime ridingTime; // 라이딩 시간
         private String comment;         // 매칭 코멘트
         private Timestamp createTime;   // 작성 시간
         private MatchingStatus status;  // 상태 Enum 타입으로 저장
@@ -31,6 +35,9 @@
                     .id(matching.getId())
                     .metropolitanCity(matching.getRegion().getMetropolitanCity())
                     .member(matching.getMember())
+                    .title(matching.getTitle())
+                    .kilometer(matching.getKilometer())
+                    .ridingTime(matching.getRidingTime())
                     .city(matching.getRegion().getCity())
                     .comment(matching.getComment())
                     .createTime(matching.getCreateTime())

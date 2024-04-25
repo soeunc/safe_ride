@@ -17,7 +17,7 @@ import java.util.Map;
 public class StationMapManager {
     private Map<String, JSONObject> stationMap = new HashMap<>();
 
-    // 도로명 주소 일치할 때 업데이트 됨
+    // 도로명 주소 일치 or 위도, 경도 비슷할 때 업데이트 됨
     public synchronized void updateMap(String rntstnId, JSONObject item) {
         stationMap.put(rntstnId, item);
     }

@@ -49,16 +49,21 @@ public class WebSecurityConfig {
                                         // 대여소 정보 관련 (테스트)
                                         "/public-bicycle/**",
                                         "/public-bicycle-test/**",
-                                        "/error"
+                                        "/error",
+
+                                        //회원가입 관련
+                                        "/safe-ride/duplicateCkForId",//아이디 중복확인
+                                        "/safe-ride/duplicateCkForNickname",//닉네임 중복확인
+                                        "/safe-ride/duplicateCkForEmail"//이메일 중복확인
                                 )
                                 // 이 경로에 도달할 수 있는 사람에 대한 설정(모두)
                                 .permitAll()
                                 //익명사용자 접근 허가
-                                .requestMatchers(
-                                    "/safe-ride/login",//로그인
-                                    "/safe-ride/join"//회원가입
-                                )
-                                .anonymous()
+//                                .requestMatchers(
+//                                    "/safe-ride/login",//로그인
+//                                    "/safe-ride/join"//회원가입
+//                                )
+//                                .anonymous()
                                 //인증된 사용자 접근 허가
                                 .requestMatchers(
                                         "/safe-ride/logout",//로그아웃
@@ -76,7 +81,9 @@ public class WebSecurityConfig {
                                         "/article/{id}", // 게시글 상세 조회
                                         "/article/{id}/edit", // 게시글 수정
                                         "/article/{id}/delete", // 게시글 삭제
-                                        "/city"
+                                        "/city", // 도시 목록 불러오기
+                                        "/article/{articleId}/comment", // 댓글 생성
+                                        "/article/{articleId}/comment/{commentId}/delete" // 댓글 삭제
                                 )
                                 .authenticated()
                                 // 커뮤니티 - 매칭글
@@ -87,9 +94,11 @@ public class WebSecurityConfig {
                                         "/matching/{id}/edit", // 매칭글 수정
                                         "/matching/{id}/delete", // 매칭글 삭제
                                         "/matching/{id}/apply" ,// 매칭글 상세 조회
-                                        "/matching/{matchingId}/accept/{applicationId}", // 매칭글
-                                        "/matching/{matchingId}/reject/{applicationId}", // 매칭글
-                                        "/matching/{matchingId}/cancel-application"
+                                        "/matching/{matchingId}/accept/{applicationId}", // 매칭 신청 수락
+                                        "/matching/{matchingId}/reject/{applicationId}", // 매칭 신청 거절
+                                        "/matching/{matchingId}/cancel-application", // 신청자가 자기 매칭 신청 취소
+                                        "/matching/{matchingId}/reject/{applicationId}", // 매칭 신청 유저 정보
+                                        "/matching/{matchingId}/applicantInfo/{applicationId}" // 매칭 신청 유저 정보
                                 )
                                 .authenticated()
 

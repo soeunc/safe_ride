@@ -1,5 +1,6 @@
 package com.example.safe_ride.article.entity;
 
+import com.example.safe_ride.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,8 +19,8 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String content;
-    private String authorId;
-    private String createdAt;
+    @ManyToOne
+    private Member writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")

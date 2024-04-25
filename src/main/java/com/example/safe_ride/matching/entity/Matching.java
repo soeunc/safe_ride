@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -23,6 +24,14 @@ public class Matching {
     @JoinColumn(name = "member_id")
     private Member member;          // 매칭글 작성자
 
+    @Setter
+    private String title;
+
+    @Setter
+    private LocalDateTime ridingTime; // 라이딩 시간
+
+    @Setter
+    private String kilometer;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,12 +46,5 @@ public class Matching {
     @OneToMany(mappedBy = "matching", cascade = CascadeType.ALL)
     private List<MatchingApplication> applications;
 
-    public void accept() {
-        this.status = MatchingStatus.ACCEPTED;
-    }
-
-    public void reject() {
-        this.status = MatchingStatus.REJECTED;
-    }
 }
 
