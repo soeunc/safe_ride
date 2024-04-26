@@ -136,7 +136,7 @@ public class LocationInfoController {
                         + ", roadAddrPart1: {}"
                 , inputYn, roadFullAddr, roadAddrPart1);
 
-        String confmKey = "devU01TX0FVVEgyMDI0MDQxODE3MDEwNzExNDcwMTQ="; // TODO : yaml 설정에 추가
+        String confmKey = "devU01TX0FVVEgyMDI0MDQyNjEwMTczMzExNDcyMjg="; // TODO : yaml 설정에 추가
 
         model.addAttribute("confmKey", confmKey);
         model.addAttribute("inputYn", inputYn);
