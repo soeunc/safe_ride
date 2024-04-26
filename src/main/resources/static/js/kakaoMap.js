@@ -1,7 +1,9 @@
 // 마커를 담을 배열입니다
 var markers = [];
-var total = 0.0;
+var currentMarker;
+var total = 0;
 var id, curLatitude, curLongitude;
+var map, mapContainer, options, preLatitude, preLongitude;
 // 장소 검색 객체를 생성합니다
 var ps = new kakao.maps.services.Places();
 
@@ -144,7 +146,7 @@ function addMarker(position, idx, title) {
     var imageSrc = '../img/flag.png', // 마커 이미지 url, 스프라이트 이미지를 씁니다
         imageSize = new kakao.maps.Size(36, 37),  // 마커 이미지의 크기
         imageOption = {offset: new kakao.maps.Point(13, 37)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
-        markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
+    markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
         marker = new kakao.maps.Marker({
             position: position, // 마커의 위치
             image: markerImage
@@ -229,11 +231,22 @@ function panTo(lat, long) {
     map.panTo(moveLatLon);
 }
 function stopRiding() {
-    removeMarker();
-    document.getElementById("menu_wrap").style.display = "block";
-    document.getElementById("start_riding").style.display = "none";
-    navigator.geolocation.clearWatch(id);
-    total = 0;
+    axios.post('/route', {}, {
+        params: {
+            totalRiding: total * 1000
+        }
+    })
+        .then(function (response) {
+            removeMarker();
+            document.getElementById("menu_wrap").style.display = "block";
+            document.getElementById("start_riding").style.display = "none";
+            navigator.geolocation.clearWatch(id);
+            total = 0;
+        })
+        .catch(function (error) {
+            // 오류 발생 시의 처리
+            alert('실패했습니다. 다시 시도해주세요');
+        });
 }
 function hideMenu(){
     document.getElementById("menu_wrap").style.display = "none"; // 요소를 화면에서 숨김
@@ -261,30 +274,65 @@ function success(pos) {
     curLatitude = crd.latitude;
     curLongitude = crd.longitude;
 
+    currentMarker.setMap(null);
+
     var imageSrc = '../img/bicycle.png',
         imageSize = new kakao.maps.Size(36, 37),
         imageOption = {offset: new kakao.maps.Point(13, 37)};
 
     var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
         markerPosition  = new kakao.maps.LatLng(curLatitude, curLongitude);
-    var marker = new kakao.maps.Marker({
+    currentMarker = new kakao.maps.Marker({
         position: markerPosition,
         image: markerImage // 마커이미지 설정
     });
 
-    total = getDistance(curLatitude, curLongitude, preLatitude, preLongitude) + total;
+    total = Math.round ((getDistance(curLatitude, curLongitude, preLatitude, preLongitude) + total) * 1000) / 1000;
 
     document.getElementById("distanceDisplay").innerText = total + "km"; // 거리를 갱신하여 표시
 
     preLatitude = curLatitude;
     preLongitude = curLongitude;
 
-    console.log("hi")
-    console.log(pos)
     // 마커가 지도 위에 표시되도록 설정합니다
-    marker.setMap(map);
+    currentMarker.setMap(map);
 }
 
 function error(err) {
     console.warn("ERROR(" + err.code + "): " + err.message);
+}
+
+function getCurrentLocation(){
+    navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+
+    function geoSuccess(position) {
+        preLatitude = position.coords.latitude;
+        preLongitude = position.coords.longitude;
+
+        mapContainer = document.getElementById('map'), // 지도를 표시할 div
+            mapOption = {
+                center: new kakao.maps.LatLng(preLatitude, preLongitude), // 지도의 중심좌표
+                level: 3 // 지도의 확대 레벨
+            };
+
+        map = new kakao.maps.Map(mapContainer, mapOption);
+
+        const imageSrc = '../img/bicycle.png',
+            imageSize = new kakao.maps.Size(36, 37),
+            imageOption = {offset: new kakao.maps.Point(13, 37)};
+
+        const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
+            markerPosition  = new kakao.maps.LatLng(preLatitude, preLongitude);
+
+        currentMarker = new kakao.maps.Marker({
+            position: markerPosition,
+            image: markerImage // 마커이미지 설정
+        });
+
+        currentMarker.setMap(map);
+    }
+
+    function geoError() {
+        alert('위치 접근을 허용해 주세요.');
+    }
 }
