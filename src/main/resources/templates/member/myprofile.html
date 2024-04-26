@@ -79,11 +79,11 @@
                             <div th:unless="${#strings.isEmpty(ridingRecord.getTotalRecord())}">
                                 <div id="total-record">
                                     <h3>총 기록</h3>
-                                    <span>[[${ridingRecord.getTotalRecord()}]]km 탔어요! :)</span>
+                                    <span id="totalRecord"></span>
                                 </div>
                                 <div id="weekly-record">
                                     <h3>주간 기록</h3>
-                                    <span>[[${ridingRecord.getWeeklyRecord()}]]km 탔어요! :)</span>
+                                    <span id="weeklyRecord"></span>
                                 </div>
                                 <!--오늘자 기록이 없을 떄-->
                                 <div th:if="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
@@ -91,7 +91,7 @@
                                 </div>
                                 <div th:unless="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
                                     <h3>오늘 기록</h3>
-                                    <span>[[${ridingRecord.getTodayRecord()}]]km 탔어요! :)</span>
+                                    <span id="todayRecord"></span>
                                 </div>
                             </div>
                             <form>
@@ -178,6 +178,16 @@
             alert(alertMsg);
         }
     }
+    //html 뜨고 실행
+    //총 / 주간 / 오늘 기록 나타내기
+    $(function() {
+        const totalRecord = parseFloat([[${ridingRecord.getTotalRecord()}]]) * 0.001;
+        const weeklyRecord = parseFloat([[${ridingRecord.getWeeklyRecord()}]]) * 0.001;
+        const todayRecord = parseFloat([[${ridingRecord.getTodayRecord()}]]) * 0.001;
+        $('#totalRecord').text(totalRecord.toFixed(3) + "km 탔어요! :)");
+        $('#weeklyRecord').text(weeklyRecord.toFixed(3) + "km 탔어요! :)");
+        $('#todayRecord').text(todayRecord.toFixed(3) + "km 탔어요! :)");
+    });
 
     const weeklyRecordList = [[${ridingRecord.weeklyRecordList}]];
     new Chart(document.getElementById("bar-chart"), {
