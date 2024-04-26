@@ -150,7 +150,6 @@ public class ApiService {
             accidentInfo.setDthDnvCnt(item.getInt("dth_dnv_cnt"));  // 사망자 수
             accidentInfo.setSeDnvCnt(item.getInt("se_dnv_cnt"));    // 중상자 수
             accidentInfo.setSlDnvCnt(item.getInt("sl_dnv_cnt"));    // 경상자 수
-            accidentInfo.setGeomJson(item.getString("geom_json"));  // 사고 지점 지리적 위치 데이터
             accidentInfo.setLoCrd(item.getString("lo_crd"));        // 경도(lnt)
             accidentInfo.setLaCrd(item.getString("la_crd"));        // 위도(lat)
 
