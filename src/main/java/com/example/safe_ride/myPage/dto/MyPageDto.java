@@ -20,8 +20,6 @@ public class MyPageDto {
     private Integer totalRecord;
     //주간기록합산결과
     private Integer weeklyRecord;
-    //이번주 날짜(일~토)
-    private List<String> thisWeek;
     //주간 개별 기록
     private List<WeeklyRecordDto> weeklyRecordList;
 
