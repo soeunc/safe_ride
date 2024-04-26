@@ -20,14 +20,6 @@ public class NcpController {
     private final NcpService service;
     private final SafetyService safetyService;
 
-    // 사용자의 현재 위치를 입력받아 좌표 반환
-    @PostMapping("/check-test")
-    public PointDto locateAddressTest(
-            @RequestBody NaviWithQueryDto dto
-    ) {
-        return service.locateAddress(dto);
-    }
-
     @PostMapping("/check")
     public ResponseEntity<?> locateAddress(
             @RequestBody NaviWithQueryDto dto
