@@ -2,6 +2,7 @@ package com.example.safe_ride.locationInfo.service;
 
 import com.example.safe_ride.locationInfo.entity.LocationInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -13,14 +14,26 @@ import java.util.List;
 @Slf4j
 @Service
 public class DbLoader {
+    private final String URL;
+    private final String username;
+    private final String password;
 
-    private static final String URL = "jdbc:sqlite:db.sqlite";
+    public DbLoader(@Value("${spring.datasource.url}") String URL,
+                    @Value("${spring.datasource.username}") String username,
+                    @Value("${spring.datasource.password}") String password
+    ) {
+        this.URL = URL;
+        this.username = username;
+        this.password = password;
+    }
 
     public void createTableIfNotExist() {
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(URL, username, password);
              Statement stmt = conn.createStatement()) {
             stmt.execute("CREATE TABLE IF NOT EXISTS location_info (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    // mysql 문법
+//                    "id INT NOT NULL AUTO_INCREMENT," +
                     "sido TEXT," +
                     "sigungu TEXT," +
                     "eupmyundong TEXT," +
@@ -31,7 +44,7 @@ public class DbLoader {
     }
 
     public void insertData(List<LocationInfo> addresses) {
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(URL, username, password);
              PreparedStatement pstmt = conn.prepareStatement("INSERT INTO location_info (sido, sigungu, eupmyundong, address_code) VALUES (?, ?, ?, ?)")) {
             conn.setAutoCommit(false);  // 자동 커밋 비활성화
             int affectedRows = 0;
