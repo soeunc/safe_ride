@@ -25,7 +25,6 @@ public class AccidentInfo {
     private Integer dthDnvCnt; // 사망자 수
     private Integer seDnvCnt; // 중상자 수
     private Integer slDnvCnt; // 경상자 수
-    private String geomJson; // 사고 지점 지리적 위치 데이터
     private String loCrd; // 경도
     private String laCrd; // 위도
 }

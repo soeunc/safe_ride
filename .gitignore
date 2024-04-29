@@ -38,3 +38,7 @@ out/
 
 # Ignore application-dev.yaml file
 application-dev.yaml
+# Ignore application-mysql.yaml file
+application-mysql.yaml
+# Ignore application-mysql-rds.yaml file
+application-mysql-rds.yaml
