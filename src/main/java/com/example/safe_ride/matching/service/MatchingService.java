@@ -21,8 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,18 +31,9 @@ public class MatchingService {
     private final RegionRepository regionRepository;
     private final MatchingApplicationRepository matchingApplicationRepository;
 
-    // 매칭글 생성
     @Transactional
     public MatchingDto createMatching(MatchingDto matchingDto) {
         Member currentUser = getUserEntity();
-
-        // 현재 사용자가 이미 매칭글을 작성했는지 확인
-        Optional<Matching> existingMatching = matchingRepository.findFirstByMemberId(currentUser.getId());
-        if (existingMatching.isPresent()) {
-            String errorMessage = "이미 생성된 매칭글이 존재합니다.";
-            log.error(errorMessage);
-            throw new IllegalStateException("중복 매칭글 생성이 불가합니다.");
-        }
 
         // 게시글에 선택된 지역 정보 가져오기
         if (matchingDto.getMetropolitanCity() == null || matchingDto.getCity() == null) {
@@ -59,19 +48,12 @@ public class MatchingService {
         // 현재 시간 가져오기
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 
-        // 라이딩 시간이 오늘보다 과거인 경우, 현재 시간으로 설정
-        LocalDateTime ridingTime = matchingDto.getRidingTime();
-        if (ridingTime.isBefore(LocalDateTime.now())) {
-            log.warn("라이딩 시간이 과거로 설정되어 현재 시간으로 변경합니다.");
-            ridingTime = LocalDateTime.now();
-        }
-
         // Matching 엔티티 생성시 Member 엔티티를 설정
         Matching matching = Matching.builder()
                 .region(new Region(regionId)) // 광역자치구와 도시에 해당하는 Region ID 설정
                 .member(currentUser) // 작성자
                 .title(matchingDto.getTitle())
-                .ridingTime(ridingTime) // 수정된 라이딩 시간 적용
+                .ridingTime(matchingDto.getRidingTime()) // 라이딩 시간
                 .kilometer(matchingDto.getKilometer())
                 .comment(matchingDto.getComment())
                 .createTime(currentTime)
