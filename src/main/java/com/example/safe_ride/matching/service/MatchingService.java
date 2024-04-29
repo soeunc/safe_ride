@@ -4,6 +4,7 @@ import com.example.safe_ride.article.entity.Region;
 import com.example.safe_ride.article.repository.RegionRepository;
 import com.example.safe_ride.matching.dto.MatchingDto;
 import com.example.safe_ride.matching.entity.Matching;
+import com.example.safe_ride.matching.entity.MatchingStatus;
 import com.example.safe_ride.matching.repository.MatchingApplicationRepository;
 import com.example.safe_ride.matching.repository.MatchingRepository;
 import com.example.safe_ride.member.entity.Member;
@@ -74,7 +75,7 @@ public class MatchingService {
                 .kilometer(matchingDto.getKilometer())
                 .comment(matchingDto.getComment())
                 .createTime(currentTime)
-                .status(null) // 상태를 null로 설정
+                .status(MatchingStatus.PENDING)
                 .build();
 
         // 생성된 Matching 엔티티 저장
@@ -144,5 +145,13 @@ public class MatchingService {
     public Page<MatchingDto> readPageByMetropolitanCityAndCity(Pageable pageable, String metropolitanCity, String city) {
         Page<Matching> matchingPage = matchingRepository.findByRegionMetropolitanCityAndRegionCity(pageable, metropolitanCity, city);
         return matchingPage.map(MatchingDto::fromEntity);
+    }
+
+    // 매칭 상태를 END로 변경
+    public void endMatching(Long id) {
+        Matching matching = matchingRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Matching not found with id: " + id));
+        matching.setStatus(MatchingStatus.END); // 매칭 상태를 END로 설정
+        matchingRepository.save(matching);
     }
 }

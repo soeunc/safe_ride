@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MatchingApplicationRepository extends JpaRepository<MatchingApplication, Long> {
@@ -13,4 +14,6 @@ public interface MatchingApplicationRepository extends JpaRepository<MatchingApp
 
     MatchingApplication findByMatching_IdAndApplicant_Id(Long matchingId, Long applicantId);
 
+
+    Optional<MatchingApplication> findByMatchingId(Long matchingId);
 }
