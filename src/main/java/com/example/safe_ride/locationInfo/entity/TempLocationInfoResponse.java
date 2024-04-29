@@ -1,5 +1,8 @@
 package com.example.safe_ride.locationInfo.entity;
 
+import com.example.safe_ride.locationInfo.dto.CombinedInfoDto;
+import com.example.safe_ride.locationInfo.dto.LocationInfoResponseDto;
+import com.example.safe_ride.safe.dto.PointDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,18 +13,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Getter
-@Entity
-@Builder
 @Slf4j
+@Entity
+@Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocationInfo {
+public class TempLocationInfoResponse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String sido;
-    private String sigungu;
-    private String eupmyundong;
-    private String addressCode;
+    private Double lng;
+    private Double lat;
+    private String transCode;
+    private String fullAddress;
+
 }

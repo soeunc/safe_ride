@@ -2,6 +2,7 @@ package com.example.safe_ride.myPage.service;
 
 import com.example.safe_ride.member.dto.BadgeDto;
 import com.example.safe_ride.member.entity.Badge;
+import com.example.safe_ride.member.entity.Grade;
 import com.example.safe_ride.member.repo.BadgeRepo;
 import com.example.safe_ride.myPage.dto.MyPageDto;
 import com.example.safe_ride.myPage.dto.WeeklyRecordDto;
@@ -37,25 +38,40 @@ public class MyPageService {
         MyPageDto myPageDto = new MyPageDto();
         //memberId로 조회 시 데이터가 하나라도 있는가
         boolean isExist = myPageRepo.existsByMemberId(memberId);
-        if (!isExist) return myPageDto;
 
-        //오늘자 데이터가 있는지 확인
-        Optional<MyPage> optionalMyPage =
-                myPageRepo.findByMemberIdAndCreateDateAfter(
-                    memberId, LocalDate.now().atStartOfDay()
-                );
-        if (optionalMyPage.isPresent()) {
-            myPage = optionalMyPage.get();
-            myPageDto = MyPageDto.fromEntity(myPage);
+        //이전 정보가 존재한다면
+        if (isExist) {
+            //오늘자 데이터가 있는지 확인
+            Optional<MyPage> optionalMyPage =
+                    myPageRepo.findByMemberIdAndCreateDateAfter(
+                        memberId, LocalDate.now().atStartOfDay()
+                    );
+            if (optionalMyPage.isPresent()) {
+                myPage = optionalMyPage.get();
+                myPageDto = MyPageDto.fromEntity(myPage);
+            }
+            //전체기록합산
+            myPageDto.setTotalRecord(findTotalRecord(memberId));
+            //주간기록합산
+            myPageDto.setWeeklyRecord(findWeeklyRecord(memberId));
+            //주간 개별 기록(날짜, 기록)
+            myPageDto.setWeeklyRecordList(weeklyRecordListTotal(getThisWeekDayList(),findWeeklyRecordList(memberId)));
+        } else {
+            //이번주 날짜(일~토)
+            List<String> thisWeek = getThisWeekDayList();
+            List<WeeklyRecordDto> weeklyRecordDtoList = new ArrayList<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+            for (int i = 0; i < thisWeek.size(); i++) {
+                WeeklyRecordDto dto = new WeeklyRecordDto();
+                String oneDay = thisWeek.get(i) + " 00:00:00.000";
+                LocalDateTime localDateTime = LocalDateTime.parse(oneDay, formatter);
+                dto.setTodayRecord(0);
+                dto.setCreateDate(localDateTime);
+                weeklyRecordDtoList.add(dto);
+            }
+            myPageDto.setWeeklyRecordList(weeklyRecordDtoList);
         }
-        //전체기록합산
-        myPageDto.setTotalRecord(findTotalRecord(memberId));
-        //주간기록합산
-        myPageDto.setWeeklyRecord(findWeeklyRecord(memberId));
-        //이번주 날짜(일~토)
-        myPageDto.setThisWeek(getThisWeekDayList());
-        //주간 개별 기록
-        myPageDto.setWeeklyRecordList(weeklyRecordListTotal(getThisWeekDayList(),findWeeklyRecordList(memberId)));
+
 
         return myPageDto;
     }
@@ -202,15 +218,50 @@ public class MyPageService {
     }
     
     //뱃지 가져오기
-    public BadgeDto readBadges(Long memberId){
+    @Transactional
+    public BadgeDto readBadges(Long memberId, int totalRecord) {
         Optional<Badge> optionalBadge = badgeRepo.findByMemberId(memberId);
         BadgeDto badgeDto = new BadgeDto();
-        if (optionalBadge.isPresent()){
+        if (optionalBadge.isPresent()) {
             Badge badge = optionalBadge.get();
+            //전체기록을 확인하여 뱃지 grade update(가능하다면)
+            upgradeBadgeGrade(badge, totalRecord);
             badgeDto = BadgeDto.fromEntity(badge);
         } else {
             return badgeDto;
         }
         return badgeDto;
     }
+
+    //등급뱃지 업그레이드 가능 여부 체크
+    //0~99km : 킥보드
+    //100~499km : 자전거
+    //500~999km : 스쿠터
+    //1000km ~ : 오토바이
+    //기존 뱃지 grade와 동일하다면 pass
+    @Transactional
+    public void upgradeBadgeGrade(
+            Badge badge,
+            int totalRecord
+    ) {
+        //전체기록에 따른 뱃지 grade 저장용 변수
+        Grade newGrade;
+        if (totalRecord >= 1000000) {
+            newGrade = Grade.MOTOR_CYCLE;
+        } else if (totalRecord >= 500000) {
+            newGrade = Grade.SCOOTER;
+        } else if (totalRecord >= 100000) {
+            newGrade = Grade.BYCICLE;
+        } else {
+            newGrade = Grade.QUICK_BOARD;
+        }
+        //현재 DB의 뱃지의 grade와
+        // 전체기록에 따른 뱃지의 grade가 다르다면 upgrade
+        if (!badge.getGrade().equals(newGrade)) {
+            badge.setGrade(newGrade);
+        }
+
+    }
+
+
 }

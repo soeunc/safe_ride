@@ -1,11 +1,11 @@
 package com.example.safe_ride.myPage.controller;
 
 import com.example.safe_ride.facade.AuthenticationFacade;
-import com.example.safe_ride.member.dto.JoinDto;
+import com.example.safe_ride.member.dto.BadgeDto;
 import com.example.safe_ride.member.dto.MemberDto;
 import com.example.safe_ride.member.dto.UpdateDto;
-import com.example.safe_ride.member.entity.Member;
 import com.example.safe_ride.member.service.MemberService;
+import com.example.safe_ride.myPage.dto.MyPageDto;
 import com.example.safe_ride.myPage.dto.TodayRecordDto;
 import com.example.safe_ride.myPage.service.MyPageService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +24,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 @RequestMapping("/safe-ride/myprofile")
 public class MyPageController {
-    private final UserDetailsManager manager;
-    private final PasswordEncoder passwordEncoder;
     private final AuthenticationFacade authFacade;
     private final MemberService memberService;
     private final MyPageService myPageService;
@@ -39,11 +37,12 @@ public class MyPageController {
         MemberDto memberDto = memberService.readMember(authFacade.getAuth().getName());
         model.addAttribute("member", memberDto);
         //라이딩 정보 가져오기
-        model.addAttribute(
-                "ridingRecord",
-                myPageService.readRidingRecord(memberDto.getId()));
+        MyPageDto myPageDto = myPageService.readRidingRecord(memberDto.getId());
+        model.addAttribute("ridingRecord",myPageDto);
         //뱃지 가져오기
-        model.addAttribute("badges", myPageService.readBadges(memberDto.getId()));
+        BadgeDto badgeDto =  myPageService.readBadges(memberDto.getId(), myPageDto.getTotalRecord());
+        //이건 업그레이드 된거로 바꿔야함
+        model.addAttribute("badges", badgeDto);
         return "member/myprofile";
     }
     //마이페이지 수정
@@ -72,6 +71,4 @@ public class MyPageController {
         redirectAttributes.addFlashAttribute("msg", msg);
         return ResponseEntity.ok().body(dto);
     }
-
-
 }

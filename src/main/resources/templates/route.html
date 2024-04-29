@@ -7,61 +7,52 @@
 </head>
 
 <body>
-	<div class="wrapper">
-		<th:block th:replace="common/sidebar :: sidebarFragment"></th:block>
+<div class="wrapper">
+	<th:block th:replace="common/sidebar :: sidebarFragment"></th:block>
 
-		<div class="main">
-			<th:block th:replace="common/navbar :: navbarFragment"></th:block>
-			<main>
-				<div class="map_wrap">
-					<div id="map" style="width:100%;height:630px;position:relative;overflow:hidden;"></div>
+	<div class="main">
+		<th:block th:replace="common/navbar :: navbarFragment"></th:block>
+		<main>
+			<div class="map_wrap">
+				<div id="map" style="width:100%;height:630px;position:relative;overflow:hidden;"></div>
 
-					<div id="menu_wrap" class="bg_white">
-						<div class="option">
-							<div>
-								<form onsubmit="searchPlaces(); return false;">
-									키워드 : <input type="text" id="keyword" size="15">
-									<button type="submit">검색하기</button>
-								</form>
-							</div>
-						</div>
-						<hr>
-						<ul id="placesList"></ul>
-						<div id="pagination"></div>
-					</div>
-					<div id="start_riding" class="bg_cus_white">
-						<div class="option">
-							<form onsubmit="stopRiding(); return false;">
-								<div class="ridingContainer">
-									<p>라이딩 중: </p>
-									<p id="distanceDisplay"> 0km</p>
-									<button type="submit">종료하기</button>
-								</div>
+				<div id="menu_wrap" class="bg_white">
+					<div class="option">
+						<div>
+							<form onsubmit="searchPlaces(); return false;">
+								키워드 : <input type="text" id="keyword" size="15">
+								<button type="submit">검색하기</button>
 							</form>
 						</div>
 					</div>
+					<hr>
+					<ul id="placesList"></ul>
+					<div id="pagination"></div>
 				</div>
-			</main>
-			<th:block th:replace="common/footer :: footerFragment"></th:block>
-		</div>
-
+				<div id="start_riding" class="bg_cus_white">
+					<div class="option">
+						<form onsubmit="stopRiding(); return false;">
+							<div class="ridingContainer">
+								<p>라이딩 중: </p>
+								<p id="distanceDisplay"> 0km</p>
+								<button type="submit">종료하기</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</main>
+		<th:block th:replace="common/footer :: footerFragment"></th:block>
 	</div>
-	<script src="js/app.js"></script>
-	<script type="text/javascript" th:src="@{'//dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoApiKey} + '&libraries=services'}"></script>
-	<script src="js/kakaoMap.js"></script>
-	<script>
-		var options;
 
-		var preLatitude = localStorage.getItem('UserLocationX');
-		var preLongitude = localStorage.getItem('UserLocationY');
-
-		var mapContainer = document.getElementById('map'), // 지도를 표시할 div
-				mapOption = {
-					center: new kakao.maps.LatLng(preLatitude, preLongitude), // 지도의 중심좌표
-					level: 3 // 지도의 확대 레벨
-				};
-		var map = new kakao.maps.Map(mapContainer, mapOption);
-	</script>
+</div>
+<script src="js/app.js"></script>
+<script type="text/javascript" th:src="@{'//dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoApiKey} + '&libraries=services'}"></script>
+<script src="js/kakaoMap.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+	getCurrentLocation();
+</script>
 </body>
 
 </html>

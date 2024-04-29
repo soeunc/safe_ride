@@ -166,6 +166,67 @@
           margin-top: 10px; /* 위쪽 여백 추가 */
       }
 
+      .manner-form {
+          padding: 20px;
+          background-color: #f8f8f8;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      textarea {
+          width: calc(100% - 22px);
+          padding: 10px;
+      }
+
+      .toggle-button, .submit-button {
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          margin: 4px 2px;
+          transition-duration: 0.4s;
+          cursor: pointer;
+          border-radius: 4px;
+      }
+
+      .toggle-button:hover, .submit-button:hover {
+          background-color: #45a049;
+      }
+
+
+      .star-rating input[type="radio"] {
+          display: none;
+      }
+
+      .star-rating label {
+          display: inline-block;
+          font-size: 30px; /* 별 크기 설정 */
+          color: #ddd; /* 비활성 별의 색상 */
+          cursor: pointer;
+      }
+
+      .star-rating label:before {
+          content: '\2605'; /* 별 모양 */
+      }
+
+      .star-rating input[type="radio"]:checked ~ label:before,
+      .star-rating input[type="radio"]:checked ~ label ~ label:before {
+          color: #ddd; /* 비활성 별의 색상 */
+      }
+
+      .star-rating input[type="radio"]:checked ~ label:before,
+      .star-rating input[type="radio"]:checked ~ label:before {
+          color: #ffd700; /* 활성 별의 색상 */
+      }
+      .review {
+          width: 100%; /* 매칭 상세 조회 영역을 전체 너비로 설정 */
+          margin-top: 20px; /* 위쪽 여백 추가 */
+      }
+
   </style>
 
 </head>
@@ -176,6 +237,29 @@
   <div class="main">
     <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
     <main class="content">
+      <div class="review" th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).END}">
+        <h4>라이딩 종료</h4>
+        <button id="toggleMannerFormButton" class="toggle-button">매너 후기 작성</button>
+        <div id="mannerForm" class="manner-form hidden">
+          <form th:action="@{'/matching/' + ${matching.id} + '/manner'}" method="post">
+            <div class="star-rating">
+              <input type="radio" id="star1" name="score" value="1">
+              <label for="star1" title="1 star"></label>
+              <input type="radio" id="star2" name="score" value="2">
+              <label for="star2" title="2 stars"></label>
+              <input type="radio" id="star3" name="score" value="3">
+              <label for="star3" title="3 stars"></label>
+              <input type="radio" id="star4" name="score" value="4">
+              <label for="star4" title="4 stars"></label>
+              <input type="radio" id="star5" name="score" value="5">
+              <label for="star5" title="5 stars"></label>
+            </div>
+            <label for="comment">매너 후기:</label>
+            <textarea id="comment" name="comment" rows="4" cols="50"></textarea><br>
+            <button type="submit" class="submit-button">작성 완료</button>
+          </form>
+        </div>
+      </div>
       <!--👇여기에 내용 넣어주시면 됩니다👇-->
       <div class="container mt-4">
         <div class="post-details">
@@ -186,7 +270,7 @@
             <div style="text-align: center;">
               <span class="nickname" th:text="${matching.member.nickname}"></span> <br>
             </div>
-            <div class="rider-info"  style="margin-top: 20px">
+            <div class="rider-info" style="margin-top: 20px; background-color: #f8f8f8; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
               <p class="location">
                 <strong>라이딩 지역:</strong>
                 <span th:text="${metropolitanCity}"></span> - <span th:text="${city}"></span>
@@ -216,6 +300,11 @@
         <div class="creation-date">
           <span>작성일자: <span th:text="${#dates.format(matching.createTime, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
         </div>
+        <div th:if="${matching.member.id == currentUser.id}">
+          <form th:action="@{'/matching/' + ${matching.id} + '/end'}" method="post" style="display: inline-block;">
+            <button type="submit" style="background-color: #ff4500; color: white; border: none; padding: 10px 20px; border-radius: 4px;">라이딩 종료</button>
+          </form>
+        </div>
       </div>
       <div class="matching">
         <div class="post-details">
@@ -226,12 +315,14 @@
             <br>
           </div>
         </div>
+
         <!-- 매칭 상태가 ACCEPTED일 경우 매칭이 성사되었다는 메시지 표시 -->
         <div th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
           <h4>매칭 성사</h4>
           <br>
           <p>함께 달릴 라이더 매칭이 완료 되었습니다^^</p>
         </div>
+
 
         <!-- 매칭 상태가 ACCEPTED가 아닌 경우에 매칭 신청 관련 요소들을 표시 -->
         <div th:unless="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
@@ -247,7 +338,7 @@
             </form>
           </div>
           <!-- 매칭 신청 목록 토글 버튼 -->
-          <button id="toggleApplicationsButton">매칭 신청 목록</button>
+          <button id="toggleApplicationsButton" class="submit-button">매칭 신청 목록</button>
           <!-- 매칭 신청 목록 -->
           <div id="applicationsList" class="hidden">
             <table>
@@ -347,6 +438,34 @@
     // 매칭 신청 목록 버튼에 이벤트 리스너 추가
     document.getElementById("toggleApplicationsButton").addEventListener("click", toggleApplicationsList);
 
+    // 매너 후기 작성 폼을 토글하는 함수
+    function toggleMannerForm() {
+        var form = document.getElementById("mannerForm");
+        form.classList.toggle("hidden");
+    }
+
+    // 매너 후기 작성 버튼 클릭 시 매너 후기 작성 폼을 토글
+    document.getElementById("toggleMannerFormButton").addEventListener("click", toggleMannerForm);
+
+
+    // 별점 클릭 시 이벤트 처리
+    document.querySelectorAll('.star-rating input[type="radio"]').forEach(function(star) {
+        star.addEventListener('click', function() {
+            // 선택한 별의 값을 가져와서 활성화
+            var score = this.value;
+            for (var i = 1; i <= 5; i++) {
+                var starElement = document.getElementById('star' + i);
+                // 현재 별의 값보다 작은 별들을 모두 노란색으로 채웁니다.
+                if (i <= score) {
+                    starElement.checked = true;
+                    starElement.nextElementSibling.style.color = '#ffd700'; // 다음 형제 요소(라벨)의 색상을 변경합니다.
+                } else {
+                    starElement.checked = false;
+                    starElement.nextElementSibling.style.color = '#ddd'; // 다음 형제 요소(라벨)의 색상을 변경합니다.
+                }
+            }
+        });
+    });
 </script>
 <!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
 

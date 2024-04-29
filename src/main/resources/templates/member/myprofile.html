@@ -79,11 +79,11 @@
                             <div th:unless="${#strings.isEmpty(ridingRecord.getTotalRecord())}">
                                 <div id="total-record">
                                     <h3>총 기록</h3>
-                                    <span>[[${ridingRecord.getTotalRecord()}]]km 탔어요! :)</span>
+                                    <span id="totalRecord"></span>
                                 </div>
                                 <div id="weekly-record">
                                     <h3>주간 기록</h3>
-                                    <span>[[${ridingRecord.getWeeklyRecord()}]]km 탔어요! :)</span>
+                                    <span id="weeklyRecord"></span>
                                 </div>
                                 <!--오늘자 기록이 없을 떄-->
                                 <div th:if="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
@@ -91,7 +91,7 @@
                                 </div>
                                 <div th:unless="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
                                     <h3>오늘 기록</h3>
-                                    <span>[[${ridingRecord.getTodayRecord()}]]km 탔어요! :)</span>
+                                    <span id="todayRecord"></span>
                                 </div>
                             </div>
                             <form>
@@ -178,19 +178,30 @@
             alert(alertMsg);
         }
     }
-    const thisWeek = [[${ridingRecord.thisWeek}]];
+    //html 뜨고 실행
+    //총 / 주간 / 오늘 기록 나타내기
+    $(function() {
+        const totalRecord = parseFloat([[${ridingRecord.getTotalRecord()}]]) * 0.001;
+        const weeklyRecord = parseFloat([[${ridingRecord.getWeeklyRecord()}]]) * 0.001;
+        const todayRecord = parseFloat([[${ridingRecord.getTodayRecord()}]]) * 0.001;
+        $('#totalRecord').text(totalRecord.toFixed(3) + "km 탔어요! :)");
+        $('#weeklyRecord').text(weeklyRecord.toFixed(3) + "km 탔어요! :)");
+        $('#todayRecord').text(todayRecord.toFixed(3) + "km 탔어요! :)");
+    });
+
     const weeklyRecordList = [[${ridingRecord.weeklyRecordList}]];
     new Chart(document.getElementById("bar-chart"), {
         type: 'bar',
         data: {
             labels: [
-                thisWeek.at(0),
-                thisWeek.at(1),
-                thisWeek.at(2),
-                thisWeek.at(3),
-                thisWeek.at(4),
-                thisWeek.at(5),
-                thisWeek.at(6)
+                weeklyRecordList[0].createDate.split('T')[0],
+                weeklyRecordList[1].createDate.split('T')[0],
+                weeklyRecordList[2].createDate.split('T')[0],
+                weeklyRecordList[3].createDate.split('T')[0],
+                weeklyRecordList[4].createDate.split('T')[0],
+                weeklyRecordList[5].createDate.split('T')[0],
+                weeklyRecordList[6].createDate.split('T')[0],
+
             ],
             datasets: [
                 {
@@ -204,7 +215,6 @@
                         weeklyRecordList[4].todayRecord,
                         weeklyRecordList[5].todayRecord,
                         weeklyRecordList[6].todayRecord,
-
                     ]
                 }
             ]
@@ -404,11 +414,11 @@
         event.preventDefault();
         let todayRecordInput = $('#todayRecordInput').val();
         //한번에 1000키로 이상을 타는 사람일때
-        if (todayRecord >= 1000 || todayRecordInput >= 1000){
+        if (todayRecord + todayRecordInput >= 1000000 || todayRecordInput > 1000000){
             alert("오늘자 입력 범위 초과입니다! :) (1000km까지 입력가능)")
         } else {
             const formData = {
-                todayRecord : todayRecord
+                todayRecord : todayRecordInput
             };
             $.ajax({
                 type : "POST",
