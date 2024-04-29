@@ -18,7 +18,56 @@
     <main class="content">
       <div class="container mt-4">
         <!--👇여기에 내용 넣어주시면 됩니다👇-->
-
+        <div class="col-12">
+          <div class="row g-3 p-3" style="border-bottom: 2px solid black;">
+            <div class="col-4"></div>
+<!--            <div class="col-8">라이딩 하기 좋아요</div>-->
+          </div>
+          <div class="row g-3 p-3" style="border-bottom: 2px solid black;">
+            <div class="col-4">
+              <div class="col-12 p-1 d-flex justify-content-center" id="sky_img"></div>
+              <div class="col-12 p-1 d-flex justify-content-center" id="sky_value" style="font-size: 3rem;font-weight: bold;"></div>
+            </div>
+            <div class="col-8">
+              <div class="col-12" id="tmp" style="font-size: 4rem;font-weight: bold;padding-left: 25px;"></div>
+              <div class="col-12">
+                <div class="row g-3">
+                  <div class="col-4">
+                    <div class="col-12 p-1 d-flex justify-content-center" id="vec_img">
+                      <img alt="" src="/img/weather/wind.png" width="75" height="75">
+                    </div>
+                    <div class="col-12 p-1 d-flex justify-content-center" id="vec" style="font-size: 1.5rem;font-weight: bold;"></div>
+                    <div class="col-12 p-1 d-flex justify-content-center" id="wsd" style="font-size: 1.25rem;font-weight: bold;color: blue;"></div>
+                  </div>
+                  <div class="col-4">
+                    <div class="col-12 p-1 d-flex justify-content-center" id="reh_img">
+                      <img alt="" src="/img/weather/drop.png" width="75" height="75">
+                    </div>
+                    <div class="col-12 p-1 d-flex justify-content-center" style="font-size: 1.5rem;font-weight: bold;">습도</div>
+                    <div class="col-12 p-1 d-flex justify-content-center" id="reh_value" style="font-size: 1.25rem;font-weight: bold;color: blue;"></div>
+                  </div>
+                  <div class="col-4">
+                    <div class="col-12 p-1 d-flex justify-content-center" id="pcp_img">
+                      <img alt="" src="/img/weather/rainy_mount.png" width="75" height="75">
+                    </div>
+                    <div class="col-12 p-1 d-flex justify-content-center" style="font-size: 1.5rem;font-weight: bold;">강수량</div>
+                    <div class="col-12 p-1 d-flex justify-content-center" id="pcp_value" style="font-size: 1.25rem;font-weight: bold;color: blue;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row g-3 p-3 justify-content-between">
+            <div class="col-4">
+              <div class="col-12">미세먼지</div>
+              <div class="col-12"></div>
+            </div>
+            <div class="col-4">
+              <div class="col-12">초미세먼지</div>
+              <div class="col-12"></div>
+            </div>
+          </div>
+        </div>
         <!--👆여기에 내용 넣어주시면 됩니다👆-->
       </div>
     </main>
@@ -27,8 +76,161 @@
 </div>
 
 <script src="/js/app.js"></script>
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.7/dayjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.7/plugin/isBetween.min.js"></script>
+<script>
+  dayjs.extend(dayjs_plugin_isBetween);
+</script>
 <!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
 <script>
+  getCurrentPosition();
+
+  // 현재 gps 호출
+  function getCurrentPosition() {
+    navigator.geolocation.getCurrentPosition((position) => {
+      fetchWeather(position.coords.latitude, position.coords.longitude);
+    }, (err) => {
+      if (err.code === err.PERMISSION_DENIED) {
+        console.log('gps 사용 거부')
+      }
+    }, {
+      timeout: 15000
+    });
+  }
+
+  function degStr(deg) {
+    const value = Number(deg)
+    if(value === 0) return '북'
+    else if(value > 0 && value < 45) return '북북동'
+    else if(value === 45) return '북동'
+    else if(value > 45 && value < 90) return '동북동'
+    else if(value === 90) return '동'
+    else if(value > 90 && value < 135) return '동남동'
+    else if(value === 135) return '남동'
+    else if(value > 135 && value < 180) return '남남동'
+    else if(value === 180) return '남'
+    else if(value > 180 && value < 225) return '남남서'
+    else if(value === 225) return '남서'
+    else if(value > 225 && value < 270) return '서남서'
+    else if(value === 270) return '서'
+    else if(value > 270 && value < 315) return '서북서'
+    else if(value === 315) return '북서'
+    else if(value > 315 && value < 360) return '북북서'
+  }
+
+  function isCurrentTimeWithinRange(time) {
+    const next = dayjs().add(1, 'day')
+    const startTime = dayjs().hour(6).minute(0).second(0); // 오전 6시
+    const endTime = dayjs().hour(18).minute(0).second(0);  // 오후 6시
+    const nextStartTime = next.hour(6).minute(0).second(0); // 오전 6시
+    const nextEndTime = next.hour(18).minute(0).second(0);  // 오후 6시
+    // 현재 시간이 시작 시간과 종료 시간 사이에 있는지 확인
+    return time.isBetween(startTime, endTime) || time.isBetween(nextStartTime, nextEndTime);
+  }
+
+  function parseWeatherFastData(weatherData) {
+    if(weatherData.PTY[0].fcstValue === '0') {
+      if(weatherData.SKY[0].fcstValue === '1') {
+        if(isCurrentTimeWithinRange(dayjs())) {
+          $('#sky_img').html('<img alt="" src="/img/weather/sunny.png" width="150" height="150">');
+          $('#sky_value').text('맑음');
+        } else {
+          $('#sky_img').html('<img alt="" src="/img/weather/night.png" width="150" height="150">');
+          $('#sky_value').text('맑음');
+        }
+      } else {
+        if(isCurrentTimeWithinRange(dayjs())) {
+          $('#sky_img').html('<img alt="" src="/img/weather/sunny_cloudy.png" width="150" height="150">');
+          $('#sky_value').text('구름');
+        } else {
+          $('#sky_img').html('<img alt="" src="/img/weather/night_cloudy.png" width="150" height="150">');
+          $('#sky_value').text('구름');
+        }
+      }
+    } else if(weatherData.PTY[0].fcstValue === '1') { // 비
+      $('#sky_img').html('<img alt="" src="/img/weather/rainy_power.png" width="150" height="150">');
+      $('#sky_value').text('비');
+    } else if(weatherData.PTY[0].fcstValue === '2') { // 비/눈
+      $('#sky_img').html('<img alt="" src="/img/weather/snow_rainy.png" width="150" height="150">');
+      $('#sky_value').text('비/눈');
+    } else if(weatherData.PTY[0].fcstValue === '3') { // 눈
+      $('#sky_img').html('<img alt="" src="/img/weather/snow.png" width="150" height="150">');
+      $('#sky_value').text('눈');
+    } else if(weatherData.PTY[0].fcstValue === '5') { // 빗방울
+      $('#sky_img').html('<img alt="" src="/img/weather/rainy.png" width="150" height="150">');
+      $('#sky_value').text('빗방울');
+    } else if(weatherData.PTY[0].fcstValue === '6') { // 빗방울눈날림
+      $('#sky_img').html('<img alt="" src="/img/weather/rainy_snow_small.png" width="150" height="150">');
+      $('#sky_value').text('빗방울눈날림');
+    } else if(weatherData.PTY[0].fcstValue === '7') { // 눈날림
+      $('#sky_img').html('<img alt="" src="/img/weather/snow_small.png" width="150" height="150">');
+      $('#sky_value').text('눈날림');
+    }
+  }
+
+  function calculateGetVilageFcstTime(requestHour) {
+    if(requestHour === '02' || requestHour === '03' || requestHour === '04') {
+      return '0200'
+    } else if(requestHour === '05' || requestHour === '06' || requestHour === '07') {
+      return '0500'
+    } else if(requestHour === '08' || requestHour === '09' || requestHour === '10') {
+      return '0800'
+    } else if(requestHour === '11' || requestHour === '12' || requestHour === '13') {
+      return '1100'
+    } else if(requestHour === '14' || requestHour === '15' || requestHour === '16') {
+      return '1400'
+    } else if(requestHour === '17' || requestHour === '18' || requestHour === '19') {
+      return '1700'
+    } else if(requestHour === '20' || requestHour === '21' || requestHour === '22') {
+      return '2000'
+    } else if(requestHour === '23' || requestHour === '00' || requestHour === '01') {
+      return '2300'
+    }
+  }
+
+  function calculateGetVilageFcstDate(base_date, base_time) {
+    if(base_time.substring(0, 2) === '00' || base_time.substring(0, 2) === '01') {
+      return {
+        date: dayjs(base_date).subtract(1, 'day').format('YYYYMMDD'),
+        time: '2300'
+      }
+    } else {
+      return {
+        date: base_date,
+        time: calculateGetVilageFcstTime((base_time).substring(0,2))
+      }
+    }
+  }
+
+  // 날짜,시간을 고정된 발표시간대에 맞춰서 변환해줌
+  function fetchWeather(lat, lon) {
+    const currentDate = dayjs().format('YYYYMMDD')
+    const currentTime = dayjs().format('HH00')
+    const dateObj = calculateGetVilageFcstDate(currentDate, currentTime);
+    $.ajax({
+      type: "GET",
+      url: `http://localhost:8080/safe-ride/weather?base_date=${dateObj.date}&base_time=${dateObj.time}&lat=${lat}&lon=${lon}`,
+      data: {}, // GET 요청 시엔 비워둔다.
+      success: function(res) { // 서버에서 받은 결과
+        console.log(res);
+        const data = res.response.body.items.item;
+        const result = {};
+        data.forEach((el) => {
+          const { category } = el;
+          if (!result[category]) result[category] = [];
+          result[category].push(el)
+        })
+        console.log(result)
+        parseWeatherFastData(result);
+        $('#tmp').text(result.TMP[0].fcstValue + '℃');
+        $('#vec').text(degStr(result.VEC[0].fcstValue));
+        $('#wsd').text(result.WSD[0].fcstValue + 'm/s');
+        $('#reh_value').text(result.REH[0].fcstValue + '%');
+        $('#pcp_value').text(result.PCP[0].fcstValue + (result.PCP[0].fcstValue === '강수없음' ? '' : 'mm'));
+      }
+    })
+  }
 
 </script>
 <!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
