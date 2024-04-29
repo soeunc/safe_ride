@@ -97,8 +97,8 @@ public class WebSecurityConfig {
                                         "/matching/{matchingId}/accept/{applicationId}", // 매칭 신청 수락
                                         "/matching/{matchingId}/reject/{applicationId}", // 매칭 신청 거절
                                         "/matching/{matchingId}/cancel-application", // 신청자가 자기 매칭 신청 취소
-                                        "/matching/{matchingId}/reject/{applicationId}", // 매칭 신청 유저 정보
-                                        "/matching/{matchingId}/applicantInfo/{applicationId}" // 매칭 신청 유저 정보
+                                        "/matching/{matchingId}/manner", // 매너 평가하기
+                                        "/matching/{id}/end" // 매칭글 END 상태로 변경
                                 )
                                 .authenticated()
 

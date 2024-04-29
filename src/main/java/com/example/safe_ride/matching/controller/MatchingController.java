@@ -7,9 +7,9 @@ import com.example.safe_ride.matching.dto.MatchingApplicationDto;
 import com.example.safe_ride.matching.dto.MatchingDto;
 import com.example.safe_ride.matching.entity.MatchingApplication;
 import com.example.safe_ride.matching.entity.MatchingStatus;
+import com.example.safe_ride.matching.service.MannerService;
 import com.example.safe_ride.matching.service.MatchingApplicationService;
 import com.example.safe_ride.matching.service.MatchingService;
-import com.example.safe_ride.member.dto.MemberDto;
 import com.example.safe_ride.member.entity.Member;
 import com.example.safe_ride.member.repo.MemberRepo;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +38,7 @@ public class MatchingController {
     private final MemberRepo memberRepository;
     private final MatchingApplicationService matchingApplicationService;
     private final RegionRepository regionRepository;
+    private final MannerService mannerService;
     // 매칭글 생성 페이지 이동
     @GetMapping("/create")
     public String createMatchingForm(Model model) {
@@ -240,33 +241,20 @@ public class MatchingController {
         return "redirect:/matching/" + application.getMatching().getId();
     }
 
-    @GetMapping("/{matchingId}/applicantInfo/{applicationId}")
-    public String viewApplicantInfo(@PathVariable Long matchingId,
-                                    @PathVariable Long applicationId,
-                                    Model model) throws AccessDeniedException {
-        // 현재 로그인한 사용자 정보 가져오기
-        Member currentUser = getUserEntity();
-        // 해당 매칭의 작성자 정보 가져오기
-        MatchingDto matchingDto = matchingService.getMatchingById(matchingId);
-        Long matchingAuthorId = matchingDto.getMember().getId();
-
-        // 매칭글 작성자와 현재 로그인한 사용자가 같은 경우에만 처리
-        if (currentUser.getId().equals(matchingAuthorId)) {
-            // 매칭 신청자의 정보 가져오기
-            MatchingApplicationDto applicationDto = matchingApplicationService.getMatchingApplicationDtoById(applicationId);
-            // 매칭 신청자의 멤버 정보 가져오기
-            MemberDto applicantDto = applicationDto.getApplicant();
-
-            // 모델에 신청자의 정보 추가
-            model.addAttribute("applicant", applicantDto);
-        } else {
-            // 매칭글 작성자가 아닌 경우에는 권한이 없다는 메시지를 보여줄 수 있습니다.
-            // 혹은 다른 처리 방법을 선택할 수도 있습니다.
-            throw new AccessDeniedException("매칭글 작성자만 신청자 정보를 볼 수 있습니다.");
-        }
-
-        return "/matching/applicantInfo";
+    // 매너 평가하기
+    @PostMapping("/{matchingId}/manner")
+    public String rateManner(@PathVariable Long matchingId,
+                             @RequestParam int score,
+                             @RequestParam String comment) {
+        mannerService.rateManner(matchingId, score, comment);
+        return "redirect:/matching/" + matchingId;
     }
 
+    // 매칭 상태를 END로 변경
+    @PostMapping("/{id}/end")
+    public String endMatching(@PathVariable Long id) {
+        matchingService.endMatching(id);
+        return "redirect:/matching/" + id;
+    }
 
 }
