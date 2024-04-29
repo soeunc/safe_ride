@@ -41,6 +41,10 @@ public class WebSecurityConfig {
                                         "/safe-ride/join",//회원가입
                                         "/safety-direction/**",
 
+                                        // 날씨 관련
+                                        "/safe-ride/weather",
+                                        "/safe-ride/weather-view",
+
                                         //템플릿 관련
                                         "/css/**",
                                         "/js/**",
@@ -145,7 +149,7 @@ public class WebSecurityConfig {
                                 .deleteCookies("JSESSIONID") //해당 쿠키 삭제
                                 .permitAll()
                 )
-                   
+
 
         ;
 
