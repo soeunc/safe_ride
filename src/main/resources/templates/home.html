@@ -1,57 +1,86 @@
 <!DOCTYPE html>
-<html
-        lang="en"
-        xmlns:sec="http://www.w3.org/1999/xhtml"
-        xmlns:th="http://www.thymeleaf.org"
->
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <th:block th:replace="~{common/header :: headerFragment}"></th:block>
     <!--👇여기에 기타 header 넣어주시면 됩니다👇-->
-
+  <style>
+      body {
+          padding-top: 100px;
+          padding-bottom: 100px;
+      }
+  </style>
     <!--👆 여기에 기타 header 넣어주시면 됩니다 👆-->
 </head>
 
 <body>
 <div class="wrapper">
-    <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
-
-    <div class="main">
-        <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
-        <main>
-            <div class="container mt-4">
-                <!--👇여기에 내용 넣어주시면 됩니다👇-->
-                <div sec:authorize="isAnonymous()">
-                    <a href="/safe-ride/login">로그인</a>
-                    <a href="/safe-ride/join">회원가입</a>
-                </div>
-                <div sec:authorize="isAuthenticated()">
-<!--                    <h3>반갑습니다, <span sec:authentication="name"></span>님!</h3>-->
-                    <h3>반갑습니다, <span th:text="${userId}"></span>님!</h3>
-                    <form action="/safe-ride/logout" method="post">
-                        <input type="submit" value="로그아웃">
-                    </form>
-                    <a href="/safe-ride/myprofile">마이프로필</a>
-                </div>
-                <!--👆여기에 내용 넣어주시면 됩니다👆-->
-            </div>
-        </main>
-        <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
+  <!-- 상단 바 -->
+  <nav class="main-custom-navbar" th:fragment="HeadBarFragment">
+    <div class="container">
+      <a class="sidebar-brand mx-auto" href="/">SAFE RIDE</a>
     </div>
+  </nav>
+
+  <div class="main">
+    <main class="mt-4">
+      <div class="container text-center">
+        <!-- 로그인 및 회원가입 버튼을 중앙에 배치 -->
+        <div sec:authorize="isAnonymous()" class="mb-3">
+          <a href="/safe-ride/login" class="btn btn-warning">로그인</a>
+          <a href="/safe-ride/join" class="btn btn-warning">회원가입</a>
+        </div>
+
+        <div sec:authorize="isAuthenticated()">
+          <h3>반갑습니다, <span th:text="${userId}"></span>님!</h3>
+          <form action="/safe-ride/logout" method="post">
+            <input type="submit" value="로그아웃" class="btn btn-danger">
+          </form>
+          <a href="/safe-ride/myprofile" class="btn btn-info">마이프로필</a>
+        </div>
+
+        <!-- 이미지, 메뉴 2열 -->
+        <div class="main-custom-row mt-5">
+          <div class="main-custom-img-container col-md-6">
+            <img src="/img/main.jpg" alt="Main Image" class="img-fluid">
+          </div>
+          <div class="main-custom-menu-container">
+            <div class="row">
+              <div class="col-md-4">
+                <a href="/weather" class="btn btn-primary w-100 mb-2">실시간 날씨</a>
+              </div>
+              <div class="col-md-4">
+                <a href="/public-bicycle" class="btn btn-primary w-100 mb-2">공영자전거 현황</a>
+              </div>
+              <div class="col-md-4">
+                <a href="/safety-direction" class="btn btn-primary w-100 mb-2">안전한 자전거 길 안내</a>
+              </div>
+              <div class="col-md-4">
+                <a href="/article" class="btn btn-primary w-100 mb-2">커뮤니티</a>
+              </div>
+              <div class="col-md-4">
+                <a href="/matching/list" class="btn btn-primary w-100 mb-2">라이더 매칭</a>
+              </div>
+              <div class="col-md-4">
+                <a href="/route" class="btn btn-primary w-100 mb-2">라이딩 기록하기</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
+  </div>
 </div>
 
 <script src="js/app.js"></script>
-<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
 <script th:inline="javascript">
     window.onload = function () {
-        //alert
         const alertMsg = [[${msg}]];
-
-        if (alertMsg){
+        if (alertMsg) {
             alert(alertMsg);
         }
     }
 </script>
-<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
 </body>
 </html>
