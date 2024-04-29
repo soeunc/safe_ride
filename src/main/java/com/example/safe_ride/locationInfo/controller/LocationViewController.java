@@ -96,7 +96,7 @@ public class LocationViewController {
         model.addAttribute("roadFullAddr", roadFullAddr);
         model.addAttribute("roadAddrPart1", roadAddrPart1);
 
-        return "/locationInfo/jusoPopup";
+        return "locationInfo/jusoPopup";
     }
 
     // 상세보기 Popup
@@ -108,7 +108,7 @@ public class LocationViewController {
     ) {
         TempCombinedInfo selectedInfo = tempCombinedInfoRepo.findByRntstnId(stationId);
         model.addAttribute("selectedInfo", selectedInfo);
-        return "/locationInfo/stationDetailPopup";
+        return "locationInfo/stationDetailPopup";
     }
 
     // 현재 위치 검색 동의 및 반경 설정 팝업 페이지
