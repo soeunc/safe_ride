@@ -1,13 +1,6 @@
 package com.example.safe_ride.locationInfo.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
