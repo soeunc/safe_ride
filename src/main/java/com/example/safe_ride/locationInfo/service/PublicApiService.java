@@ -112,6 +112,22 @@ public class PublicApiService {
         return latDistance <= 0.018 && lotDistance <= 0.018;
     }
 
+    // 두 지점간 거리를 계산하는 함수(헤버사인 공식)
+    public double calculateDistance(JSONObject item, double lat2, double lon2) {
+        double stationLot = item.getDouble("lot"); // 경도
+        double stationLat = item.getDouble("lat"); // 위도
+
+        double R = 6371.01; // 지구의 반경(km)
+        double latDistance = Math.toRadians(lat2 - stationLat);
+        double lonDistance = Math.toRadians(lon2 - stationLot);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(stationLat)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c;
+        // 소수점 둘째 자리까지 반올림
+        return Math.round(distance * 100) / 100.0;
+    }
 
     /** NCP API : GeoCoding 관련 서비스 */
     // 주소 입력 -> 좌표 반환

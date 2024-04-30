@@ -30,5 +30,6 @@ public class StationInfoDto {
     private String rntstnOperDayoffDayCn;    // 휴무일(연중무휴)
     private String rntFeeTypeNm;             // 요금구분(유료)
     private String mngInstTelno;             // 관리기관전화번호(https://data.seoul.go.kr)
+    private double distance;                // 검색 대상과의 거리
 
 }
