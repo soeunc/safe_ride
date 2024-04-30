@@ -63,13 +63,6 @@
           background-color: #28a745;
       }
 
-      /* 매칭 상태 메시지 스타일 */
-      .matching-message {
-          font-size: 18px;
-          color: #007bff;
-          font-weight: bold;
-          margin-bottom: 20px;
-      }
 
       /* 매칭 신청 목록 테이블 스타일 */
       #applicationsList table {
@@ -80,8 +73,28 @@
 
       #applicationsList th, #applicationsList td {
           border: 1px solid #ddd;
-          padding: 8px;
+          padding: 10px;
           text-align: left;
+      }
+
+      /* 신청자 영역 크기 조정 */
+      #applicationsList th:nth-child(1), #applicationsList td:nth-child(1) {
+          width: 20%; /* 신청자 영역의 너비를 줄입니다. */
+      }
+
+      #applicationsList th:nth-child(3), #applicationsList td:nth-child(3) {
+          width: 80px; /* 라이딩 등급 영역의 너비를 좁힙니다. */
+          text-align: center; /* 라이딩 등급 텍스트를 가운데 정렬합니다. */
+      }
+
+      /* 신청 메시지 영역 크기 조정 */
+      #applicationsList th:nth-child(2), #applicationsList td:nth-child(2) {
+          width: 50%; /* 신청 메시지 영역의 너비를 늘립니다. */
+      }
+
+      /* 상태 영역 크기 조정 */
+      #applicationsList th:nth-child(4), #applicationsList td:nth-child(4) {
+          width: 20%; /* 상태 영역의 너비를 줄입니다. */
       }
 
       #applicationsList th {
@@ -166,6 +179,10 @@
           margin-top: 10px; /* 위쪽 여백 추가 */
       }
 
+      .riding-course {
+          white-space: pre-line;
+      }
+
       .manner-form {
           padding: 20px;
           background-color: #f8f8f8;
@@ -227,8 +244,17 @@
           margin-top: 20px; /* 위쪽 여백 추가 */
       }
 
+      #applicationsList table img {
+          max-width: 80px; /* 이미지의 최대 너비를 조정합니다. */
+          max-height: 80px; /* 이미지의 최대 높이를 조정합니다. */
+          display: block;
+          margin: 0 auto; /* 이미지를 가운데 정렬합니다. */
+      }
+      .cancel-button {
+          padding: 8px 16px; /* 버튼의 내부 여백을 조정합니다. */
+          font-size: 14px; /* 버튼의 글꼴 크기를 줄입니다. */
+      }
   </style>
-
 </head>
 
 <body>
@@ -238,6 +264,9 @@
     <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
     <main class="content">
       <div class="review" th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).END}">
+        <div class="image-container">
+          <img src="/img/endMatching.jpg" alt="" style="max-width: 90%; max-height: 90%; object-fit: cover; border-radius: 10px;">
+        </div>
         <h4>라이딩 종료</h4>
         <button id="toggleMannerFormButton" class="toggle-button">매너 후기 작성</button>
         <div id="mannerForm" class="manner-form hidden">
@@ -296,7 +325,7 @@
             </form>
           </div>
         </div>
-        <a href="/matching/list" style="display: block; margin-top: 10px; text-align: left;">뒤로가기</a>
+        <a href="/matching/list" style="display: block; margin-top: 10px; text-align: left; color: #333; text-decoration: none; font-size: 16px; font-weight: bold;">뒤로가기</a>
         <div class="creation-date">
           <span>작성일자: <span th:text="${#dates.format(matching.createTime, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
         </div>
@@ -346,6 +375,7 @@
               <tr>
                 <th>신청자</th>
                 <th>신청 메시지</th>
+                <th>라이더 등급</th>
                 <th> </th>
               </tr>
               </thead>
@@ -353,6 +383,25 @@
               <tr th:each="apply : ${applications}">
                 <td th:text="${apply.applicant.nickname}"></td>
                 <td th:text="${apply.message}"></td>
+                <td>
+                  <div class="badge-image-container">
+                    <span th:if="${#strings.equals(badges.getGrade(), 'QUICK_BOARD')}">
+                        <img class="badge-grade" src="/img/badge/kickboard.png" style="max-width: 50px; max-height: 50px;">
+                    </span>
+                    <span th:if="${#strings.equals(badges.getGrade(), 'BYCICLE')}">
+                        <img class="badge-grade" src="/img/badge/bicycle.png" style="max-width: 50px; max-height: 50px;">
+                    </span>
+                    <span th:if="${#strings.equals(badges.getGrade(), 'SCOOTER')}">
+                        <img class="badge-grade" src="/img/badge/scooter.png" style="max-width: 50px; max-height: 50px;">
+                    </span>
+                    <span th:if="${#strings.equals(badges.getGrade(), 'MOTOR_CYCLE')}">
+                        <img class="badge-grade" src="/img/badge/motorcycle.png" style="max-width: 50px; max-height: 50px;">
+                    </span>
+                    <span th:if="${badges.getGrade() == null}">
+                        <img class="badge-grade" src="/img/badge/default.png" style="max-width: 50px; max-height: 50px;">
+                    </span>
+                  </div>
+                </td>
                 <td>
                   <div th:if="${matching.member.id == currentUser.id}">
                     <form th:action="@{'/matching/' + ${matching.id} + '/accept/' + ${apply.id}}" method="post">
@@ -388,11 +437,6 @@
 </div>
 </body>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-<script src="/js/app.js"></script> <!-- template -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> <!-- jQuery -->
 <!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
 <script>
     // 게시글 삭제 시 확인창
@@ -473,4 +517,6 @@
     });
 </script>
 <!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
+
+<script src="/js/app.js"></script> <!-- template -->
 </html>
