@@ -29,7 +29,8 @@ public class CombinedInfoDto {
     private String rntstnOperDayoffDayCn;    // 휴무일(연중무휴)
     private String rntFeeTypeNm;             // 요금구분(유료)
     private String mngInstTelno;             // 관리기관전화번호(https://data.seoul.go.kr)
-    private String bcyclTpkctNocs;      // 자전거 주차 총 건수(12)
+    private int bcyclTpkctNocs;          // 자전거 주차 총 건수(12)
+    private double distance;               // 검색 대상과의 거리
 
     public static TempCombinedInfo toEntity(CombinedInfoDto dto) {
         return TempCombinedInfo.builder()
@@ -52,6 +53,7 @@ public class CombinedInfoDto {
                 .rntFeeTypeNm(dto.getRntFeeTypeNm())
                 .mngInstTelno(dto.getMngInstTelno())
                 .bcyclTpkctNocs(dto.getBcyclTpkctNocs())
+                .distance(dto.getDistance())
                 .build();
     }
 }
