@@ -6772,6 +6772,11 @@ textarea.form-control-lg {
     text-align: right !important
 }
 
+.text-end-custom {
+    text-align: right !important;
+    margin-right: 20px;
+}
+
 .text-center {
     text-align: center !important
 }
@@ -14382,7 +14387,11 @@ span.flatpickr-weekday {
 }
 
 .background-has-data-light {
-    background-color: #d5eafd;
+    background-color: #ebfae9;
+}
+
+.custom-box.background-has-data-light strong {
+    color: #08a708;
 }
 
 /* 추가: 박스 모델 구분 */
