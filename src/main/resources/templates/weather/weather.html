@@ -29,7 +29,7 @@
               <div class="col-12 p-1 d-flex justify-content-center" id="sky_value" style="font-size: 3rem;font-weight: bold;"></div>
             </div>
             <div class="col-8">
-              <div class="col-12" id="tmp" style="font-size: 4rem;font-weight: bold;padding-left: 25px;"></div>
+              <div class="col-12" id="tmp" style="font-size: 4rem;font-weight: bold;padding-left: 95px;"></div>
               <div class="col-12">
                 <div class="row g-3">
                   <div class="col-4">
@@ -332,7 +332,7 @@
   }
 
   function checkPm10DustData(dust) {
-    $('#pm10status').css('font-size', '2.5rem');
+    $('#pm10status').css('font-size', '3.5rem');
     if(dust.pm10Value < 31) {
       $('#pm10status').text('좋음');
       $('#pm10status').css('color', 'blue');
@@ -351,7 +351,7 @@
     }
   }
   function checkPm25DustData(dust) {
-    $('#pm25status').css('font-size', '2.5rem');
+    $('#pm25status').css('font-size', '3.5rem');
     if(dust.pm25Value < 16) {
       $('#pm25status').text('좋음');
       $('#pm25status').css('color', 'blue');
@@ -385,9 +385,15 @@
           $('#ride_value').css('color', 'orange');
           $('#ride_img').html('<img alt="" src="/img/weather/dust3.png" width="150" height="150">');
         } else {
-          $('#ride_value').text('라이딩 하기 좋아요!');
-          $('#ride_value').css('color', 'blue');
-          $('#ride_img').html('<img alt="" src="/img/weather/dust1.png" width="150" height="150">');
+          if(Number(globalWeatherData.TMP[0].fcstValue) < 5) {
+            $('#ride_value').text('라이딩 하기 힘들어요!');
+            $('#ride_value').css('color', 'orange');
+            $('#ride_img').html('<img alt="" src="/img/weather/dust3.png" width="150" height="150">');
+          } else {
+            $('#ride_value').text('라이딩 하기 좋아요!');
+            $('#ride_value').css('color', 'blue');
+            $('#ride_img').html('<img alt="" src="/img/weather/dust1.png" width="150" height="150">');
+          }
         }
       }
     } else { // 기상 상태 불량

@@ -18,7 +18,7 @@ import java.net.URI;
 
 @Slf4j
 @Controller
-@RequestMapping("/safe-ride/weather")
+@RequestMapping("/safe-ride")
 public class WeatherC {
 
     @Value("${weather.api.decode-key}")
@@ -116,12 +116,12 @@ public class WeatherC {
         return rs;
     }
 
-    @GetMapping("/view")
+    @GetMapping("/weather")
     public String viewWeather(Model model) {
         return "weather/weather";
     }
 
-    @GetMapping("/fcst")
+    @GetMapping("/weather/fcst")
     public ResponseEntity<String> getWeatherData(@RequestParam String base_date,
                                                  @RequestParam String base_time,
                                                  @RequestParam Double lat,
@@ -149,7 +149,7 @@ public class WeatherC {
         }
     }
 
-    @GetMapping("/trans-coord")
+    @GetMapping("/weather/trans-coord")
     public ResponseEntity<String> getTransCoordData(@RequestParam Double lat,
                                                     @RequestParam Double lon) {
         // uri 주소 생성
@@ -193,7 +193,7 @@ public class WeatherC {
         }
     }
 
-    @GetMapping("/getNearbyMsrstnList")
+    @GetMapping("/weather/getNearbyMsrstnList")
     public ResponseEntity<String> getNearbyMsrstnList(@RequestParam Double tmX,
                                                       @RequestParam Double tmY) {
         // uri 주소 생성
@@ -235,7 +235,7 @@ public class WeatherC {
         }
     }
 
-    @GetMapping("/airInfo")
+    @GetMapping("/weather/airInfo")
     public ResponseEntity<String> getAirInfo(
             @RequestParam String stationName,
             @RequestParam String dataTerm) {
