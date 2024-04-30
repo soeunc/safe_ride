@@ -12,7 +12,6 @@
             display: flex;
             justify-content: center;
             height: 110px;
-            margin-bottom: 5%;
         }
         #container{
             display: flex;
@@ -23,15 +22,34 @@
         #riding-record{
             width: 50%;
         }
+        #riding-record h2{
+            margin-bottom: 2%;
+
+        }
         #profileUpdate{
             width: 30%;
         }
         #introduce {
             display: inline-block;
         }
-
         .badge-grade {
             width: 70px;
+        }
+        .records {
+            font-size: x-large;
+            margin-bottom: 5%;
+        }
+        #inputTodayRecord{
+            width: 70%;
+        }
+        #totalRecord{
+            color: red;
+        }
+        #weeklyRecord{
+            color: deepskyblue;
+        }
+        #todayRecord{
+            color: forestgreen;
         }
 
 
@@ -74,27 +92,26 @@
                             </div>
                             <!--라이딩 기록이 존재한다면-->
                             <div th:unless="${#strings.isEmpty(ridingRecord.getTotalRecord())}">
-                                <div id="total-record">
-                                    <h3>총 기록</h3>
-                                    <span id="totalRecord"></span>
+                                <div id="total-record" class="records">
+                                    <span>총 <span id="totalRecord"></span>km</span>
                                 </div>
-                                <div id="weekly-record">
-                                    <h3>주간 기록</h3>
-                                    <span id="weeklyRecord"></span>
+                                <div id="weekly-record" class="records">
+                                    <span>주간 <span id="weeklyRecord"></span>km</span>
                                 </div>
                                 <!--오늘자 기록이 없을 떄-->
-                                <div th:if="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
+                                <div th:if="${#strings.isEmpty(ridingRecord.getTodayRecord())}" class="records">
                                     <h4>오늘 기록이 아직 없습니다! 열심히 달려봐요! :)</h4>
                                 </div>
-                                <div th:unless="${#strings.isEmpty(ridingRecord.getTodayRecord())}">
-                                    <h3>오늘 기록</h3>
-                                    <span id="todayRecord"></span>
+                                <div th:unless="${#strings.isEmpty(ridingRecord.getTodayRecord())}" class="records">
+                                    <span>오늘 <span id="todayRecord"></span>km</span>
                                 </div>
                             </div>
                             <form>
-                                <input id="todayRecordInput" name="todayRecord" type="number" required
-                                       placeholder="오늘 기록을 입력" maxlength="4">
-                                <button class="btn btn-primary btn" type="button" id="todaySubmit">오늘 기록 입력</button>
+                                <div id="inputTodayRecord" class="input-group mb-3">
+                                    <input id="todayRecordInput" class="form-control" name="todayRecord" type="number" required
+                                           placeholder="오늘 기록을 입력" maxlength="4">
+                                    <button class="btn btn-outline-secondary" type="button" id="todaySubmit">오늘 기록 입력</button>
+                                </div>
                             </form>
                             <div id="chart">
                                 <canvas id="bar-chart"></canvas>
@@ -182,9 +199,9 @@
         const totalRecord = parseFloat([[${ridingRecord.getTotalRecord()}]]) * 0.001;
         const weeklyRecord = parseFloat([[${ridingRecord.getWeeklyRecord()}]]) * 0.001;
         const todayRecord = parseFloat([[${ridingRecord.getTodayRecord()}]]) * 0.001;
-        $('#totalRecord').text(totalRecord.toFixed(3) + "km 탔어요! :)");
-        $('#weeklyRecord').text(weeklyRecord.toFixed(3) + "km 탔어요! :)");
-        $('#todayRecord').text(todayRecord.toFixed(3) + "km 탔어요! :)");
+        $('#totalRecord').text(totalRecord.toFixed(3));
+        $('#weeklyRecord').text(weeklyRecord.toFixed(3));
+        $('#todayRecord').text(todayRecord.toFixed(3));
     });
 
     const weeklyRecordList = [[${ridingRecord.weeklyRecordList}]];
