@@ -2,15 +2,14 @@
 <html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <th:block th:replace="~{common/header :: headerFragment}"></th:block>
-    <!--👇여기에 기타 header 넣어주시면 됩니다👇-->
+  <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+  <!--👇여기에 기타 header 넣어주시면 됩니다👇-->
   <style>
-      body {
-          padding-top: 100px;
-          padding-bottom: 100px;
+      strong {
+          color: #386fa4;
       }
   </style>
-    <!--👆 여기에 기타 header 넣어주시면 됩니다 👆-->
+  <!--👆 여기에 기타 header 넣어주시면 됩니다 👆-->
 </head>
 
 <body>
@@ -23,55 +22,53 @@
   </nav>
 
   <div class="main">
-    <main class="mt-4">
-      <div class="container text-center">
-        <!-- 로그인 및 회원가입 버튼을 중앙에 배치 -->
-        <div sec:authorize="isAnonymous()" class="mb-3">
-          <a href="/safe-ride/login" class="btn btn-warning">로그인</a>
-          <a href="/safe-ride/join" class="btn btn-warning">회원가입</a>
+    <main>
+      <div class="container centered-container">
+        <!-- 로그인 및 회원가입 버튼 (익명 사용자만 보임) -->
+        <div sec:authorize="isAnonymous()" class="centered-container-new">
+          <p>
+          <h6><strong>회원가입</strong> 및 <strong>로그인</strong>을 하면 메뉴를 이용하실 수 있습니다. 함께 달려요!</h6>
+          </p>
+          <p>
+            <a href="/safe-ride/login" class="btn btn-warning btn-spacing">로그인</a>
+            <a href="/safe-ride/join" class="btn btn-warning btn-spacing">회원가입</a>
+          </p>
         </div>
 
-        <div sec:authorize="isAuthenticated()">
-          <h3>반갑습니다, <span th:text="${userId}"></span>님!</h3>
-          <form action="/safe-ride/logout" method="post">
+        <!-- 마이프로필 및 로그아웃 버튼 (인증된 사용자만 보임) -->
+        <div sec:authorize="isAuthenticated()" class="centered-container-new">
+          <p>
+          <h6>반갑습니다, <strong><span th:text="${userId}"></span></strong>님!</h6>
+          </p>
+          <p>
+          <form action="/safe-ride/logout" method="post" style="display: inline;">
+            <a href="/safe-ride/myprofile" class="btn btn-info btn-spacing" style="margin-right: 10px;">마이프로필</a>
             <input type="submit" value="로그아웃" class="btn btn-danger">
           </form>
-          <a href="/safe-ride/myprofile" class="btn btn-info">마이프로필</a>
+          </p>
         </div>
+      </div>
+      <hr>
 
-        <!-- 이미지, 메뉴 2열 -->
-        <div class="main-custom-row mt-5">
-          <div class="main-custom-img-container col-md-6">
-            <img src="/img/main.jpg" alt="Main Image" class="img-fluid">
-          </div>
-          <div class="main-custom-menu-container">
-            <div class="row">
-              <div class="col-md-4">
-                <a href="/weather" class="btn btn-primary w-100 mb-2">실시간 날씨</a>
-              </div>
-              <div class="col-md-4">
-                <a href="/public-bicycle" class="btn btn-primary w-100 mb-2">공영자전거 현황</a>
-              </div>
-              <div class="col-md-4">
-                <a href="/safety-direction" class="btn btn-primary w-100 mb-2">안전한 자전거 길 안내</a>
-              </div>
-              <div class="col-md-4">
-                <a href="/article" class="btn btn-primary w-100 mb-2">커뮤니티</a>
-              </div>
-              <div class="col-md-4">
-                <a href="/matching/list" class="btn btn-primary w-100 mb-2">라이더 매칭</a>
-              </div>
-              <div class="col-md-4">
-                <a href="/route" class="btn btn-primary w-100 mb-2">라이딩 기록하기</a>
-              </div>
-            </div>
-          </div>
+      <!-- 이미지, 메뉴 2열 -->
+      <div class="main-container">
+        <div class="main-image">
+          <img src="/img/main.jpg" alt="Main Image" class="img-fluid">
+        </div>
+        <div class="menu-container">
+          <a href="/weather" class="menu-link"><img src="/img/menu/menu-weather.png" alt="Weather"></a>
+          <a href="/public-bicycle" class="menu-link"><img src="/img/menu/menu-public.png" alt="Public Bicycle"></a>
+          <a href="/safety-direction" class="menu-link"><img src="/img/menu/menu-safety.png"
+                                                             alt="Safety Directions"></a>
+          <a href="/article" class="menu-link"><img src="/img/menu/menu-community.png" alt="Community"></a>
+          <a href="/matching/list" class="menu-link"><img src="/img/menu/menu-matching.png" alt="Rider Matching"></a>
+          <a href="/route" class="menu-link"><img src="/img/menu/menu-route.png" alt="Route Recording"></a>
         </div>
       </div>
     </main>
-    <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
   </div>
 </div>
+<th:block th:replace="~{common/footer :: footerFragment}"></th:block>
 
 <script src="js/app.js"></script>
 <script th:inline="javascript">

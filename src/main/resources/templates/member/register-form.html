@@ -1,34 +1,41 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <th:block th:replace="~{common/header :: headerFragment}"></th:block>
   <!--👇여기에 기타 header 넣어주시면 됩니다👇-->
   <style>
-    .date_item{
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      .warning{
-        color:red;
-        font-size:0.8rem;
-        visibility:hidden;
-        &.on{
-          visibility:visible;
-        }
+      strong {
+          color: #386fa4;
       }
-    }
+       .date_item{
+           display:flex;
+           flex-direction:column;
+           justify-content:center;
+           align-items:center;
+           .warning{
+               color:red;
+               font-size:0.8rem;
+               visibility:hidden;
+               &.on{
+                   visibility:visible;
+               }
+           }
+       }
   </style>
   <!--👆 여기에 기타 header 넣어주시면 됩니다 👆-->
 </head>
 
 <body>
 <div class="wrapper">
-  <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
+  <!-- 상단 바 -->
+  <nav class="main-custom-navbar" th:fragment="HeadBarFragment">
+    <div class="container">
+      <a class="sidebar-brand mx-auto" href="/safe-ride">SAFE RIDE</a>
+    </div>
+  </nav>
 
   <div class="main">
-    <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
     <main>
       <div class="container mt-4">
         <!--👇여기에 내용 넣어주시면 됩니다👇-->

@@ -12744,7 +12744,7 @@ a.list-group-item {
     border-top-left-radius: 0;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 80vh;
     min-width: 0;
     overflow: hidden;
     transition: margin-left .35s ease-in-out, left .35s ease-in-out, margin-right .35s ease-in-out, right .35s ease-in-out;
@@ -14355,6 +14355,17 @@ span.flatpickr-weekday {
     justify-content: center;
     height: auto;
     width: 100%;
+    padding-bottom: 10px;
+    padding-top: 120px;
+}
+
+.centered-container-new {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    width: 100%;
 }
 
 /* 추가: 검색결과에 따른 색 구분 */
@@ -14446,6 +14457,94 @@ span.flatpickr-weekday {
     background-color: #222E3C;
     color: white;
     text-align: center;
+    height: 100px;
+}
+
+.button-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.greeting {
+    margin-right: 10px;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.btn-spacing {
+    margin-right: 10px;
+}
+
+.main-container {
+    display: flex;
+    width: 100%;
+    max-width: 1300px;
+    margin: auto;
+    margin-bottom: 50px;
+}
+
+.main-image {
+    flex: 3;
+    padding-right: 5px;
+}
+
+.main-image img {
+    width: 100%;
+    height: 100%;
+}
+
+.menu-container {
+    flex: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: stretch;
+    height: auto;
+}
+
+.menu-link {
+    width: calc(33.333% - 4px); /* 각 이미지 너비 계산, 좌우 간격 포함 */
+    margin-right: 5px; /* 이미지 사이의 오른쪽 간격 */
+    margin-bottom: 3px; /* 행 사이의 아래쪽 간격 */
+    box-sizing: border-box; /* 패딩과 보더를 너비에 포함 */
+}
+
+.menu-link:nth-child(3n) {
+    margin-right: 0; /* 3번째 이미지 오른쪽 간격 제거 */
+}
+
+.menu-link:nth-last-child(-n+3) { /* 마지막 3개 요소에 대해 */
+    margin-bottom: 0; /* 아래쪽 마진 제거 */
+}
+
+.menu-link img {
+    width: 100%;
+    height: auto; /* 높이는 자동으로 조절 */
+}
+
+.menu-link img:hover {
+    filter: brightness(70%);
+}
+
+.navbar-container {
+    background-color: #222E3C;
+    color: white;
+    text-align: center;
+    height: 100px;
+}
+.navbar-brand-custom {
+    font-size: 24px;
+    line-height: 100px;
+    color: white;
+    text-decoration: none;
+}
+.navbar-buttons {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 /*# sourceMappingURL=app.css.map*/
