@@ -42,8 +42,11 @@ public class WebSecurityConfig {
                                         "/safety-direction/**",
 
                                         // 날씨 관련
-                                        "/safe-ride/weather",
-                                        "/safe-ride/weather-view",
+                                        "/safe-ride/weather/fcst",
+                                        "/safe-ride/weather/trans-coord",
+                                        "/safe-ride/weather/getNearbyMsrstnList",
+                                        "/safe-ride/weather/airInfo",
+                                        "/safe-ride/weather/view",
 
                                         //템플릿 관련
                                         "/css/**",
