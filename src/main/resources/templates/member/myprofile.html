@@ -9,23 +9,23 @@
     <!--👇여기에 기타 header 넣어주시면 됩니다👇-->
     <style>
         #topInfo {
-            height: 130px;
+            display: flex;
+            justify-content: center;
+            height: 110px;
+            margin-bottom: 5%;
         }
-
-        #riding-record {
-            display: inline-block; /* 가로로 나열하기 위해 block레벨 요소를 inline-block레벨로 전환 */
-            width: 33%; /* 영역 크기 지정 안해주면 inline 레벨처럼 내용물 만큼만 차지하기 때문에 크기 지정 */
-            border: 2px solid aqua;
-            background: orange;
+        #container{
+            display: flex;
+            justify-content: space-evenly;
+            max-height: 100vw;
+            margin-bottom: 20%;
         }
-
-        #prifile-update {
-            display: inline-block; /* 가로로 나열하기 위해 block레벨 요소를 inline-block레벨로 전환 */
-            width: 50%; /* 영역 크기 지정 안해주면 inline 레벨처럼 내용물 만큼만 차지하기 때문에 크기 지정 */
-            border: 2px solid aqua;
-            background: orange;
+        #riding-record{
+            width: 50%;
         }
-
+        #profileUpdate{
+            width: 30%;
+        }
         #introduce {
             display: inline-block;
         }
@@ -34,10 +34,7 @@
             width: 70px;
         }
 
-        #chart {
-            width: 800px;
-            height: 400px;
-        }
+
     </style>
     <!--👆 여기에 기타 header 넣어주시면 됩니다 👆-->
 </head>
@@ -99,62 +96,58 @@
                                        placeholder="오늘 기록을 입력" maxlength="4">
                                 <button class="btn btn-primary btn" type="button" id="todaySubmit">오늘 기록 입력</button>
                             </form>
-                        </div>
-                        <div id="chart">
-                            <canvas id="bar-chart"></canvas>
+                            <div id="chart">
+                                <canvas id="bar-chart"></canvas>
+                            </div>
                         </div>
                         <!--프로필 수정-->
-                        <section class="py-5">
-                            <div class="container px-5">
-                                <!-- login form-->
-                                <div class="bg-light rounded-3 py-5 px-4 px-md-5 mb-5">
-                                    <div class="row gx-5 justify-content-center">
-                                        <div class="col-lg-8 col-xl-6">
-                                            <h2 class="text-center mb-5">회원정보 수정</h2>
-                                            <form id="updateForm" onsubmit="return false">
-                                                <div class="form-floating mb-3">
-                                                    <input class="form-control" id="password" name="password" type="password" onkeyup="passwordValidCkFnc()" maxlength="20" required placeholder="비밀번호 입력">
-                                                    <label for="password">패스워드</label>
-                                                </div>
-                                                <div class="form-floating mb-3">
-                                                    <input class="form-control" id="passwordCk" name="passwordCk" type="password" maxlength="20" required placeholder="비밀번호 확인">
-                                                    <button class="btn btn-info" id="passwordMatchCk" onclick="passwordMatchCkFnc()">패스워드 일치여부 확인</button>
-                                                    <span id="passwordCkMsg"></span>
-                                                    <label for="passwordCk">패스워드 확인</label>
-                                                </div>
-                                                <div class="form-floating mb-3">
-                                                    <input class="form-control" id="email" name="email" type="text" th:value="${member.email}" maxlength="30" disabled>
-                                                    <label for="email">이메일</label>
-                                                </div>
-                                                <div class="form-floating mb-3">
-                                                    <input class="form-control" id="nickName" name="nickName" type="text" th:value="${member.nickname}" onkeyup="nickNameValidFunc()" maxlength="30">
-                                                    <button class="btn btn-info" id="duplicateCkForNickname" onclick="duplicateCkForNicknameFnc()">닉네임 중복확인</button>
-                                                    <span id="nickNameCkMsg"></span>
-                                                    <label for="nickName">닉네임</label>
-                                                </div>
-                                                <div class="form-floating mb-3">
-                                                    <input class="form-control" id="phoneNumber" name="phoneNumber" type="text" th:value="${member.phoneNumber}" onkeyup="phoneNumberVaildFnc()" maxlength="11">
-                                                    <span id="phoneNumberMsg"></span>
-                                                    <label for="phoneNumber">전화번호</label>
-                                                </div>
-                                                <div class="form-floating mb-3 date_item">
-                                                    <input class="form-control" id="birthday" name="birthday" th:value="${member.getBirthday()}" maxlength="8" disabled>
-                                                    <label for="birthday">생년월일</label>
-                                                </div>
-                                                <div class="d-grid"><button class="btn btn-primary btn-lg" id="submitBtn" type="button">Submit</button></div>
-                                            </form>
+                        <div id="profileUpdate">
+                            <section>
+                                <div>
+                                    <!-- login form-->
+                                    <div>
+                                        <div>
+                                            <div>
+                                                <h2>회원정보 수정</h2>
+                                                <form id="updateForm" onsubmit="return false">
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" id="password" name="password" type="password" onkeyup="passwordValidCkFnc()" maxlength="20" required placeholder="비밀번호 입력">
+                                                        <label for="password">패스워드</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" id="passwordCk" name="passwordCk" type="password" maxlength="20" required placeholder="비밀번호 확인">
+                                                        <button class="btn btn-info" id="passwordMatchCk" onclick="passwordMatchCkFnc()">패스워드 일치여부 확인</button>
+                                                        <span id="passwordCkMsg"></span>
+                                                        <label for="passwordCk">패스워드 확인</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" id="email" name="email" type="text" th:value="${member.email}" maxlength="30" disabled>
+                                                        <label for="email">이메일</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" id="nickName" name="nickName" type="text" th:value="${member.nickname}" onkeyup="nickNameValidFunc()" maxlength="30">
+                                                        <button class="btn btn-info" id="duplicateCkForNickname" onclick="duplicateCkForNicknameFnc()">닉네임 중복확인</button>
+                                                        <span id="nickNameCkMsg"></span>
+                                                        <label for="nickName">닉네임</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" id="phoneNumber" name="phoneNumber" type="text" th:value="${member.phoneNumber}" onkeyup="phoneNumberVaildFnc()" maxlength="11">
+                                                        <span id="phoneNumberMsg"></span>
+                                                        <label for="phoneNumber">전화번호</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3 date_item">
+                                                        <input class="form-control" id="birthday" name="birthday" th:value="${member.getBirthday()}" maxlength="8" disabled>
+                                                        <label for="birthday">생년월일</label>
+                                                    </div>
+                                                    <div class="d-grid"><button class="btn btn-primary btn-lg" id="submitBtn" type="button">Submit</button></div>
+                                                </form>
+                                            </div>
                                         </div>
+
                                     </div>
-
                                 </div>
-                            </div>
-                        </section>
-
-
-                    <form action="/safe-ride/logout">
-                        <input type="submit" value="로그아웃">
-                    </form>
-                    <a href="/safe-ride">홈으로</a>
+                            </section>
+                        </div>
                 </div>
                 <!--👆여기에 내용 넣어주시면 됩니다👆-->
             </div>
