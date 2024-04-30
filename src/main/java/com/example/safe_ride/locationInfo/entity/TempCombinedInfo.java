@@ -35,5 +35,6 @@ public class TempCombinedInfo {
     private String rntstnOperDayoffDayCn;    // 휴무일(연중무휴)
     private String rntFeeTypeNm;             // 요금구분(유료)
     private String mngInstTelno;             // 관리기관전화번호(https://data.seoul.go.kr)
-    private String bcyclTpkctNocs;      // 자전거 주차 총 건수(12)
+    private int bcyclTpkctNocs;          // 자전거 주차 총 건수(12)
+    private Double distance;                // 검색 위치와의 거리
 }

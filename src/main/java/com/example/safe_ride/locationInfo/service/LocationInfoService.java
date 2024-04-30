@@ -6,6 +6,7 @@ import com.example.safe_ride.locationInfo.dto.StationInfoDto;
 import com.example.safe_ride.locationInfo.dto.TotalInfoDto;
 import com.example.safe_ride.locationInfo.entity.TempCombinedInfo;
 import com.example.safe_ride.locationInfo.repo.TempCombinedInfoRepo;
+import com.example.safe_ride.locationInfo.repo.TempLocationInfoRepo;
 import com.example.safe_ride.safe.dto.PointDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,8 @@ public class LocationInfoService {
     private final PublicApiService apiService;
     private final TempTableService tempService;
     private final TempCombinedInfoRepo tempRepo;
+    private final TempLocationInfoRepo tempLocationInfoRepo;
+
 
     // 1. 데이터 패치
     public List<?> fetchData(
@@ -58,8 +61,10 @@ public class LocationInfoService {
     public void processPageData(
             String status, PointDto pointDto, String url, List<Object> allResults, int pageNo) throws IOException {
         JSONObject jsonResponse = apiService.fetchJsonResponse(url);
+
         List<?> result = null;
 
+        //필터링
         if ("station".equals(status)) {
             result = filterStationsByPoint(pointDto, jsonResponse);
         } else if ("bicycle".equals(status)) {
@@ -86,7 +91,7 @@ public class LocationInfoService {
 
             // 위도 경도가 반경안에 포함하는지 확인
             if (apiService.isWithinRange(item, pointDto)) {
-                FilteredResult.add(formatStation(item));
+                FilteredResult.add(formatStation(item, pointDto));
                 mapManager.updateMap(item.getString("rntstnId"), item);
             }
         }
@@ -112,8 +117,10 @@ public class LocationInfoService {
     }
 
 
-    // 4-1. 필터링 된 데이터 포매팅 (대여소 현황)
-    private StationInfoDto formatStation(JSONObject item) throws JSONException {
+    // 4-1. 필터링 된 데이터 포매팅 (대여소 현황) + 거리 계산 데이터 추가
+    private StationInfoDto formatStation(JSONObject item, PointDto pointDto) throws JSONException {
+        double distance = apiService.calculateDistance(item, pointDto.getLat(), pointDto.getLng());
+        item.put("distance", distance); // CombinedInfo를 만들 때 Map value가 JsonObject 타입으로 JSON 데이터에도 넣어줘야한다.
         return StationInfoDto.builder()
                 .bcyclDataCrtrYmd(item.getString("bcyclDataCrtrYmd"))           // 관리기관명(서울특별시)
                 .mngInstNm(item.getString("mngInstNm"))                         // 데이터기준일자(2024-02-08)
@@ -134,6 +141,7 @@ public class LocationInfoService {
                 .rntstnOperDayoffDayCn(item.getString("rntstnOperDayoffDayCn")) // 휴무일(연중무휴)
                 .rntFeeTypeNm(item.getString("rntFeeTypeNm"))                   // 요금구분(유료)
                 .mngInstTelno(item.getString("mngInstTelno"))                   // 관리기관전화번호(https://data.seoul.go.kr)
+                .distance(distance)                                  // 검색 대상과의 거리
                 .build();
     }
 
@@ -146,9 +154,10 @@ public class LocationInfoService {
                 .rntstnNm(item.getString("rntstnNm"))
                 .lat(item.getString("lat"))
                 .lot(item.getString("lot"))
-                .bcyclTpkctNocs(item.optString("bcyclTpkctNocs", "0"))
+                .bcyclTpkctNocs(item.optInt("bcyclTpkctNocs", 0))
                 .build();
     }
+
 
     // 5-1. StationInfo와 BicycleInfo 리스트를 받아서 CombinedInfoDto 리스트를 생성하는 메소드
     public List<CombinedInfoDto> createCombinedInfo(List<BicycleInfoDto> bicycleList) {
@@ -159,6 +168,7 @@ public class LocationInfoService {
         // stationList를 기준으로 bcyclTpkctNocs를 매칭하여 CombinedInfoDto를 생성하고 리스트에 추가
         for (BicycleInfoDto bicycle : bicycleList) {
             JSONObject station = stationMap.get(bicycle.getRntstnId());
+            log.info("JsonObject test :{}", station);
 
                 if (station != null) {
                     try {
@@ -181,7 +191,8 @@ public class LocationInfoService {
                             .rntstnOperDayoffDayCn(station.getString("rntstnOperDayoffDayCn")) // 휴무일(연중무휴)
                             .rntFeeTypeNm(station.getString("rntFeeTypeNm"))                   // 요금구분(유료)
                             .mngInstTelno(station.getString("mngInstTelno"))                   // 관리기관전화번호(https://data.seoul.go.kr)
-                            .bcyclTpkctNocs(Optional.ofNullable(bicycle.getBcyclTpkctNocs()).orElse("정보 없음"))
+                            .bcyclTpkctNocs(bicycle.getBcyclTpkctNocs())
+                            .distance(station.getDouble("distance"))
                             .build();
                         combinedList.add(combinedInfo);
                     } catch (JSONException e) {
@@ -191,6 +202,15 @@ public class LocationInfoService {
         }
         saveCombinedInfo(combinedList);
         return combinedList;
+    }
+
+    // plus. bcyclTpkctNocs를 정수로 변환
+    private int parseBicycleCount(String bcyclTpkctNocs) {
+        try {
+            return Integer.parseInt(bcyclTpkctNocs);
+        } catch (NumberFormatException e) {
+            return 0; // 변환 실패 시 0으로 설정
+        }
     }
 
     // 5-2. 생성된 List를 TempCombined 엔티티로 변환하고 리스트를 임시DB에 저장
@@ -226,8 +246,8 @@ public class LocationInfoService {
         List<TempCombinedInfo> allInfos = tempRepo.findAll();
         int totalStation = allInfos.size();
         int totalBicycle = allInfos.stream()
-                .filter(info -> info.getBcyclTpkctNocs() != null)
-                .mapToInt(info -> Integer.parseInt(info.getBcyclTpkctNocs()))
+                .filter(info -> info.getBcyclTpkctNocs() != 0)
+                .mapToInt(info -> info.getBcyclTpkctNocs())
                 .sum();
         return new TotalInfoDto(totalStation, totalBicycle);
     }

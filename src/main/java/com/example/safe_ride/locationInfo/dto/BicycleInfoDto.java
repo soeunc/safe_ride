@@ -16,5 +16,5 @@ public class BicycleInfoDto {
     private String rntstnNm;            // 대여소명(108. 서교동 사거리)
     private String lat;                 // 위도(37.5527458200)
     private String lot;                 // 경도(126.9186172500)
-    private String bcyclTpkctNocs;      // 자전거 주차 총 건수(12)
+    private int bcyclTpkctNocs;      // 자전거 주차 총 건수(12)
 }
