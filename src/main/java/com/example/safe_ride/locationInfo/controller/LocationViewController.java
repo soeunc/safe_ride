@@ -9,10 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,9 +33,14 @@ public class LocationViewController {
     public String mainPage (
             HttpServletRequest request,
             Model model,
-            @PageableDefault(size = 10) Pageable pageable,
+            @PageableDefault(size = 10)
+            Pageable pageable,
             @RequestParam(value = "page", defaultValue = "0")
-            int page
+            int page,
+            @RequestParam(value = "sort", defaultValue = "distance")
+            String sort,
+            @RequestParam(value = "direction", defaultValue = "asc")
+            String direction
     ) {
         HttpSession session = request.getSession();
         LocationInfoResponseDto infoResponse = (LocationInfoResponseDto) session.getAttribute("infoResponse");
@@ -53,8 +55,16 @@ public class LocationViewController {
         }
         log.info("isSearched = {} ", session.getAttribute("isSearched"));
 
+        // 정렬기능 (거리, 자전거대수)
+        Sort.Direction sortDirection;
+        if ("bcyclTpkctNocs".equals(sort)) {
+            sortDirection = Sort.Direction.DESC; // '보유 자전거수'일 때 내림차순
+        } else {
+            sortDirection = "asc".equalsIgnoreCase(direction) ? Sort.Direction.ASC : Sort.Direction.DESC; // 그 외는 사용자 지정
+        }
         // 페이지 처리를 위한 Pageable
-        Pageable updatedPageable = PageRequest.of(page, 10);
+        Pageable updatedPageable = PageRequest.of(page, 10, Sort.by(sortDirection, sort));
+
         Page<TempCombinedInfo> pageInfo = locationInfoService.readTempCombinedInfo(updatedPageable);
         if (pageInfo == null) {
             pageInfo = new PageImpl<>(new ArrayList<>());
@@ -69,6 +79,7 @@ public class LocationViewController {
             model.addAttribute("totalInfoDto", totalInfoDto);
         }
 
+        model.addAttribute("sort", sort);
         model.addAttribute("page", pageInfo);
         model.addAttribute("isSearched", isSearched);
         model.addAttribute("infoResponse", infoResponse);
@@ -111,11 +122,9 @@ public class LocationViewController {
         return "locationInfo/stationDetailPopup";
     }
 
-    // 현재 위치 검색 동의 및 반경 설정 팝업 페이지
+    // 현재 위치 검색 동의 팝업 페이지
     @GetMapping("/positionPopup")
     public String positionPopup() {
         return "locationInfo/positionPopup";
     }
-
-
 }
