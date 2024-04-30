@@ -50,12 +50,12 @@ public class MyPageService {
                 myPage = optionalMyPage.get();
                 myPageDto = MyPageDto.fromEntity(myPage);
             }
-            //전체기록합산
-            myPageDto.setTotalRecord(findTotalRecord(memberId));
-            //주간기록합산
-            myPageDto.setWeeklyRecord(findWeeklyRecord(memberId));
-            //주간 개별 기록(날짜, 기록)
-            myPageDto.setWeeklyRecordList(weeklyRecordListTotal(getThisWeekDayList(),findWeeklyRecordList(memberId)));
+//            //전체기록합산
+//            myPageDto.setTotalRecord(findTotalRecord(memberId));
+//            //주간기록합산
+//            myPageDto.setWeeklyRecord(findWeeklyRecord(memberId));
+//            //주간 개별 기록(날짜, 기록)
+//            myPageDto.setWeeklyRecordList(weeklyRecordListTotal(getThisWeekDayList(),findWeeklyRecordList(memberId)));
         } else {
             //이번주 날짜(일~토)
             List<String> thisWeek = getThisWeekDayList();
@@ -71,7 +71,12 @@ public class MyPageService {
             }
             myPageDto.setWeeklyRecordList(weeklyRecordDtoList);
         }
-
+        //전체기록합산
+        myPageDto.setTotalRecord(findTotalRecord(memberId));
+        //주간기록합산
+        myPageDto.setWeeklyRecord(findWeeklyRecord(memberId));
+        //주간 개별 기록(날짜, 기록)
+        myPageDto.setWeeklyRecordList(weeklyRecordListTotal(getThisWeekDayList(),findWeeklyRecordList(memberId)));
 
         return myPageDto;
     }
@@ -214,7 +219,13 @@ public class MyPageService {
 
     //전체기록합산결과
     public int findTotalRecord(Long memberId){
-        return myPageRepoDsl.getTotalRecord(memberId);
+        int totalRecord = 0;
+        try {
+            totalRecord = myPageRepoDsl.getTotalRecord(memberId);
+        } catch (NullPointerException npe){
+            log.info("전체 기록 합산 결과 error : {}", npe.getMessage());
+        }
+        return totalRecord;
     }
     
     //뱃지 가져오기
