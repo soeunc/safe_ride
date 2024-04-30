@@ -65,6 +65,7 @@ public class MatchingService {
         return MatchingDto.fromEntity(savedMatching);
     }
 
+
     private Member getUserEntity() {
         UserDetails userDetails =
                 (UserDetails) (SecurityContextHolder.getContext().getAuthentication().getPrincipal());

@@ -75,27 +75,50 @@
             <div th:if="${isSearched and !page.isEmpty()}" class="table-responsive mt-3">
               <div class="custom-box background-has-data-light">
                 <p class="px-0 mb-0"
-                   th:utext="${totalInfoDto != null ? '총 <strong>' + totalInfoDto.totalStation + '</strong>개의 대여소에서 <strong>' + totalInfoDto.totalBicycle + '</strong>개의 자전거를 이용하실 수 있습니다.' : '정보를 불러오는데 실패했습니다.'}">
+                   th:utext="${totalInfoDto != null ?
+       '총 <strong>' + totalInfoDto.totalStation + '</strong>개의 대여소에서 ' +
+       '<strong>' + totalInfoDto.totalBicycle + '</strong>개의 자전거를 이용하실 수 있습니다🚲'
+       : '정보를 불러오는데 실패했습니다.'}">
                   공영자전거 대여소 및 자전거 현황
                 </p>
               </div>
+
               <table class="table table-striped">
                 <thead>
                 <tr>
                   <th>대여소 ID</th>
                   <th>도로명 주소</th>
-                  <th>사용 가능 자전거(대)</th>
+                  <th>
+                    <a th:href="@{/public-bicycle(page=${page.number}, sort='bcyclTpkctNocs', direction='desc')}"
+                       class="btn"
+                       th:classappend="${sort == 'bcyclTpkctNocs' ? 'btn-danger btn-sm' : 'btn-secondary btn-sm'}">보유
+                      자전거 수🔼</a>
+                  </th>
+                  <th>
+                    <a th:href="@{/public-bicycle(page=${page.number}, sort='distance', direction='asc')}"
+                       class="btn"
+                       th:classappend="${sort == 'distance' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}">거리🔽</a>
+                  </th>
                   <th>상세 보기</th>
+                  <th>지도</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="info : ${page.content}">
                   <td th:text="${info.rntstnId}"></td>
                   <td th:text="${info.roadNmAddr}"></td>
-                  <td th:text="${info.bcyclTpkctNocs != null ? info.bcyclTpkctNocs : '정보 없음'}"></td>
+                  <td><strong style="color: red"
+                              th:text="${info.bcyclTpkctNocs != null ? info.bcyclTpkctNocs : '정보 없음'}"></strong></td>
+                  <td><strong style="color: dodgerblue;" th:text="${info.distance} + ' km'"></strong></td>
                   <td>
                     <button th:data-id="${info.rntstnId}" onclick="showDetails(this.getAttribute('data-id'))"
                             class="btn btn-info">상세보기
+                    </button>
+                  </td>
+                  <td>
+                    <button th:data-lat="${info.lat}" th:data-lng="${info.lot}" th:data-bckcnt="${info.bcyclTpkctNocs}" th:data-nm="${info.rntstnNm}" th:data-addr="${info.roadNmAddr}"
+                            onclick="showMap(this.getAttribute('data-lat'), this.getAttribute('data-lng'),  this.getAttribute('data-bckcnt'), this.getAttribute('data-nm'), this.getAttribute('data-addr'))"
+                            class="btn btn-primary">Go
                     </button>
                   </td>
                 </tr>
@@ -108,15 +131,19 @@
               <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-center">
                   <li th:classappend="${page.first ? 'disabled' : ''}" class="page-item">
-                    <a th:href="@{/public-bicycle(page=${page.number - 1})}" th:unless="${page.first}"
+                    <a th:href="@{/public-bicycle(page=${page.number - 1}, sort=${sort != null ? sort : 'distance'}, direction=${sort == 'distance' ? 'asc' : 'desc'})}"
+                       th:unless="${page.first}"
                        class="page-link">Previous</a>
                   </li>
                   <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
                       th:classappend="${i == page.number ? 'active' : ''}" class="page-item">
-                    <a th:href="@{/public-bicycle(page=${i})}" th:text="${i + 1}" class="page-link"></a>
+                    <!-- 현재 정렬 상태를 유지하면서 페이지 번호를 클릭할 수 있는 링크 -->
+                    <a th:href="@{/public-bicycle(page=${i}, sort=${sort != null ? sort : 'distance'}, direction=${sort == 'distance' ? 'asc' : 'desc'})}"
+                       th:text="${i + 1}" class="page-link"></a>
                   </li>
                   <li th:classappend="${page.last ? 'disabled' : ''}" class="page-item">
-                    <a th:href="@{/public-bicycle(page=${page.number + 1})}" th:unless="${page.last}" class="page-link">Next</a>
+                    <a th:href="@{/public-bicycle(page=${page.number + 1}, sort=${sort != null ? sort : 'distance'}, direction=${sort == 'distance' ? 'asc' : 'desc'})}"
+                       th:unless="${page.last}" class="page-link">Next</a>
                   </li>
                 </ul>
               </nav>
@@ -126,7 +153,7 @@
       </div>
       <!-- 로딩 마크업 -->
       <div id="loading"
-           style="display:none; position:absolute; top:0; left:0; right:0; bottom:0; background-color:rgba(255,255,255,0.8); z-index:9999;">
+           style="display:none; position:absolute; top:0; left:0; right:0; bottom:0; background-color:rgba(241,241,241,0.8); z-index:9999;">
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
           <img src="/img/loading.gif" alt="Loading..."/>
         </div>
@@ -243,7 +270,7 @@
 
     var mapOptions = {
         center: new naver.maps.LatLng(defaultLat, defaultLng),
-        zoom: 17
+        zoom: 14
     };
 
     var map = new naver.maps.Map('map', mapOptions);
@@ -291,7 +318,101 @@
                 anchor: new naver.maps.Point(15, 15)
             }
         });
+
+        // 마커에 대한 정보(대여소 도로명 주소명)창 생성
+        var infoWindowContent = '<div class="iw_inner">' +
+            '<h5><strong> 🔖' + station.rntstnNm + '</strong> </h5>' +
+            '<p> 🗺️ ' +
+            '<a>' + station.roadNmAddr + '</a>' +
+            ' </p>' +
+            '</div>';
+        var infoWindow = new naver.maps.InfoWindow({
+            content: infoWindowContent
+        });
+
+        // 마커 클릭 이벤트
+        naver.maps.Event.addListener(marker, "click", function (e) {
+            if (infoWindow.getMap()) {
+                infoWindow.close();
+            } else {
+                infoWindow.open(map, marker); // 클릭 시 정보창 열기
+            }
+        });
+
     });
+
+    // 지도에서보기 활성화
+    var currentInfoWindow = null; // 현재 정보창을 저장할 전역 변수
+    function showMap(lat, lng, bckcnt, nm, addr) {
+        // 문자열로 넘어온 위도와 경도를 실수형으로 변환
+        var lat = parseFloat(lat);
+        var lng = parseFloat(lng);
+        var bikeCount = parseInt(bckcnt);
+        var rntstnNm = nm;
+        var roadNmAddr = addr;
+
+        // 지도의 중심을 새로운 위도와 경도로 설정
+        var newCenter = new naver.maps.LatLng(lat, lng);
+        map.setCenter(newCenter);
+        map.setZoom(16, true);
+
+        var markerContent =
+            '<div style="background-color: red; ' +  // 배경색을 빨간색으로 변경
+            'color: white; ' +
+            'width: 30px; ' +
+            'height: 30px; ' +
+            'line-height: 20px; ' +
+            'text-align: center; ' +
+            'border-radius: 50%; ' +
+            'font-size: 14px; ' +
+            'font-weight: bold; ' +
+            'border: 2px solid black;">'
+            + bikeCount  // 여기에 실제 필요한 값을 넣으세요.
+            + '</div>';
+
+        // 선택된 위치에 마커 표시
+        var marker = new naver.maps.Marker({
+            position: newCenter,
+            map: map,
+            icon: {
+                content: markerContent,
+                size: new naver.maps.Size(30, 30),
+                anchor: new naver.maps.Point(15, 15)
+            }
+        });
+
+        // 마커에 대한 정보(대여소 도로명 주소명)창 생성
+        var infoWindowContent = '<div class="iw_inner">' +
+            '<h5><strong> 🔖' + rntstnNm + '</strong> </h5>' +
+            '<p> 🗺️ ' +
+            '<a>' + roadNmAddr + '</a>' +
+            ' </p>' +
+            '</div>';
+
+        // 기존 정보창이 열려있다면 닫기
+        if (currentInfoWindow) {
+            currentInfoWindow.close();
+        }
+
+        // 새 정보창 생성
+        currentInfoWindow = new naver.maps.InfoWindow({
+            content: infoWindowContent
+        });
+
+        // // 정보창을 바로여는데 지연시키면서 열기 (깨짐 문제)
+        // setTimeout(function() {
+        //     currentInfoWindow.open(map, marker);
+        // }, 100);
+
+        // 클릭 이벤트 유지
+        naver.maps.Event.addListener(marker, "click", function() {
+            if (currentInfoWindow.getMap()) {
+                currentInfoWindow.close();
+            } else {
+                currentInfoWindow.open(map, marker);
+            }
+        });
+    }
 
     // 📄상세보기 팝업 관련 script
     function showDetails(stationId) {

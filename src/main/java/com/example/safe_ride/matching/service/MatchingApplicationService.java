@@ -124,7 +124,9 @@ public class MatchingApplicationService {
 
         // 매칭 신청 엔티티 저장
         matchingApplicationRepository.save(application);
+
     }
+
 
 
     public MatchingApplicationDto getMatchingApplicationDtoById(Long applicationId) {
