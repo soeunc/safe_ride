@@ -12,6 +12,8 @@ import com.example.safe_ride.matching.service.MatchingApplicationService;
 import com.example.safe_ride.matching.service.MatchingService;
 import com.example.safe_ride.member.entity.Member;
 import com.example.safe_ride.member.repo.MemberRepo;
+import com.example.safe_ride.myPage.dto.MyPageDto;
+import com.example.safe_ride.myPage.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +41,7 @@ public class MatchingController {
     private final MatchingApplicationService matchingApplicationService;
     private final RegionRepository regionRepository;
     private final MannerService mannerService;
+    private final MyPageService myPageService;
     // 매칭글 생성 페이지 이동
     @GetMapping("/create")
     public String createMatchingForm(Model model) {
@@ -76,6 +79,10 @@ public class MatchingController {
         List<MatchingApplication> applications = matchingApplicationService.getApplicationsByMatchingId(id);
         // 현재 사용자 정보를 모델에 추가
         Member currentUser = getUserEntity();
+        //라이딩 정보 가져오기
+        MyPageDto myPageDto = myPageService.readRidingRecord(currentUser.getId());
+        //뱃지 가져오기
+        model.addAttribute("badges", myPageService.readBadges(currentUser.getId(), myPageDto.getTotalRecord()));
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("matching", matchingDto);
         model.addAttribute("applications", applications);
