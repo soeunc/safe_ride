@@ -2,8 +2,7 @@ package com.example.safe_ride.weather.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,15 +11,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 
 @Slf4j
 @Controller
-@RequestMapping("/safe-ride")
+@RequestMapping("/safe-ride/weather")
 public class WeatherC {
 
-    @Value("${weather.api.key}")
+    @Value("${weather.api.decode-key}")
     private String apiKey;
+
+    @Value("${kakao.rest.key}")
+    private String kakaoRestApiKey;
 
     public static int TO_GRID = 0;
     public static int TO_GPS = 1;
@@ -111,12 +116,12 @@ public class WeatherC {
         return rs;
     }
 
-    @GetMapping("/weather-view")
+    @GetMapping("/view")
     public String viewWeather(Model model) {
-        return "/weather/weather";
+        return "weather/weather";
     }
 
-    @GetMapping("/weather")
+    @GetMapping("/fcst")
     public ResponseEntity<String> getWeatherData(@RequestParam String base_date,
                                                  @RequestParam String base_time,
                                                  @RequestParam Double lat,
@@ -131,17 +136,148 @@ public class WeatherC {
 
         try {
             RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            return response;
+            return restTemplate.getForEntity(url, String.class);
         } catch (HttpClientErrorException e) {
             // 클라이언트 에러 발생 시
-            return ResponseEntity.status(e.getRawStatusCode()).body("클라이언트 에러: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         } catch (HttpServerErrorException e) {
             // 서버 에러 발생 시
-            return ResponseEntity.status(e.getRawStatusCode()).body("서버 에러: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         } catch (Exception e) {
             // 기타 예외 발생 시
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/trans-coord")
+    public ResponseEntity<String> getTransCoordData(@RequestParam Double lat,
+                                                    @RequestParam Double lon) {
+        // uri 주소 생성
+        URI uri = UriComponentsBuilder
+                .fromUriString("https://dapi.kakao.com")
+                .path("/v2/local/geo/transcoord.json")
+                .queryParam("x", lon)  // query parameter가 필요한 경우 이와 같이 사용
+                .queryParam("y", lat)
+                .queryParam("input_coord", "WGS84")
+                .queryParam("output_coord", "TM")
+                .encode()
+                .build()
+                .toUri();
+
+//        System.out.println(uri.toString());
+
+        // HttpHeaders 객체 생성 및 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + kakaoRestApiKey);
+
+        // HttpEntity 객체 생성
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+        try {
+            RestTemplate restTemplete = new RestTemplate();
+            return restTemplete.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    request,
+                    String.class
+            );
+        } catch (HttpClientErrorException e) {
+            // 클라이언트 에러 발생 시
+            return ResponseEntity.badRequest().build();
+        } catch (HttpServerErrorException e) {
+            // 서버 에러 발생 시
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            // 기타 예외 발생 시
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/getNearbyMsrstnList")
+    public ResponseEntity<String> getNearbyMsrstnList(@RequestParam Double tmX,
+                                                      @RequestParam Double tmY) {
+        // uri 주소 생성
+        URI uri = UriComponentsBuilder
+                .fromUriString("https://apis.data.go.kr")
+                .path("/B552584/MsrstnInfoInqireSvc/getNearbyMsrstnList")
+                .queryParam("serviceKey", apiKey)
+                .queryParam("returnType", "json")
+                .queryParam("tmX", tmX)
+                .queryParam("tmY", tmY)
+                .encode()
+                .build()
+                .toUri();
+
+        // HttpHeaders 객체 생성 및 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Language", "ko-KR");
+
+        // HttpEntity 객체 생성
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+        try {
+            RestTemplate restTemplete = new RestTemplate();
+            return restTemplete.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    request,
+                    String.class
+            );
+        } catch (HttpClientErrorException e) {
+            // 클라이언트 에러 발생 시
+            return ResponseEntity.badRequest().build();
+        } catch (HttpServerErrorException e) {
+            // 서버 에러 발생 시
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            // 기타 예외 발생 시
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/airInfo")
+    public ResponseEntity<String> getAirInfo(
+            @RequestParam String stationName,
+            @RequestParam String dataTerm) {
+        // uri 주소 생성
+        URI uri = UriComponentsBuilder
+                .fromUriString("https://apis.data.go.kr")
+                .path("/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty")
+                .queryParam("serviceKey", apiKey)
+                .queryParam("returnType", "json")
+                .queryParam("pageNo", 1)
+                .queryParam("numOfRows", 100)
+                .queryParam("stationName", stationName)
+                .queryParam("dataTerm", dataTerm)
+                .queryParam("ver", 1.1)
+                .encode()
+                .build()
+                .toUri();
+
+        // HttpHeaders 객체 생성 및 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Language", "ko-KR");
+
+        // HttpEntity 객체 생성
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+        try {
+            RestTemplate restTemplete = new RestTemplate();
+            return restTemplete.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    request,
+                    String.class
+            );
+        } catch (HttpClientErrorException e) {
+            // 클라이언트 에러 발생 시
+            return ResponseEntity.badRequest().build();
+        } catch (HttpServerErrorException e) {
+            // 서버 에러 발생 시
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            // 기타 예외 발생 시
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

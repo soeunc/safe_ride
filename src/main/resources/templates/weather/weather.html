@@ -20,8 +20,8 @@
         <!--👇여기에 내용 넣어주시면 됩니다👇-->
         <div class="col-12">
           <div class="row g-3 p-3" style="border-bottom: 2px solid black;">
-            <div class="col-4"></div>
-<!--            <div class="col-8">라이딩 하기 좋아요</div>-->
+            <div class="col-4 d-flex justify-content-center align-items-center" id="ride_img"></div>
+            <div class="col-8 d-flex justify-content-center align-items-center" id="ride_value" style="font-size: 3rem;font-weight: bold;">데이터 통신중</div>
           </div>
           <div class="row g-3 p-3" style="border-bottom: 2px solid black;">
             <div class="col-4">
@@ -57,14 +57,14 @@
               </div>
             </div>
           </div>
-          <div class="row g-3 p-3 justify-content-between">
-            <div class="col-4">
-              <div class="col-12">미세먼지</div>
-              <div class="col-12"></div>
+          <div class="row g-3 p-3 justify-content-center">
+            <div class="col-5">
+              <div class="col-12 d-flex justify-content-center" style="font-size: 1.5rem;font-weight: bold;">미세먼지</div>
+              <div class="col-12 d-flex justify-content-center" id="pm10status" style="font-size: 1rem;font-weight: bold;">통신중</div>
             </div>
-            <div class="col-4">
-              <div class="col-12">초미세먼지</div>
-              <div class="col-12"></div>
+            <div class="col-5">
+              <div class="col-12 d-flex justify-content-center" style="font-size: 1.5rem;font-weight: bold;">초미세먼지</div>
+              <div class="col-12 d-flex justify-content-center" id="pm25status" style="font-size: 1rem;font-weight: bold;">통신중</div>
             </div>
           </div>
         </div>
@@ -84,6 +84,7 @@
 </script>
 <!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
 <script>
+  let globalWeatherData, globalDustData;
   getCurrentPosition();
 
   // 현재 gps 호출
@@ -98,6 +99,17 @@
       timeout: 15000
     });
   }
+
+  // 측정소 문제인지 확인을 위한 하드코딩방식
+  /*
+  function getCurrentPosition() {
+    // 하드 코딩할 위경도 값
+    const latitude = 37.1234; // 원하는 위도 값
+    const longitude = -122.1234; // 원하는 경도 값
+
+    // fetchWeather 함수에 하드 코딩한 위경도 값을 전달
+    fetchWeather(latitude, longitude);
+  } */
 
   function degStr(deg) {
     const value = Number(deg)
@@ -210,26 +222,175 @@
     const dateObj = calculateGetVilageFcstDate(currentDate, currentTime);
     $.ajax({
       type: "GET",
-      url: `http://localhost:8080/safe-ride/weather?base_date=${dateObj.date}&base_time=${dateObj.time}&lat=${lat}&lon=${lon}`,
+      url: `http://localhost:8080/safe-ride/weather/fcst?base_date=${dateObj.date}&base_time=${dateObj.time}&lat=${lat}&lon=${lon}`,
       data: {}, // GET 요청 시엔 비워둔다.
       success: function(res) { // 서버에서 받은 결과
         console.log(res);
-        const data = res.response.body.items.item;
-        const result = {};
-        data.forEach((el) => {
-          const { category } = el;
-          if (!result[category]) result[category] = [];
-          result[category].push(el)
-        })
-        console.log(result)
-        parseWeatherFastData(result);
-        $('#tmp').text(result.TMP[0].fcstValue + '℃');
-        $('#vec').text(degStr(result.VEC[0].fcstValue));
-        $('#wsd').text(result.WSD[0].fcstValue + 'm/s');
-        $('#reh_value').text(result.REH[0].fcstValue + '%');
-        $('#pcp_value').text(result.PCP[0].fcstValue + (result.PCP[0].fcstValue === '강수없음' ? '' : 'mm'));
+        if(res.response) {
+          const data = res.response.body.items.item;
+          const result = {};
+          data.forEach((el) => {
+            const { category } = el;
+            if (!result[category]) result[category] = [];
+            result[category].push(el)
+          })
+          console.log(result)
+          globalWeatherData = result;
+          parseWeatherFastData(result);
+          $('#tmp').text(result.TMP[0].fcstValue + '℃');
+          $('#vec').text(degStr(result.VEC[0].fcstValue));
+          $('#wsd').text(result.WSD[0].fcstValue + 'm/s');
+          $('#reh_value').text(result.REH[0].fcstValue + '%');
+          $('#pcp_value').text(result.PCP[0].fcstValue + (result.PCP[0].fcstValue === '강수없음' ? '' : 'mm'));
+          getTMPosition(lat, lon);
+        } else {
+          $('#tmp').text('서버 오류');
+          $('#tmp').css('font-size', '1rem');
+          $('#ride_value').text('서버 오류');
+          $('#ride_value').css('color', 'black');
+        }
+      },
+      error: function(error) {
+        console.error(error);
       }
     })
+  }
+
+  function getTMPosition(lat, lon) {
+    $.ajax({
+      type: "GET",
+      url: `http://localhost:8080/safe-ride/weather/trans-coord?lat=${lat}&lon=${lon}`,
+      data: {}, // GET 요청 시엔 비워둔다.
+      success: function(res) { // 서버에서 받은 결과
+        console.log(res);
+        if(res.documents.length > 0) {
+          getNearbyMsrstn(res.documents[0].x, res.documents[0].y);
+        }
+      },
+      error: function(error) {
+        console.error(error);
+      }
+    })
+  }
+
+  function getNearbyMsrstn(x, y) {
+    $.ajax({
+      type: "GET",
+      url: `http://localhost:8080/safe-ride/weather/getNearbyMsrstnList?tmX=${x}&tmY=${y}`,
+      data: {}, // GET 요청 시엔 비워둔다.
+      success: function(res) { // 서버에서 받은 결과
+        console.log(res);
+        if(res.response) {
+          if(res.response.header.resultCode === '00') {
+            getMsrAirData(res.response.body.items[0].stationName);
+          }
+        }
+      },
+      error: function(error) {
+        console.error(error);
+      }
+    })
+  }
+
+  function getMsrAirData(stationName) {
+    $.ajax({
+      type: "GET",
+      url: `http://localhost:8080/safe-ride/weather/airInfo?stationName=${stationName}&dataTerm=DAILY`,
+      data: {}, // GET 요청 시엔 비워둔다.
+      success: function(res) { // 서버에서 받은 결과
+        console.log(res);
+        if(res.response) {
+          const dust = res.response.body.items[0];
+          if(dust) {
+            checkPm10DustData(dust);
+            checkPm25DustData(dust);
+            globalDustData = dust;
+            checkRideStatus();
+          } else {
+            $('#pm10status').text('현위치 데이터없음');
+            $('#pm10status').css('color', 'black');
+            $('#pm10status').css('font-size', '2rem');
+            $('#pm25status').text('현위치 데이터없음');
+            $('#pm25status').css('color', 'black');
+            $('#pm25status').css('font-size', '2rem');
+          }
+        } else {
+          $('#pm10status').text('서버 오류');
+          $('#pm10status').css('color', 'black');
+          $('#pm25status').text('서버 오류');
+          $('#pm25status').css('color', 'black');
+        }
+      },
+      error: function(error) {
+        console.error(error);
+      }
+    })
+  }
+
+  function checkPm10DustData(dust) {
+    $('#pm10status').css('font-size', '2.5rem');
+    if(dust.pm10Value < 31) {
+      $('#pm10status').text('좋음');
+      $('#pm10status').css('color', 'blue');
+    } else if(dust.pm10Value > 30 && dust.pm10Value < 51) {
+      $('#pm10status').text('보통');
+      $('#pm10status').css('color', 'green');
+    } else if(dust.pm10Value > 50 && dust.pm10Value < 100) {
+      $('#pm10status').text('나쁨');
+      $('#pm10status').css('color', 'orange');
+    } else if(dust.pm10Value === '-') { // 통신장애
+      $('#pm10status').text('통신 대기중');
+      $('#pm10status').css('color', 'black');
+    } else {
+      $('#pm10status').text('매우 나쁨');
+      $('#pm10status').css('color', 'red');
+    }
+  }
+  function checkPm25DustData(dust) {
+    $('#pm25status').css('font-size', '2.5rem');
+    if(dust.pm25Value < 16) {
+      $('#pm25status').text('좋음');
+      $('#pm25status').css('color', 'blue');
+    } else if(dust.pm25Value > 15 && dust.pm25Value < 26) {
+      $('#pm25status').text('보통');
+      $('#pm25status').css('color', 'green');
+    } else if(dust.pm25Value > 25 && dust.pm25Value < 51) {
+      $('#pm25status').text('나쁨');
+      $('#pm25status').css('color', 'orange');
+    } else if(dust.pm25Value === '-') { // 통신장애
+      $('#pm25status').text('통신 대기중');
+      $('#pm25status').css('color', 'black');
+    } else {
+      $('#pm25status').text('매우 나쁨');
+      $('#pm25status').css('color', 'red');
+    }
+  }
+
+  function checkRideStatus() {
+    if(globalWeatherData.PTY[0].fcstValue === '0') {
+      if(globalDustData.pm10Value > 100 || globalDustData.pm25Value > 25) {
+        // 미세, 초미세먼지 나쁨 이상일때
+        $('#ride_value').text('라이딩 하기 힘들어요!');
+        $('#ride_value').css('color', 'orange');
+        $('#ride_img').html('<img alt="" src="/img/weather/dust3.png" width="150" height="150">');
+      } else {
+        // 공기 상태 좋음,보통
+        if(Number(globalWeatherData.TMP[0].fcstValue) > 28 || Number(globalWeatherData.REH[0].fcstValue) > 68) {
+          // 온도 29도 이상인 경우, 습도 69% 이상인 경우 너무 덥고 불쾌한 습도
+          $('#ride_value').text('라이딩 하기 힘들어요!');
+          $('#ride_value').css('color', 'orange');
+          $('#ride_img').html('<img alt="" src="/img/weather/dust3.png" width="150" height="150">');
+        } else {
+          $('#ride_value').text('라이딩 하기 좋아요!');
+          $('#ride_value').css('color', 'blue');
+          $('#ride_img').html('<img alt="" src="/img/weather/dust1.png" width="150" height="150">');
+        }
+      }
+    } else { // 기상 상태 불량
+      $('#ride_value').text('라이딩 하기 힘들어요!');
+      $('#ride_value').css('color', 'orange');
+      $('#ride_img').html('<img alt="" src="/img/weather/dust3.png" width="150" height="150">');
+    }
   }
 
 </script>
