@@ -457,7 +457,7 @@
         event.preventDefault();
         let todayRecordInput = $('#todayRecordInput').val();
         //한번에 1000키로 이상을 타는 사람일때
-        if (todayRecord + todayRecordInput >= 1000000 || todayRecordInput > 1000000){
+        if (parseInt(todayRecord) + parseInt(todayRecordInput) >= 1000000 || parseInt(todayRecordInput) > 1000000){
             alert("오늘자 입력 범위 초과입니다! :) (1000km까지 입력가능)")
         } else {
             const formData = {
