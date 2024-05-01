@@ -79,6 +79,11 @@ public class MatchingApplicationService {
         return matchingApplicationRepository.findAllByMatching_Id(matchingId);
     }
 
+    // 매칭 ID로 모든 대기 중인(PENDING) 매칭 신청 가져오기
+    public List<MatchingApplication> getPendingApplicationsByMatchingId(Long matchingId) {
+        return matchingApplicationRepository.findAllByMatching_IdAndStatus(matchingId, MatchingStatus.PENDING);
+    }
+
     // 현재 로그인한 사용자 정보 가져오기
     private Member getUserEntity() {
         UserDetails userDetails =

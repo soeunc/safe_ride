@@ -76,7 +76,7 @@ public class MatchingController {
     @GetMapping("/{id}")
     public String viewMatching(@PathVariable Long id, Model model) {
         MatchingDto matchingDto = matchingService.getMatchingById(id);
-        List<MatchingApplication> applications = matchingApplicationService.getApplicationsByMatchingId(id);
+        List<MatchingApplication> applications = matchingApplicationService.getPendingApplicationsByMatchingId(id);
         // 현재 사용자 정보를 모델에 추가
         Member currentUser = getUserEntity();
         //라이딩 정보 가져오기
