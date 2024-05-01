@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -33,8 +34,9 @@ public class PublicApiService {
     private final TempLocationInfoRepo tempLocationInfoRepo;
 
     private static final String BASE_URL = "https://apis.data.go.kr/B551982/pbdo"; // baseURL
-    private static final String SERVICE_KEY = "z88eBNe%2B8cP%2BJbPk%2BPcjoRg1biqWAPB%2B1oH6sqToU4SqwZJzkUMKuWZKQpRolY8gg6nISJeqtLLDv5I7COksvw%3D%3D"; // Encoding 인증키
-    // private static final String SERVICE_KEY = "z88eBNe+8cP+JbPk+PcjoRg1biqWAPB+1oH6sqToU4SqwZJzkUMKuWZKQpRolY8gg6nISJeqtLLDv5I7COksvw==";     // Decoding 인증키
+
+    @Value("${public.api.second-key}")
+    private String SERVICE_KEY;
 
     /*
     공공데이터 포털 API : 대여소 현황, 자전거 현황 관련 서비스
@@ -89,7 +91,10 @@ public class PublicApiService {
     public LocationInfoResponseDto getLocationInfo(Map<String, Double> payload) {
         double lng = payload.get("lng"); // 경도
         double lat = payload.get("lat"); // 위도
-        PointDto pointDto = new PointDto(lng, lat);
+        double testLng = 126.925490;
+        double testLat = 37.550756;
+//        PointDto pointDto = new PointDto(lng, lat);
+        PointDto pointDto = new PointDto(testLng, testLat);
         return getLocationInfo(pointDto);
     }
 
