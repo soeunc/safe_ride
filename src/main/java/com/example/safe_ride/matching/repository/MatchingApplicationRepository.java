@@ -1,6 +1,7 @@
 package com.example.safe_ride.matching.repository;
 
 import com.example.safe_ride.matching.entity.MatchingApplication;
+import com.example.safe_ride.matching.entity.MatchingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +14,8 @@ public interface MatchingApplicationRepository extends JpaRepository<MatchingApp
     List<MatchingApplication> findAllByMatching_Id(Long matchingId);
 
     MatchingApplication findByMatching_IdAndApplicant_Id(Long matchingId, Long applicantId);
+
+    List<MatchingApplication> findAllByMatching_IdAndStatus(Long matchingId, MatchingStatus status);
 
 
     Optional<MatchingApplication> findByMatchingId(Long matchingId);

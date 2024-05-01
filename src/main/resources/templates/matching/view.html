@@ -254,6 +254,54 @@
           padding: 8px 16px; /* 버튼의 내부 여백을 조정합니다. */
           font-size: 14px; /* 버튼의 글꼴 크기를 줄입니다. */
       }
+      .application-form {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+          background-color: #f8f8f8;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          margin: 20px;
+      }
+
+      .application-form.hidden {
+          display: none;
+      }
+
+      .matching-form {
+          width: 100%;
+          max-width: 500px; /* 폼의 최대 너비를 제한 */
+      }
+
+      .form-group {
+          margin-bottom: 20px;
+      }
+
+      .form-control {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          resize: none; /* 텍스트 영역의 크기 조절 기능 비활성화 */
+      }
+
+      .submit-button {
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          border-radius: 5px;
+          cursor: pointer;
+      }
+
+      .submit-button:hover {
+          background-color: #45a049;
+      }
   </style>
 </head>
 
@@ -319,7 +367,7 @@
             </div>
           </div>
           <div style="text-align: center;" th:if="${matching.member.id == currentUser.id}">
-            <a th:href="@{'/matching/' + ${matching.id} + '/edit'}" class="edit-button" style="margin-right: 3px;">수정</a>
+            <a th:href="@{'/matching/' + ${matching.id} + '/edit'}" class="edit-button" style="margin-right: 3px; text-decoration: none;">수정</a>
             <form th:action="@{'/matching/' + ${matching.id} + '/delete'}" method="post" id="deleteForm" style="display: inline-block;">
               <button type="submit" onclick="confirmDelete()" class="delete-button" style="margin-right: 10px;">삭제</button>
             </form>
@@ -329,7 +377,7 @@
         <div class="creation-date">
           <span>작성일자: <span th:text="${#dates.format(matching.createTime, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
         </div>
-        <div th:if="${matching.member.id == currentUser.id}">
+        <div th:if="${matching.member.id == currentUser.id and matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
           <form th:action="@{'/matching/' + ${matching.id} + '/end'}" method="post" style="display: inline-block;">
             <button type="submit" style="background-color: #ff4500; color: white; border: none; padding: 10px 20px; border-radius: 4px;">라이딩 종료</button>
           </form>
@@ -346,11 +394,11 @@
         </div>
 
         <!-- 매칭 상태가 ACCEPTED일 경우 매칭이 성사되었다는 메시지 표시 -->
-        <div th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
-          <h4>매칭 성사</h4>
-          <br>
-          <p>함께 달릴 라이더 매칭이 완료 되었습니다^^</p>
+        <div th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}" style="text-align: center; margin-top: 20px;">
+          <h4 style="color: #007bff; font-weight: bold;">매칭 성사</h4>
+          <p style="margin-top: 10px; font-size: 18px;">함께 달릴 라이더 매칭이 완료되었습니다^^</p>
         </div>
+
 
 
         <!-- 매칭 상태가 ACCEPTED가 아닌 경우에 매칭 신청 관련 요소들을 표시 -->
@@ -358,12 +406,14 @@
           <span>라이더 찾는 중...</span> <br>
           <button id="applyButton" class="apply-button">매칭 신청</button>
           <!-- 매칭 신청 폼 -->
-          <div id="applicationForm" class="hidden">
-            <form th:action="@{'/matching/' + ${matching.id} + '/apply'}" method="post">
+          <div id="applicationForm" class="application-form hidden">
+            <form th:action="@{'/matching/' + ${matching.id} + '/apply'}" method="post" class="matching-form">
               <input type="hidden" name="matchingId" th:value="${matching.id}">
-              <label for="message">신청 메시지:</label>
-              <textarea id="message" name="message" rows="4" cols="50"></textarea><br>
-              <button type="submit" class="submit-button">신청하기</button>
+              <div class="form-group">
+                <label for="message">신청 메시지:</label>
+                <textarea id="message" name="message" rows="4" cols="50" class="form-control"></textarea>
+              </div>
+              <button type="submit" class="submit-button" style="float: right; background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">신청하기</button>
             </form>
           </div>
           <!-- 매칭 신청 목록 토글 버튼 -->
@@ -375,7 +425,7 @@
               <tr>
                 <th>신청자</th>
                 <th>신청 메시지</th>
-                <th>라이더 등급</th>
+                <th>등급</th>
                 <th> </th>
               </tr>
               </thead>
@@ -437,11 +487,6 @@
 </div>
 </body>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-<script src="/js/app.js"></script> <!-- template -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> <!-- jQuery -->
 <!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
 <script>
     // 게시글 삭제 시 확인창
@@ -522,4 +567,6 @@
     });
 </script>
 <!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
+
+<script src="/js/app.js"></script> <!-- template -->
 </html>
