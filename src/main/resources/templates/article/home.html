@@ -126,6 +126,7 @@
     <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
     <main class="content">
       <div class="container mt-4">
+        <h2 style="color: #007bff; font-size: 28px; font-weight: bold; margin-bottom: 20px;">커뮤니티 게시판</h2>
         <h5>지역별로 검색</h5>
         <form action="#" th:action="@{/article}" method="get">
           <select name="metropolitanCity" id="metropolitanCity" onchange="this.form.submit()">
