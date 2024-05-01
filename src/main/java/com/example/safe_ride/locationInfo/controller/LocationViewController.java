@@ -6,7 +6,9 @@ import com.example.safe_ride.locationInfo.entity.TempCombinedInfo;
 import com.example.safe_ride.locationInfo.repo.TempCombinedInfoRepo;
 import com.example.safe_ride.locationInfo.service.LocationInfoService;
 import com.example.safe_ride.locationInfo.service.TempTableService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -104,12 +106,16 @@ public class LocationViewController {
     @RequestMapping(value = {"/jusoPopup"})
     public String jusoPopup(
             HttpServletRequest request,
+            HttpServletResponse response,
             Model model
     ) {
         String inputYn = request.getParameter("inputYn");
         String roadFullAddr = request.getParameter("roadFullAddr");
         String roadAddrPart1 = request.getParameter("roadAddrPart1");
 
+//        // 쿠키 문자열 직접 생성 및 설정
+//        String cookieValue = "sessionId=sessionValue; Secure; HttpOnly; SameSite=None";
+//        response.addHeader("Set-Cookie", cookieValue);
 
         log.debug("inputYn: {} roadFullAddr: {} roadAddrPart1: {}", inputYn, roadFullAddr, roadAddrPart1);
 

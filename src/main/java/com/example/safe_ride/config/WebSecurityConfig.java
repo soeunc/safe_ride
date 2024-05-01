@@ -38,8 +38,9 @@ public class WebSecurityConfig {
                             "/safe-ride/duplicateCkForId",
                             "/safe-ride/duplicateCkForNickname",
                             "/safe-ride/duplicateCkForEmail",
-                            "error"
 
+                            // 공영자전거 관련
+                            "/public-bicycle/**"
 
                     )
                     .permitAll()
@@ -56,9 +57,7 @@ public class WebSecurityConfig {
                     .requestMatchers(
                             "/route",
                             "/safe-ride/weather/**",
-                            "/safety-direction/**",
-                            "/public-bicycle/**"
-
+                            "/safety-direction/**"
                     )
                     .authenticated()
 
