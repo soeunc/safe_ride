@@ -46,7 +46,7 @@ public class WebSecurityConfig {
                                         "/safe-ride/weather/trans-coord",
                                         "/safe-ride/weather/getNearbyMsrstnList",
                                         "/safe-ride/weather/airInfo",
-                                        "/safe-ride/weather/view",
+                                        "/safe-ride/weather",
 
                                         //템플릿 관련
                                         "/css/**",
