@@ -37,7 +37,10 @@ public class WebSecurityConfig {
                             //회원가입 관련
                             "/safe-ride/duplicateCkForId",
                             "/safe-ride/duplicateCkForNickname",
-                            "/safe-ride/duplicateCkForEmail"
+                            "/safe-ride/duplicateCkForEmail",
+                            "error"
+
+
                     )
                     .permitAll()
 
@@ -55,6 +58,7 @@ public class WebSecurityConfig {
                             "/safe-ride/weather/**",
                             "/safety-direction/**",
                             "/public-bicycle/**"
+
                     )
                     .authenticated()
 
