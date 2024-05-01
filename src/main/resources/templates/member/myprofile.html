@@ -156,7 +156,7 @@
                                                         <input class="form-control" id="birthday" name="birthday" th:value="${member.getBirthday()}" maxlength="8" disabled>
                                                         <label for="birthday">생년월일</label>
                                                     </div>
-                                                    <div class="d-grid"><button class="btn btn-primary btn-lg" id="submitBtn" type="button">Submit</button></div>
+                                                    <div class="d-grid"><button class="btn btn-primary btn-lg" id="submitBtn" type="button">회원정보 수정</button></div>
                                                 </form>
                                             </div>
                                         </div>
@@ -165,6 +165,9 @@
                                 </div>
                             </section>
                         </div>
+                </div>
+                <div>
+                    <button class="btn btn-danger btn-lg" id="deleteBtn" type="button">회원탈퇴</button>
                 </div>
                 <!--👆여기에 내용 넣어주시면 됩니다👆-->
             </div>
@@ -245,7 +248,8 @@
     const myNickName = [[${member.nickname}]];
     const myPhoneNumber = [[${member.phoneNumber}]];
     const todayRecord = [[${ridingRecord.getTodayRecord()}]];
-    //패스워드 정규식 체크용 flag변수
+    const memberId = [[${member.id}]];
+        //패스워드 정규식 체크용 flag변수
     let passwordCk = false;
     //패스워드 중복확인용 flag변수
     let passwordMatchCk = false;
@@ -353,6 +357,30 @@
             passwordMatchCk = true;
         }
     }
+
+    //회원탈퇴 버튼 클릭 시 동작
+    $('#deleteBtn').click(function (event){
+        $.ajax({
+            type   : "POST",
+            url    : "/safe-ride/myprofile/delete",
+            data   : {
+                memberId: memberId
+            },
+            success: function (result) {
+                if (result === 1) { // 닉네임이 이미 존재한다면
+                    alert("삭제되었습니다. 감사합니다!");
+                    window.location.href = "/safe-ride/myprofile";
+                } else if (result === 0) {
+                    alert("에러가 발생했습니다!");
+                } else {
+                    alert("에러가 발생했습니다!");
+                }
+            },
+            error  : function (error) {
+                alert("에러가 발생했습니다. 새로고침해주세요!");
+            }
+        })
+    });
 
     //수정 버튼 클릭 시 동작
     $('#submitBtn').click(function (event){

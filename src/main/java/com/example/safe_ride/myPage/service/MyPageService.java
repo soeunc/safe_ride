@@ -3,7 +3,9 @@ package com.example.safe_ride.myPage.service;
 import com.example.safe_ride.member.dto.BadgeDto;
 import com.example.safe_ride.member.entity.Badge;
 import com.example.safe_ride.member.entity.Grade;
+import com.example.safe_ride.member.entity.Member;
 import com.example.safe_ride.member.repo.BadgeRepo;
+import com.example.safe_ride.member.repo.MemberRepo;
 import com.example.safe_ride.myPage.dto.MyPageDto;
 import com.example.safe_ride.myPage.dto.WeeklyRecordDto;
 import com.example.safe_ride.myPage.entity.MyPage;
@@ -11,17 +13,16 @@ import com.example.safe_ride.myPage.repo.MyPageRepo;
 import com.example.safe_ride.myPage.repo.MyPageRepoDsl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.*;
-
-import static java.lang.String.format;
 
 @Service
 @Slf4j
@@ -30,6 +31,7 @@ public class MyPageService {
     private final MyPageRepo myPageRepo;
     private final MyPageRepoDsl myPageRepoDsl;
     private final BadgeRepo badgeRepo;
+    private final MemberRepo memberRepo;
 
     //라이딩 정보 가져오기
     @Transactional
@@ -113,9 +115,13 @@ public class MyPageService {
         } 
         //오늘 주행기록이 없다면
         else {
+            Member member = memberRepo.findById(memberId)
+                    .orElseThrow(
+                            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+                    );
             //새로운 주행기록 만들기
             MyPage myPage = MyPage.builder()
-                    .memberId(memberId)
+                    .member(member)
                     .todayRecord(todayRecord)
                     .createDate(LocalDateTime.now())
                     .build();
