@@ -53,10 +53,6 @@ public class WebSecurityConfig {
                                         "/js/**",
                                         "/fonts/**",
                                         "/img/**",
-                                        // 대여소 정보 관련 (테스트)
-                                        "/public-bicycle/**",
-                                        "/public-bicycle-test/**",
-                                        "/error",
 
                                         //회원가입 관련
                                         "/safe-ride/duplicateCkForId",//아이디 중복확인
@@ -106,6 +102,10 @@ public class WebSecurityConfig {
                                         "/matching/{matchingId}/cancel-application", // 신청자가 자기 매칭 신청 취소
                                         "/matching/{matchingId}/manner", // 매너 평가하기
                                         "/matching/{id}/end" // 매칭글 END 상태로 변경
+                                )
+                                .authenticated()
+                                .requestMatchers(
+                                        "/public-bicycle/**"
                                 )
                                 .authenticated()
 

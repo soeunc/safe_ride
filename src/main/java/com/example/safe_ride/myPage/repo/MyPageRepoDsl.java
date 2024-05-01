@@ -28,7 +28,7 @@ public class MyPageRepoDsl {
                     )
                     .from(qMyPage)
                     .where(
-                        qMyPage.memberId.eq(memberId),
+                        qMyPage.member.id.eq(memberId),
                         qMyPage.createDate.between(start, end)
                     )
                     .fetchOne();
@@ -42,7 +42,7 @@ public class MyPageRepoDsl {
                 )
                 .from(qMyPage)
                 .where(
-                        qMyPage.memberId.eq(memberId)
+                        qMyPage.member.id.eq(memberId)
                 )
                 .fetchOne();
 
@@ -62,7 +62,7 @@ public class MyPageRepoDsl {
                 )
                 .from(qMyPage)
                 .where(
-                        qMyPage.memberId.eq(memberId),
+                        qMyPage.member.id.eq(memberId),
                         qMyPage.createDate.between(start, end)
                 )
                 .orderBy(qMyPage.createDate.asc())

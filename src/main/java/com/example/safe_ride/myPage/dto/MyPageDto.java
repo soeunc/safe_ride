@@ -29,7 +29,7 @@ public class MyPageDto {
 //                .orElse(new Manner());
         return MyPageDto.builder()
                 .id(entity.getId())
-                .memberId(entity.getMemberId())
+                .memberId(entity.getMember().getId())
                 .todayRecord(entity.getTodayRecord())
                 .createDate(LocalDateTime.now())
                 .build();

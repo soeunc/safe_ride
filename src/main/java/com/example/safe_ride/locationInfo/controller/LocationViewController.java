@@ -5,18 +5,17 @@ import com.example.safe_ride.locationInfo.dto.TotalInfoDto;
 import com.example.safe_ride.locationInfo.entity.TempCombinedInfo;
 import com.example.safe_ride.locationInfo.repo.TempCombinedInfoRepo;
 import com.example.safe_ride.locationInfo.service.LocationInfoService;
+import com.example.safe_ride.locationInfo.service.TempTableService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +27,10 @@ import java.util.List;
 public class LocationViewController {
     private final LocationInfoService locationInfoService;
     private final TempCombinedInfoRepo tempCombinedInfoRepo;
+    private final TempTableService tempTableService;
+
+    @Value("${juso.api.key}")
+    String confmKey;
     // 메인페이지
     @GetMapping
     public String mainPage (
@@ -43,6 +46,14 @@ public class LocationViewController {
             String direction
     ) {
         HttpSession session = request.getSession();
+        // 다른페이지에서 왔을 경우 초기화 로직 수행
+        String referrer = request.getHeader("Referer");
+        if (referrer == null || !referrer.contains("/public-bicycle")) {
+            session.removeAttribute("isSearched");
+            session.removeAttribute("searchInfo");
+            tempTableService.clearData();
+        }
+
         LocationInfoResponseDto infoResponse = (LocationInfoResponseDto) session.getAttribute("infoResponse");
         if (infoResponse == null) {
             infoResponse = new LocationInfoResponseDto();
@@ -98,7 +109,7 @@ public class LocationViewController {
         String inputYn = request.getParameter("inputYn");
         String roadFullAddr = request.getParameter("roadFullAddr");
         String roadAddrPart1 = request.getParameter("roadAddrPart1");
-        String confmKey = "devU01TX0FVVEgyMDI0MDQyNjEwMTczMzExNDcyMjg="; // TODO : yaml 설정에 추가
+
 
         log.debug("inputYn: {} roadFullAddr: {} roadAddrPart1: {}", inputYn, roadFullAddr, roadAddrPart1);
 

@@ -30,10 +30,9 @@
     function agreeToSearch() {
                 console.log("여기는 agreeToSearch")
         navigator.geolocation.getCurrentPosition(function(position) {
-            if (window.opener && !window.opener.closed) {
-                document.getElementById('loading').style.display = 'block';
-                window.opener.sendPositionToServer(position);
-            }
+            // 메인 윈도우의 로딩 화면을 표시
+            window.opener.document.getElementById('loading').style.display = 'block';
+            window.opener.sendPositionToServer(position);
             window.close();
         }, function(error) {
             console.error('위치 정보를 가져오는 데 실패했습니다.', error);
