@@ -135,4 +135,15 @@ public class MemberService {
             isDuplicated = 1;
         return isDuplicated;
     }
+
+    public int deleteMember(Long memberId){
+        Optional<Member> optionalMember = memberRepo.findById(memberId);
+        int isDeleted = 0;
+        if (optionalMember.isPresent()){
+
+            memberRepo.deleteById(memberId);
+            isDeleted = 1;
+        }
+        return isDeleted;
+    }
 }
