@@ -1,7 +1,5 @@
 package com.example.safe_ride.config;
 
-import com.example.safe_ride.locationInfo.service.PublicBicycleInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.Formatter;
@@ -15,14 +13,11 @@ import java.util.Locale;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
     private final UserNameInterceptor userNameInterceptor;
-    private final PublicBicycleInterceptor publicBicycleInterceptor;
 
     public WebMvcConfig(
-            UserNameInterceptor userNameInterceptor,
-            PublicBicycleInterceptor publicBicycleInterceptor
+            UserNameInterceptor userNameInterceptor
     ) {
         this.userNameInterceptor = userNameInterceptor;
-        this.publicBicycleInterceptor = publicBicycleInterceptor;
     }
 
     @Bean
@@ -44,9 +39,5 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userNameInterceptor);
-        // '/public-bicycle/**' 패턴에 대해 인터셉터 적용
-        registry.addInterceptor(publicBicycleInterceptor)
-                .addPathPatterns("/")
-                .excludePathPatterns("/public-bicycle"); // 이 경로 제외
     }
 }
