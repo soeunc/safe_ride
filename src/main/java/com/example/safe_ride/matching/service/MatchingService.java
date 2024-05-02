@@ -95,10 +95,10 @@ public class MatchingService {
 
         // 매칭글에 변경된 내용 적용
         matching.setComment(dto.getComment());
-        matching.setStatus(dto.getStatus());
         matching.setKilometer(dto.getKilometer());
         matching.setRidingTime(dto.getRidingTime());
         matching.setTitle(dto.getTitle());
+        matching.setStatus(MatchingStatus.PENDING);
 
         // 광역자치구와 도시에 해당하는 Region ID 가져오기
         Long regionId = regionRepository.findByMetropolitanCityAndCity(dto.getMetropolitanCity(), dto.getCity())
