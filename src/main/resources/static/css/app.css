@@ -14571,7 +14571,7 @@ span.flatpickr-weekday {
     background: #f8f9fa;
     color: #007bff;
 }
-.pagination-cst .page-item-cst.disabled a, .pagination .page-item-cst.active a {
+.pagination-cst .page-item-cst.disabled a, .pagination-cst .page-item-cst.active a {
     background: #007bff;
     color: #fff;
 }
