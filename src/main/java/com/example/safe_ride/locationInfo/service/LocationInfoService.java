@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -168,7 +167,7 @@ public class LocationInfoService {
         // stationList를 기준으로 bcyclTpkctNocs를 매칭하여 CombinedInfoDto를 생성하고 리스트에 추가
         for (BicycleInfoDto bicycle : bicycleList) {
             JSONObject station = stationMap.get(bicycle.getRntstnId());
-            log.info("JsonObject test :{}", station);
+//            log.info("JsonObject test :{}", station);
 
                 if (station != null) {
                     try {

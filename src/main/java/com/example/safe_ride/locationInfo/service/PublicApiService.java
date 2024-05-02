@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,6 +33,7 @@ import java.util.Map;
 public class PublicApiService {
     private final NcpMapApiService mapApiService;
     private final TempLocationInfoRepo tempLocationInfoRepo;
+    private final RestTemplate restTemplate;
 
     private static final String BASE_URL = "https://apis.data.go.kr/B551982/pbdo"; // baseURL
 
@@ -60,7 +62,7 @@ public class PublicApiService {
     public int getTotalCntData(String apiUrl, String lcgvmnInstCd) throws IOException, JSONException {
         String initUrl = buildUrl(apiUrl, lcgvmnInstCd, 1, 1);
         JSONObject jsonResponse = fetchJsonResponse(initUrl);
-        log.info("total Count : " + jsonResponse.getJSONObject("body").getString("totalCount"));
+//        log.info("total Count : " + jsonResponse.getJSONObject("body").getString("totalCount"));
         return Integer.parseInt(jsonResponse.getJSONObject("body").getString("totalCount"));
     }
 
@@ -111,7 +113,7 @@ public class PublicApiService {
 
         double lotDistance = Math.abs(lot - pointDto.getLng()); //경도
         double latDistance = Math.abs(lat - pointDto.getLat()); // 위도
-        log.info("경도차 : {}, 위도차 : {}", lotDistance, latDistance);
+//        log.info("경도차 : {}, 위도차 : {}", lotDistance, latDistance);
 
         // 위도 또는 경도 차이가 0.018도 이내인지 확인
         return latDistance <= 0.018 && lotDistance <= 0.018;
@@ -143,7 +145,7 @@ public class PublicApiService {
         params.put("page", 1);
         params.put("count", 1);
         GeoNcpResponse response = mapApiService.geocode(params);
-        log.info(response.toString());
+//        log.info(response.toString());
 
         if (response.getAddresses().isEmpty()) {
             log.error("주소 검색 결과가 없습니다.");
