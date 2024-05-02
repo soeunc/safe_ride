@@ -98,7 +98,6 @@ public class MatchingService {
         matching.setKilometer(dto.getKilometer());
         matching.setRidingTime(dto.getRidingTime());
         matching.setTitle(dto.getTitle());
-        matching.setStatus(MatchingStatus.PENDING);
 
         // 광역자치구와 도시에 해당하는 Region ID 가져오기
         Long regionId = regionRepository.findByMetropolitanCityAndCity(dto.getMetropolitanCity(), dto.getCity())
@@ -136,5 +135,10 @@ public class MatchingService {
                 .orElseThrow(() -> new IllegalArgumentException("Matching not found with id: " + id));
         matching.setStatus(MatchingStatus.END); // 매칭 상태를 END로 설정
         matchingRepository.save(matching);
+    }
+
+    @Transactional
+    public void updateMatchingStatus(Long matchingId, MatchingStatus status) {
+        matchingRepository.updateMatchingStatus(matchingId, status);
     }
 }

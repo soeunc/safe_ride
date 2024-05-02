@@ -185,17 +185,14 @@ public class MatchingController {
         MatchingDto matchingDto = matchingService.getMatchingById(matchingId);
         Long matchingAuthorId = matchingDto.getMember().getId();
 
-        // 매칭글 작성자와 현재 로그인한 사용자가 같은 경우에만 거절 처리
+        // 매칭글 작성자와 현재 로그인한 사용자가 같은 경우에만 처리
         if(currentUser.getId().equals(matchingAuthorId)) {
             // 매칭 상태를 수락으로 변경
-            matchingDto.setStatus(MatchingStatus.ACCEPTED);
-            // 매칭 상태 업데이트
-            matchingService.updateMatching(matchingId, matchingDto);
-            // 매칭글 신청 ID 가져오기
-            matchingApplicationService.acceptMatchingApplication(applicationId); // 매칭 신청 ID를 전달하여 거절 처리
+            matchingService.updateMatchingStatus(matchingId, MatchingStatus.ACCEPTED);
+            // 매칭글 신청 수락 처리
+            matchingApplicationService.acceptMatchingApplication(applicationId);
         } else {
             // 매칭글 작성자가 아닌 경우에는 권한이 없다는 메시지를 보여줄 수 있습니다.
-            // 혹은 다른 처리 방법을 선택할 수도 있습니다.
             throw new AccessDeniedException("매칭글 작성자만 수락 할 수 있습니다.");
         }
         return "redirect:/matching/" + matchingId;
