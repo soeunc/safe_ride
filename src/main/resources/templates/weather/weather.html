@@ -226,7 +226,7 @@
     const dateObj = calculateGetVilageFcstDate(currentDate, currentTime);
     $.ajax({
       type: "GET",
-      url: `http://localhost:8080/safe-ride/weather/fcst?base_date=${dateObj.date}&base_time=${dateObj.time}&lat=${lat}&lon=${lon}`,
+      url: `https://localhost:8080/safe-ride/weather/fcst?base_date=${dateObj.date}&base_time=${dateObj.time}&lat=${lat}&lon=${lon}`,
       data: {}, // GET 요청 시엔 비워둔다.
       success: function(res) { // 서버에서 받은 결과
         console.log(res);
@@ -263,7 +263,7 @@
   function getTMPosition(lat, lon) {
     $.ajax({
       type: "GET",
-      url: `http://localhost:8080/safe-ride/weather/trans-coord?lat=${lat}&lon=${lon}`,
+      url: `https://localhost:8080/safe-ride/weather/trans-coord?lat=${lat}&lon=${lon}`,
       data: {}, // GET 요청 시엔 비워둔다.
       success: function(res) { // 서버에서 받은 결과
         console.log(res);
@@ -280,7 +280,7 @@
   function getNearbyMsrstn(x, y) {
     $.ajax({
       type: "GET",
-      url: `http://localhost:8080/safe-ride/weather/getNearbyMsrstnList?tmX=${x}&tmY=${y}`,
+      url: `https://localhost:8080/safe-ride/weather/getNearbyMsrstnList?tmX=${x}&tmY=${y}`,
       data: {}, // GET 요청 시엔 비워둔다.
       success: function(res) { // 서버에서 받은 결과
         console.log(res);
@@ -299,7 +299,7 @@
   function getMsrAirData(stationName) {
     $.ajax({
       type: "GET",
-      url: `http://localhost:8080/safe-ride/weather/airInfo?stationName=${stationName}&dataTerm=DAILY`,
+      url: `https://localhost:8080/safe-ride/weather/airInfo?stationName=${stationName}&dataTerm=DAILY`,
       data: {}, // GET 요청 시엔 비워둔다.
       success: function(res) { // 서버에서 받은 결과
         console.log(res);
