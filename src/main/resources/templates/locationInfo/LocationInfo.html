@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link href="/css/app.css" rel="stylesheet">
+  <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+  <!--👇여기에 기타 header 넣어주시면 됩니다👇-->
+  <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=kp0utn2vxk"></script>
+  <!--👆 여기에 기타 header 넣어주시면 됩니다 👆-->
+</head>
+
+<body>
+<div class="wrapper">
+  <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
+
+  <div class="main">
+    <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
+    <main class="content">
+      <!--👇여기에 내용 넣어주시면 됩니다👇-->
+      <div class="container mt-4" style="position: relative;">
+        <h3>공영자전거 현황</h3>
+        <div class="container">
+          <div class="row">
+            <!-- 첫 번째 카드 -->
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="card-title mb-0">주소 검색</h5>
+                </div>
+                <div class="card-body">
+                  <p class="card-text"> 검색 지역의 2km 이내 대여소와 자전거 정보를 검색합니다.</p>
+                  <button onclick="goPopup();" class="btn btn-primary">🔎 주소 검색</button>
+                </div>
+              </div>
+            </div>
+            <!-- 두 번째 카드 -->
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="card-title mb-0">현재 위치 검색</h5>
+                </div>
+                <div class="card-body">
+                  <p class="card-text"> 현재 위치의 2km 이내 대여소와 자전거 정보를 검색합니다.</p>
+                  <button id="getPositionBtn" class="btn btn-success"> 🧭현재 위치 기준 검색</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h6><strong>현재 제공되는 지자체 : 서울특별시, 세종특별자치시, 대전광역시</strong></h6>
+        <h6>2024년도 연말 7개 지자체의 데이터가 추가 제공될 예정입니다.</h6>
+        <form id="addressForm" action="/public-bicycle/getAddressPosition" method="post" class="mt-4">
+          <input type="hidden" id="roadFullAddr" name="roadFullAddr">
+          <input type="hidden" id="roadAddrPart1" name="roadAddrPart1">
+        </form>
+
+        <!-- 👀 검색 결과 -->
+        <div class="row">
+          <div class="col-12">
+            <div id="searchResults" class="mt-3 content-custom">
+              <div class="custom-box" th:classappend="${!isSearched ? 'background-default' :
+                     (page.isEmpty() ? 'background-no-data' : 'background-has-data')}">
+                <p class="px-0 mb-0" th:if="${!isSearched}">주소를 검색해주세요! 🧐</p>
+                <p class="px-0 mb-0" th:if="${isSearched and page.isEmpty()}">해당 지역의 데이터가 없습니다. 😢</p>
+                <p class="px-0 mb-0" th:if="${isSearched and !page.isEmpty()}"><strong><span
+                        th:text="${infoResponse.getFullAddress()}"></span></strong> 지역의 검색 결과입니다 👀</p>
+              </div>
+            </div>
+
+            <!-- 검색 결과 지도 -->
+            <div id="map" th:if="${isSearched}" style="width:100%;height:400px;"></div>
+
+            <!-- 검색 결과 테이블 -->
+            <div th:if="${isSearched and !page.isEmpty()}" class="table-responsive mt-3">
+              <div class="custom-box background-has-data-light">
+                <p class="px-0 mb-0"
+                   th:utext="${totalInfoDto != null ?
+       '총 <strong>' + totalInfoDto.totalStation + '</strong>개의 대여소에서 ' +
+       '<strong>' + totalInfoDto.totalBicycle + '</strong>개의 자전거를 이용하실 수 있습니다🚲'
+       : '정보를 불러오는데 실패했습니다.'}">
+                  공영자전거 대여소 및 자전거 현황
+                </p>
+              </div>
+
+              <table class="table table-hover">
+                <thead class="table-secondary" !important;>
+                <tr>
+                  <th style="text-align: center;">대여소 ID</th>
+                  <th style="text-align: center;">자전거 대여소 명</th>
+                  <th style="text-align: center;">
+                    <a th:href="@{/public-bicycle(page=${page.number}, sort='bcyclTpkctNocs', direction='desc')}"
+                       class="btn"
+                       th:classappend="${sort == 'bcyclTpkctNocs' ? 'btn-danger btn-sm' : 'btn-outline-danger btn-sm'}">보유
+                      자전거 수🔼</a>
+                  </th>
+                  <th style="text-align: center;">
+                    <a th:href="@{/public-bicycle(page=${page.number}, sort='distance', direction='asc')}"
+                       class="btn"
+                       th:classappend="${sort == 'distance' ? 'btn-primary btn-sm' : 'btn-outline-primary btn-sm'}">거리🔽</a>
+                  </th>
+                  <th style="text-align: center;">지도</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="info : ${page.content}">
+                  <td th:text="${info.rntstnId}"></td>
+                  <td>
+                    <span th:text="${info.rntstnNm}     "></span>
+                    <button th:data-id="${info.rntstnId}" onclick="showDetails(this.getAttribute('data-id'))" class="btn btn-secondary btn-sm">상세보기</button>
+                  </td>
+                  <td style="text-align: center;"><strong style="color: red"
+                              th:text="${info.bcyclTpkctNocs != null ? info.bcyclTpkctNocs + ' 대' : '정보 없음'}"></strong></td>
+                  <td  style="text-align: center;"><strong style="color: dodgerblue;" th:text="${info.distance} + ' km'"></strong></td>
+                  <td  style="text-align: center;">
+                    <button th:data-lat="${info.lat}" th:data-lng="${info.lot}" th:data-bckcnt="${info.bcyclTpkctNocs}" th:data-nm="${info.rntstnNm}" th:data-addr="${info.roadNmAddr}"
+                            onclick="showMap(this.getAttribute('data-lat'), this.getAttribute('data-lng'),  this.getAttribute('data-bckcnt'), this.getAttribute('data-nm'), this.getAttribute('data-addr'))"
+                            class="btn btn-primary">Go
+                    </button>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 페이지네이션 링크 -->
+            <div th:if="${isSearched and not page.isEmpty()}" class="mt-4">
+              <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                  <li th:classappend="${page.first ? 'disabled' : ''}" class="page-item">
+                    <a th:href="@{/public-bicycle(page=${page.number - 1}, sort=${sort != null ? sort : 'distance'}, direction=${sort == 'distance' ? 'asc' : 'desc'})}"
+                       th:unless="${page.first}"
+                       class="page-link">Previous</a>
+                  </li>
+                  <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                      th:classappend="${i == page.number ? 'active' : ''}" class="page-item">
+                    <!-- 현재 정렬 상태를 유지하면서 페이지 번호를 클릭할 수 있는 링크 -->
+                    <a th:href="@{/public-bicycle(page=${i}, sort=${sort != null ? sort : 'distance'}, direction=${sort == 'distance' ? 'asc' : 'desc'})}"
+                       th:text="${i + 1}" class="page-link"></a>
+                  </li>
+                  <li th:classappend="${page.last ? 'disabled' : ''}" class="page-item">
+                    <a th:href="@{/public-bicycle(page=${page.number + 1}, sort=${sort != null ? sort : 'distance'}, direction=${sort == 'distance' ? 'asc' : 'desc'})}"
+                       th:unless="${page.last}" class="page-link">Next</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 로딩 마크업 -->
+      <div id="loading"
+           style="display:none; position:absolute; top:0; left:0; right:0; bottom:0; background-color:rgba(241,241,241,0.8); z-index:9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+          <img src="/img/loading.gif" alt="Loading..."/>
+        </div>
+      </div>
+      <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
+    </main>
+    <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script src="/js/app.js"></script> <!-- template -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> <!-- jQuery -->
+<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
+<script th:inline="javascript">
+
+    // 🪟 도로명주소 Popup 관련 script
+    // 도로명 주소 팝업 연결
+    function goPopup() {
+        pop = window.open("/public-bicycle/jusoPopup", "pop", "width=570, height=420, scrollbars=yes");
+    }
+
+    // 도로명 주소 팝업 검색 결과 콜백
+    function jusoCallBack(roadFullAddr, roadAddrPart1) {
+        console.log("도로명 주소: " + roadAddrPart1);
+        console.log("전체 주소: " + roadFullAddr);
+        document.getElementById('roadFullAddr').value = roadFullAddr;
+        document.getElementById('roadAddrPart1').value = roadAddrPart1;
+        // 로딩 화면 표시
+        document.getElementById('loading').style.display = 'block';
+        // 폼 제출
+        document.getElementById('addressForm').submit();
+    }
+
+
+    // 🚩좌표 관련 script
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // 위치 정보 요청 버튼 이벤트 리스너 설정
+        document.getElementById('getPositionBtn').addEventListener('click', function () {
+            window.open('/public-bicycle/positionPopup', 'locationConsent', 'width=400,height=300');
+
+        });
+        // 에러 발생 시 처리
+        function showErrorMsg(error) {
+            var errorMessage = '';
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = "사용자가 위치 정보 제공을 거부했습니다.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = "위치 정보를 사용할 수 없습니다.";
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = "위치 정보를 가져오는 요청이 시간 초과되었습니다.";
+                    break;
+                default:
+                    errorMessage = "알 수 없는 오류가 발생했습니다.";
+                    break;
+            }
+            console.log(errorMessage);
+            document.getElementById('loading').style.display = 'none';  // 로딩 화면 숨김
+        }
+
+        // 서버로 위치 데이터를 보내는 함수
+        window.sendPositionToServer = function (position) {
+            var userLng = position.coords.longitude; // 경도
+            var userLat = position.coords.latitude; // 위도
+            console.log('경도 : ' + userLng);
+            console.log('위도 : ' + userLat);
+
+            fetch('/public-bicycle/getUserPosition', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    lng: userLng,
+                    lat: userLat
+                })
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload(); // 응답 성공 시 페이지 새로 고침
+                } else {
+                    console.error('서버로부터 응답을 받는데 실패했습니다.');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            }).finally(() => {
+                document.getElementById('loading').style.display = 'none';  // 응답 완료 후 로딩 화면 숨김
+            });
+        }
+    });
+
+
+    //🗺️ 지도 관련 script
+    // 지도 생성
+    var defaultLng = [[${infoResponse?.getSearchedPoint()?.getLng()}]] || ' 126.979338';
+    var defaultLat = [[${infoResponse?.getSearchedPoint()?.getLat()}]] || '37.570502';
+
+    var mapOptions = {
+        center: new naver.maps.LatLng(defaultLat, defaultLng),
+        zoom: 14
+    };
+
+    var map = new naver.maps.Map('map', mapOptions);
+
+
+    var defaultMarkerContent = '<img src="' + '/img/pin_default.png" alt="" ' +
+        'style="margin: 0px; padding: 0px; border: 0px solid transparent; display: block; max-width: none; max-height: none; ' +
+        '-webkit-user-select: none; position: absolute; width: 22px; height: 35px; left: 0px; top: 0px;">';
+
+    var defaultMarker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(defaultLat, defaultLng),
+        map: map,
+        icon: {
+            content: defaultMarkerContent,
+            size: new naver.maps.Size(22, 35),
+            anchor: new naver.maps.Point(11, 35)
+        }
+    });
+
+
+    var stations = [[${stations}]];
+
+    stations.forEach(function (station) {
+        // 지도 마커 (위치, 사용가능 자전거 수량)
+        var bikeCount = station.bcyclTpkctNocs ? station.bcyclTpkctNocs : 'X';
+
+        var markerContent =
+            '<div style="background-color: #007bff; ' +
+            'color: white; ' +
+            'width: 30px; ' +
+            'height: 30px; ' +
+            'line-height: 20px; ' +
+            'text-align: center; ' +
+            'border-radius: 50%; ' +
+            'font-size: 16px; ' +
+            'font-weight: bold; ' +
+            'border: 3px solid black;">'
+            + bikeCount
+            + '</div>';
+
+        var marker = new naver.maps.Marker({
+            position: new naver.maps.LatLng(station.lat, station.lot),
+            map: map,
+            icon: {
+                content: markerContent,
+                size: new naver.maps.Size(30, 30),
+                anchor: new naver.maps.Point(15, 15)
+            }
+        });
+
+        // 마커에 대한 정보(대여소 도로명 주소명)창 생성
+        var infoWindowContent = '<div class="iw_inner">' +
+            '<h5><strong> 🔖' + station.rntstnNm + '</strong> </h5>' +
+            '<p> 🗺️ ' +
+            '<a>' + station.roadNmAddr + '</a>' +
+            ' </p>' +
+            '</div>';
+
+        var infoWindow = new naver.maps.InfoWindow({
+            content: infoWindowContent
+        });
+
+        // 마커 클릭 이벤트
+        naver.maps.Event.addListener(marker, "click", function (e) {
+            if (infoWindow.getMap()) {
+                infoWindow.close();
+            } else {
+                infoWindow.open(map, marker); // 클릭 시 정보창 열기
+            }
+        });
+    });
+    // 지도에서보기 활성화
+    var currentInfoWindow = null;
+    function showMap(lat, lng, bckcnt, nm, addr) {
+        var lat = parseFloat(lat);
+        var lng = parseFloat(lng);
+        var bikeCount = parseInt(bckcnt);
+        var rntstnNm = nm;
+        var roadNmAddr = addr;
+
+        var newCenter = new naver.maps.LatLng(lat, lng);
+        map.setCenter(newCenter);
+        map.setZoom(16);
+
+        var markerContent =
+            '<div style="background-color: red; color: white; width: 30px; height: 30px; line-height: 20px; text-align: center; border-radius: 50%; font-size: 16px; font-weight: bold; border: 3px solid black;">' +
+            bikeCount + '</div>';
+
+        var marker = new naver.maps.Marker({
+            position: newCenter,
+            map: map,
+            icon: {
+                content: markerContent,
+                size: new naver.maps.Size(30, 30),
+                anchor: new naver.maps.Point(15, 15)
+            }
+        });
+
+        var infoWindowContent = '<div class="iw_inner">' +
+            '<h5><strong> 🔖' + rntstnNm + '</strong></h5>' +
+            '<p> 🗺️ <a>' + roadNmAddr + '</a> </p>' +
+            '</div>';
+
+        var infoWindow = new naver.maps.InfoWindow({
+            content: infoWindowContent
+        });
+
+        // 정보창 업데이트
+        if (currentInfoWindow) {
+            currentInfoWindow.close();
+        }
+        currentInfoWindow = infoWindow;
+        currentInfoWindow.open(map, marker);
+
+        naver.maps.Event.addListener(marker, "click", function() {
+            if (infoWindow.getMap()) {
+                infoWindow.close();
+            } else {
+                infoWindow.open(map, marker);
+            }
+        });
+
+        // 지도 보이는 곳으로 스크롤 (~지역 검색 결과입니다 박스까지)
+        document.getElementById('searchResults').scrollIntoView(
+            { behavior: 'smooth', block: 'start' })
+        ;
+    }
+
+    // 📄상세보기 팝업 관련 script
+    function showDetails(stationId) {
+        const encodedId = encodeURIComponent(stationId);
+        const url = `/public-bicycle/detail/${encodedId}`;
+        window.open(url, "_blank", "width=500,height=600");
+    }
+</script>
+<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
+</body>
+</html>
+
+
+
+
+
+
+
+
+

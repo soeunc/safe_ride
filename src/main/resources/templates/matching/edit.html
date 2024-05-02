@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>세이프라이드: 안전한 라이딩의 시작</title>
+  <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+  <!--👇여기에 header script 넣어주시면 됩니다👇-->
+  <style>
+
+      .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          background-color: #fff;
+          padding: 20px;
+          border-radius: 5px;
+          box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+          margin-bottom: 20px;
+          font-size: 24px;
+      }
+
+      label {
+          font-weight: bold;
+      }
+
+      input[type="text"],
+      textarea {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
+          box-sizing: border-box;
+      }
+
+      select {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
+          box-sizing: border-box;
+      }
+
+      button {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 3px;
+          cursor: pointer;
+      }
+
+      button:hover {
+          background-color: #0056b3;
+      }
+
+      a {
+          color: #007bff;
+          text-decoration: none;
+      }
+
+      a:hover {
+          text-decoration: underline;
+      }
+  </style>
+  <!--👆여기에 header script 넣어주시면 됩니다👆-->
+</head>
+<body>
+<div class="wrapper">
+  <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
+  <div class="main">
+    <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
+    <main class="content">
+      <div class="container mt-4">
+        <h1>매칭글 수정</h1>
+        <form action="#" method="post">
+          <label for="title">제목:</label><br>
+          <input type="text" id="title" name="title" th:value="${matching.title}"><br>
+          <label for="ridingTime">라이딩 시간:</label><br>
+          <input type="datetime-local" id="ridingTime" name="ridingTime" required><br>
+          <label for="kilometer">예상 거리:</label><br>
+          <input type="text" id="kilometer" name="kilometer" th:value="${matching.kilometer}"><br>
+          <label for="comment">라이딩 코스 소개:</label>
+          <textarea name="comment" id="comment" rows="6" required th:text="${matching.comment}"></textarea><br>
+          <label for="metropolitanCity">광역 자치구:</label><br>
+          <select id="metropolitanCity" name="metropolitanCity" onchange="fetchCities()">
+            <option th:each="city : ${metropolitanCities}" th:value="${city}" th:text="${city}" th:selected="${city == matching.metropolitanCity}"></option>
+          </select><br>
+          <label for="city">도시:</label><br>
+          <select id="city" name="city">
+            <option th:each="city : ${cities}" th:value="${city}" th:text="${city}" th:selected="${city == matching.city}"></option>
+          </select><br>
+          <input type="submit" value="수정">
+        </form>
+        <a th:href="@{/matching/{id}(id=${matching.id})}">뒤로 가기</a>
+      </div>
+    </main>
+    <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
+  </div>
+</div>
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script src="/js/app.js"></script> <!-- template -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> <!-- jQuery -->
+<script>
+    function fetchCities() {
+        var metropolitanCity = document.getElementById('metropolitanCity').value;
+        var citySelect = document.getElementById('city');
+        var regionIdInput = document.getElementById('regionId'); // Get hidden input field
+
+        // AJAX 요청을 통해 선택된 광역자치구에 해당하는 도시 목록을 서버로부터 가져옴
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var cities = JSON.parse(xhr.responseText);
+
+                    // 도시 목록을 새로고침
+                    citySelect.innerHTML = '';
+                    cities.forEach(function(city) {
+                        var option = document.createElement('option');
+                        option.value = city.city; // 도시명을 가져와야 함
+                        option.textContent = city.city;
+                        citySelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Failed to fetch cities');
+                }
+            }
+        };
+
+        xhr.open('GET', '/city?metropolitanCity=' + metropolitanCity);
+        xhr.send();
+
+        // Set selected regionId value
+        // regionId 값을 문자열에서 숫자로 변환하여 설정
+        regionIdInput.value = parseInt(metropolitanCity); // Assuming metropolitanCity ID is used as regionId
+    }
+</script>
+
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html
+        lang="en" xmlns:sec="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
+>
+
+<head>
+    <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+    <!--👇여기에 기타 header 넣어주시면 됩니다👇-->
+    <style>
+        #topInfo {
+            display: flex;
+            justify-content: center;
+            height: 110px;
+        }
+        #container{
+            display: flex;
+            justify-content: space-evenly;
+            max-height: 100vw;
+            margin-bottom: 20%;
+        }
+        #riding-record{
+            width: 50%;
+        }
+        #riding-record h2{
+            margin-bottom: 2%;
+
+        }
+        #profileUpdate{
+            width: 30%;
+        }
+        #introduce {
+            display: inline-block;
+        }
+        .badge-grade {
+            width: 70px;
+        }
+        .records {
+            font-size: x-large;
+            margin-bottom: 5%;
+        }
+        #inputTodayRecord{
+            width: 70%;
+        }
+        #totalRecord{
+            color: red;
+        }
+        #weeklyRecord{
+            color: deepskyblue;
+        }
+        #todayRecord{
+            color: forestgreen;
+        }
+
+
+    </style>
+    <!--👆 여기에 기타 header 넣어주시면 됩니다 👆-->
+</head>
+
+<body>
+<div class="wrapper">
+    <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
+
+    <div class="main">
+        <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
+        <main>
+            <div class="container mt-4">
+                <!--👇여기에 내용 넣어주시면 됩니다👇-->
+                <div class="container mt-4">
+                    <div id="topInfo">
+                        <h1 id="introduce">반갑습니다, <span sec:authentication="name"></span>님!</h1>
+                        <span th:if="${#strings.equals(badges.getGrade(), 'QUICK_BOARD')}">
+                        <img class="badge-grade" src="/img/badge/kickboard.png">
+                        </span>
+                        <span th:if="${#strings.equals(badges.getGrade(), 'BYCICLE')}">
+                            <img class="badge-grade" src="/img/badge/bicycle.png">
+                        </span>
+                        <span th:if="${#strings.equals(badges.getGrade(), 'SCOOTER')}">
+                            <img class="badge-grade" src="/img/badge/scooter.png">
+                        </span>
+                        <span th:if="${#strings.equals(badges.getGrade(), 'MOTOR_CYCLE')}">
+                            <img class="badge-grade" src="/img/badge/motorcycle.png">
+                        </span>
+                    </div>
+                    <div id="container">
+                        <!--라이딩 기록-->
+                        <div id="riding-record">
+                            <h2>라이딩 기록</h2>
+                            <!--라이딩 기록이 없을 떄-->
+                            <div th:if="${#strings.isEmpty(ridingRecord.getTotalRecord())}">
+                                <h3>기록이 아직 없습니다!</h3>
+                            </div>
+                            <!--라이딩 기록이 존재한다면-->
+                            <div th:unless="${#strings.isEmpty(ridingRecord.getTotalRecord())}">
+                                <div id="total-record" class="records">
+                                    <span>총 <span id="totalRecord"></span>km</span>
+                                </div>
+                                <div id="weekly-record" class="records">
+                                    <span>주간 <span id="weeklyRecord"></span>km</span>
+                                </div>
+                                <!--오늘자 기록이 없을 떄-->
+                                <div th:if="${#strings.isEmpty(ridingRecord.getTodayRecord())}" class="records">
+                                    <h4>오늘 기록이 아직 없습니다! 열심히 달려봐요! :)</h4>
+                                </div>
+                                <div th:unless="${#strings.isEmpty(ridingRecord.getTodayRecord())}" class="records">
+                                    <span>오늘 <span id="todayRecord"></span>km</span>
+                                </div>
+                            </div>
+                            <form>
+                                <div id="inputTodayRecord" class="input-group mb-3">
+                                    <input id="todayRecordInput" class="form-control" name="todayRecord" type="number" required
+                                           placeholder="오늘 기록을 입력" maxlength="4">
+                                    <button class="btn btn-outline-secondary" type="button" id="todaySubmit">오늘 기록 입력</button>
+                                </div>
+                            </form>
+                            <div id="chart">
+                                <canvas id="bar-chart"></canvas>
+                            </div>
+                        </div>
+                        <!--프로필 수정-->
+                        <div id="profileUpdate">
+                            <section>
+                                <div>
+                                    <!-- login form-->
+                                    <div>
+                                        <div>
+                                            <div>
+                                                <h2>회원정보 수정</h2>
+                                                <form id="updateForm" onsubmit="return false">
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" id="password" name="password" type="password" onkeyup="passwordValidCkFnc()" maxlength="20" required placeholder="비밀번호 입력">
+                                                        <label for="password">패스워드</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" id="passwordCk" name="passwordCk" type="password" maxlength="20" required placeholder="비밀번호 확인">
+                                                        <button class="btn btn-info" id="passwordMatchCk" onclick="passwordMatchCkFnc()">패스워드 일치여부 확인</button>
+                                                        <span id="passwordCkMsg"></span>
+                                                        <label for="passwordCk">패스워드 확인</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" id="email" name="email" type="text" th:value="${member.email}" maxlength="30" disabled>
+                                                        <label for="email">이메일</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" id="nickName" name="nickName" type="text" th:value="${member.nickname}" onkeyup="nickNameValidFunc()" maxlength="30">
+                                                        <button class="btn btn-info" id="duplicateCkForNickname" onclick="duplicateCkForNicknameFnc()">닉네임 중복확인</button>
+                                                        <span id="nickNameCkMsg"></span>
+                                                        <label for="nickName">닉네임</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" id="phoneNumber" name="phoneNumber" type="text" th:value="${member.phoneNumber}" onkeyup="phoneNumberVaildFnc()" maxlength="11">
+                                                        <span id="phoneNumberMsg"></span>
+                                                        <label for="phoneNumber">전화번호</label>
+                                                    </div>
+                                                    <div class="form-floating mb-3 date_item">
+                                                        <input class="form-control" id="birthday" name="birthday" th:value="${member.getBirthday()}" maxlength="8" disabled>
+                                                        <label for="birthday">생년월일</label>
+                                                    </div>
+                                                    <div class="d-grid"><button class="btn btn-primary btn-lg" id="submitBtn" type="button">회원정보 수정</button></div>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                </div>
+                <div>
+                    <button class="btn btn-danger btn-lg" id="deleteBtn" type="button">회원탈퇴</button>
+                </div>
+                <!--👆여기에 내용 넣어주시면 됩니다👆-->
+            </div>
+        </main>
+        <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script src="/js/app.js"></script> <!-- template -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> <!-- jQuery -->
+<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
+<!--ajax-->
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<!--chart.js-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<script th:inline="javascript">
+
+    window.onload = function () {
+        //alert
+        const alertMsg = [[${msg}]];
+
+        if (alertMsg) {
+            alert(alertMsg);
+        }
+    }
+    //html 뜨고 실행
+    //총 / 주간 / 오늘 기록 나타내기
+    $(function() {
+        const totalRecord = parseFloat([[${ridingRecord.getTotalRecord()}]]) * 0.001;
+        const weeklyRecord = parseFloat([[${ridingRecord.getWeeklyRecord()}]]) * 0.001;
+        const todayRecord = parseFloat([[${ridingRecord.getTodayRecord()}]]) * 0.001;
+        $('#totalRecord').text(totalRecord.toFixed(3));
+        $('#weeklyRecord').text(weeklyRecord.toFixed(3));
+        $('#todayRecord').text(todayRecord.toFixed(3));
+    });
+
+    const weeklyRecordList = [[${ridingRecord.weeklyRecordList}]];
+    new Chart(document.getElementById("bar-chart"), {
+        type: 'bar',
+        data: {
+            labels: [
+                weeklyRecordList[0].createDate.split('T')[0],
+                weeklyRecordList[1].createDate.split('T')[0],
+                weeklyRecordList[2].createDate.split('T')[0],
+                weeklyRecordList[3].createDate.split('T')[0],
+                weeklyRecordList[4].createDate.split('T')[0],
+                weeklyRecordList[5].createDate.split('T')[0],
+                weeklyRecordList[6].createDate.split('T')[0],
+
+            ],
+            datasets: [
+                {
+                    label: "Population (millions)",
+                    backgroundColor: ["#ff0000", "#ff7f27", "#ffd900", "#00db07", "#00b7ff", "#3700dc", "#a600ff"],
+                    data: [
+                        weeklyRecordList[0].todayRecord,
+                        weeklyRecordList[1].todayRecord,
+                        weeklyRecordList[2].todayRecord,
+                        weeklyRecordList[3].todayRecord,
+                        weeklyRecordList[4].todayRecord,
+                        weeklyRecordList[5].todayRecord,
+                        weeklyRecordList[6].todayRecord,
+                    ]
+                }
+            ]
+        },
+        options: {
+            legend: {display: false},
+            title: {
+                display: true,
+                text: '주간 라이딩 기록'
+            }
+        }
+    });
+    const myNickName = [[${member.nickname}]];
+    const myPhoneNumber = [[${member.phoneNumber}]];
+    const todayRecord = [[${ridingRecord.getTodayRecord()}]];
+    const memberId = [[${member.id}]];
+        //패스워드 정규식 체크용 flag변수
+    let passwordCk = false;
+    //패스워드 중복확인용 flag변수
+    let passwordMatchCk = false;
+    //닉네임 정규식 체크용 flag변수
+    let nicknameCk = false;
+    //닉네임 중복확인용 flag 변수
+    let nicknameDuplicateCk = false;
+    //전화번호 정규식 체크용 flag변수
+    let phoneNumberCk = false;
+
+    //닉네임 중복확인
+    function duplicateCkForNicknameFnc(){
+        let nickName = $('#nickName').val();
+        //본인의 닉네임이라면
+        if (myNickName === nickName){
+            alert("사용 가능합니다.");
+            nicknameDuplicateCk = true;
+        } else if(nickName.trim()===''){
+            alert('닉네임을 입력해주세요!');
+        } else {
+            $.ajax({
+                type : "POST",
+                url : "/safe-ride/duplicateCkForNickname",
+                data : {
+                    nickName : nickName
+                },
+                success : function (result){
+                    if (result===1){ // 닉네임이 이미 존재한다면
+                        alert("사용 불가능한 닉네임입니다.");
+                        nicknameDuplicateCk = false;
+                    } else if(result===0) {
+                        alert("사용 가능합니다.");
+                        nicknameDuplicateCk = true;
+                    } else {
+                        alert("에러가 발생했습니다.")
+                    }
+                },
+                error:function (error){
+                    alert("에러가 발생했습니다. 새로고침해주세요!" + error);
+                }
+            });
+        }
+    }
+    //비밀번호 정규식
+    function passwordValidCkFnc() {
+        //영어 숫자 조합 8자리 이상~25자 이하
+        const regExp = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/;
+        let password = $('#password').val();
+        let passwordCkMsg = $('#passwordCkMsg');
+        if (!regExp.test(password)){
+            passwordCkMsg.text("영어 숫자 조합 8~20자 이내로 해주세요!");
+            passwordCkMsg.css('color', "red");
+            passwordCk = false;
+        } else {
+            passwordCkMsg.text("사용가능합니다!!");
+            passwordCkMsg.css('color', "blue");
+            passwordCk = true;
+        }
+    }
+    //닉네임 정규식
+    function nickNameValidFunc(){
+        //영문 대/소문자나 한글로 시작. 영문 대/소문자와 한글, 숫자를 사용할 수 있으며
+        const regExp =/^[ㄱ-ㅎ가-힣a-zA-Z0-9]{2,10}$/;
+        //2~10사이의 길이
+
+        let nickName = $('#nickName').val();
+        let nickNameCkMsg = $('#nickNameCkMsg');
+        if (!regExp.test(nickName)){
+            nickNameCkMsg.text("2~10자 이내로 해주세요!(특수문자불가)");
+            nickNameCkMsg.css('color', "red");
+            nicknameCk = false;
+        } else {
+            nickNameCkMsg.text("사용가능합니다!!");
+            nickNameCkMsg.css('color', "blue");
+            nicknameCk = true;
+        }
+    }
+    //전화번호정규식
+    function phoneNumberVaildFnc() {
+        const regExp = /^01([0|1|6|7|8|9]?)-?([0-9]{3,4})-?([0-9]{4})$/;
+
+        let phoneNumber = $('#phoneNumber').val();
+        let phoneNumberMsg = $('#phoneNumberMsg');
+
+        if (!regExp.test(phoneNumber)){
+            phoneNumberMsg.text("전화번호를 확인해주세요!");
+            phoneNumberMsg.css('color', "red");
+            phoneNumberCk = false;
+        } else {
+            phoneNumberMsg.text("사용가능합니다!!");
+            phoneNumberMsg.css('color', "blue");
+            phoneNumberCk = true;
+        }
+    }
+    //패스워드 일치여부 확인
+    function passwordMatchCkFnc() {
+        //비밀번호 체크
+        let password = document.querySelector("#password").value;
+        let passwordCk = document.querySelector("#passwordCk").value;
+        if (password !== passwordCk || password === '' || passwordCk === ''){
+            alert("패스워드가 일치하지 않습니다!");
+            passwordMatchCk = false;
+        } else {
+            alert("패스워드가 일치합니다! ^^");
+            passwordMatchCk = true;
+        }
+    }
+
+    //회원탈퇴 버튼 클릭 시 동작
+    $('#deleteBtn').click(function (event){
+        $.ajax({
+            type   : "POST",
+            url    : "/safe-ride/myprofile/delete",
+            data   : {
+                memberId: memberId
+            },
+            success: function (result) {
+                if (result === 1) { // 닉네임이 이미 존재한다면
+                    alert("삭제되었습니다. 감사합니다!");
+                    window.location.href = "/safe-ride";
+                } else if (result === 0) {
+                    alert("에러가 발생했습니다!");
+                } else {
+                    alert("에러가 발생했습니다!");
+                }
+            },
+            error  : function (error) {
+                alert("에러가 발생했습니다. 새로고침해주세요!");
+            }
+        })
+    });
+
+    //수정 버튼 클릭 시 동작
+    $('#submitBtn').click(function (event){
+        //기본 폼 제출 방지
+        event.preventDefault();
+
+        const passwordVal = $('#password').val();
+        const passwordCkVal = $('#passwordCk').val();
+        const emailVal = $('#email').val();
+        const nickNameVal = $('#nickName').val();
+        const phoneNumberVal = $('#phoneNumber').val();
+        const birthdayVal = $('#birthday').val();
+
+        //본인 닉네임이라면 닉네임 정규식 체크 여부 패스
+        if (nickNameVal === myNickName){
+            nicknameCk = true;
+        }
+        //본인 전화번호라면 닉네임 정규식 체크 여부 패스
+        if (phoneNumberVal === myPhoneNumber){
+            phoneNumberCk = true;
+        }
+
+
+        if (
+            passwordVal.trim()===''||
+            passwordCkVal.trim()===''||
+            emailVal.trim()===''||
+            nickNameVal.trim()===''||
+            passwordCkVal.trim()===''||
+            birthdayVal.trim()===''
+        ){
+            alert("비어있는 값이 있는지 확인해주세요!");
+        } else if (passwordCk !== true){
+            alert("올바른 비밀번호인지 확인해주세요!")
+        }
+        //비밀번호 일치 체크 여부 확인
+        else if (passwordMatchCk !== true){
+            alert("비밀번호 일치 체크를 진행해주세요!")
+        }
+        else if (nicknameCk !== true){
+            alert("올바른 닉네임인지 확인해주세요!")
+        }
+        else if (nicknameDuplicateCk !== true){
+            alert("닉네임 중복체크를 진행해주세요!")
+        }
+        else if (phoneNumberCk !== true){
+            alert("올바른 전화번호인지 확인해주세요!")
+        } else {
+            const formData = {
+                password: passwordVal,
+                passwordCk: passwordCkVal,
+                nickName: nickNameVal,
+                phoneNumber : phoneNumberVal,
+            };
+
+            $.ajax({
+                type : "POST",
+                url : "/safe-ride/myprofile/update",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success : function (result){
+                    alert("수정되었습니다!");
+                    window.location.href = "/safe-ride/myprofile";
+                },
+                error:function (error){
+                    alert("에러가 발생했습니다." + error);
+                }
+            });
+        }
+    });
+
+    //오늘 기록 입력
+    $('#todaySubmit').click(function (event){
+        event.preventDefault();
+        let todayRecordInput = $('#todayRecordInput').val();
+        //한번에 1000키로 이상을 타는 사람일때
+        if (parseInt(todayRecord) + parseInt(todayRecordInput) >= 1000000 || parseInt(todayRecordInput) > 1000000){
+            alert("오늘자 입력 범위 초과입니다! :) (1000km까지 입력가능)")
+        } else {
+            const formData = {
+                todayRecord : todayRecordInput
+            };
+            $.ajax({
+                type : "POST",
+                url : "/safe-ride/myprofile/create-today",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success : function (result){
+                    alert("오늘 기록이 추가되었습니다.^^");
+                    window.location.href = "/safe-ride/myprofile";
+                },
+                error:function (error){
+                    alert("에러가 발생했습니다." + error);
+                }
+            });
+        }
+    });
+
+</script>
+<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
+</body>
+</html>

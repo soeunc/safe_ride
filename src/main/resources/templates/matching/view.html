@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>세이프라이드: 안전한 라이딩의 시작</title>
+  <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+  <style>
+      .hidden {
+          display: none;
+      }
+      .content {
+          display: flex;
+          justify-content: space-between; /* 요소들을 좌우로 정렬하고 간격을 동일하게 설정합니다. */
+      }
+      /* 컨테이너와 매칭 상대방 박스 스타일 */
+      .container, .matching {
+          width: 45%;
+          background-color: #f2f2f2;
+          height: 650px;
+          margin: auto;
+          margin-top: 24px;
+          padding: 20px;
+          text-align: center;
+          border-radius: 10px; /* 모서리를 둥글게 만듭니다. */
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* 그림자 효과 추가 */
+          overflow: auto; /* 내용이 넘칠 경우 스크롤 생성 */
+      }
+
+      .rounded-image.image-container {
+          width: 200px; /* 원하는 너비로 조절 */
+          height: 200px; /* 원하는 높이로 조절 */
+          border-radius: 50%;
+          overflow: hidden;
+          display: flex;
+          justify-content: center; /* 이미지를 수평 중앙으로 정렬합니다. */
+          align-items: center; /* 이미지를 수직 중앙으로 정렬합니다. */
+          margin: auto; /* 이미지 컨테이너를 가운데로 정렬합니다. */
+      }
+
+      /* 내부 이미지의 스타일 */
+      .rounded-image.image-container img {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: cover;
+      }
+
+      /* 버튼 스타일 */
+      .apply-button, .toggle-button, .submit-button, .edit-button, .delete-button, .accept-button, .reject-button, .cancel-button {
+          padding: 10px 20px;
+          font-size: 16px;
+          cursor: pointer;
+          border: none;
+          border-radius: 5px;
+          margin-top: 10px;
+      }
+
+      .apply-button, .toggle-button, .edit-button, .delete-button, .accept-button, .reject-button, .cancel-button {
+          background-color: #007bff;
+          color: white;
+      }
+
+      .submit-button {
+          background-color: #28a745;
+      }
+
+
+      /* 매칭 신청 목록 테이블 스타일 */
+      #applicationsList table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+      }
+
+      #applicationsList th, #applicationsList td {
+          border: 1px solid #ddd;
+          padding: 10px;
+          text-align: left;
+      }
+
+      /* 신청자 영역 크기 조정 */
+      #applicationsList th:nth-child(1), #applicationsList td:nth-child(1) {
+          width: 20%; /* 신청자 영역의 너비를 줄입니다. */
+      }
+
+      #applicationsList th:nth-child(3), #applicationsList td:nth-child(3) {
+          width: 80px; /* 라이딩 등급 영역의 너비를 좁힙니다. */
+          text-align: center; /* 라이딩 등급 텍스트를 가운데 정렬합니다. */
+      }
+
+      /* 신청 메시지 영역 크기 조정 */
+      #applicationsList th:nth-child(2), #applicationsList td:nth-child(2) {
+          width: 50%; /* 신청 메시지 영역의 너비를 늘립니다. */
+      }
+
+      /* 상태 영역 크기 조정 */
+      #applicationsList th:nth-child(4), #applicationsList td:nth-child(4) {
+          width: 20%; /* 상태 영역의 너비를 줄입니다. */
+      }
+
+      #applicationsList th {
+          background-color: #f2f2f2;
+      }
+
+      #applicationsList tr:hover {
+          background-color: #f2f2f2;
+      }
+
+      /* 알림창 스타일 */
+      #notification {
+          position: fixed;
+          top: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: #28a745;
+          color: white;
+          padding: 10px 20px;
+          border-radius: 5px;
+          display: none;
+          z-index: 9999;
+      }
+
+      /* 애니메이션 효과 */
+      @keyframes fadeOut {
+          from {
+              opacity: 1;
+          }
+          to {
+              opacity: 0;
+          }
+      }
+
+      /* 알림창 표시 및 사라지는 애니메이션 */
+      .show-notification {
+          animation: fadeOut 3s ease-in-out;
+      }
+      /* rider-info 섹션을 위한 CSS 스타일링 */
+      .rider-info {
+          text-align: left; /* 텍스트를 왼쪽 정렬합니다. */
+          padding: 20px; /* 여백을 위해 패딩 추가 */
+      }
+
+      /* 닉네임 가운데 정렬 및 글씨 크기 조절 */
+      .nickname {
+          font-size: 20px; /* 폰트 크기를 줄입니다. */
+          font-weight: bold; /* 글씨를 굵게 만듭니다. */
+          text-align: center; /* 가운데 정렬합니다. */
+          margin-bottom: 10px; /* 아래쪽 여백을 추가합니다. */
+      }
+
+      .location,
+      .riding-time,
+      .riding-course,
+      .estimated-distance {
+          margin-top: 10px; /* 각 섹션 간 여백을 추가합니다. */
+      }
+
+      .estimated-distance {
+          margin-bottom: 20px; /* 마지막 섹션 아래에 여백을 더 추가합니다. */
+      }
+
+      /* rider-info 내의 강조 태그에 대한 스타일 */
+      .rider-info strong {
+          color: #007bff; /* 강조 태그의 색상을 변경합니다. */
+      }
+
+      /* rider-info 내의 문단에 대한 스타일 */
+      .rider-info p {
+          margin: 0; /* 문단의 기본 여백을 제거합니다. */
+      }
+
+      /* rider-info 내의 줄바꿈에 대한 스타일 */
+      .rider-info br {
+          display: none; /* 줄바꿈을 숨깁니다. */
+      }
+      .creation-date {
+          font-size: 12px; /* 작은 글씨로 크기 조정 */
+          color: #666; /* 회색으로 색상 지정 */
+          text-align: right; /* 우측 정렬 */
+          margin-top: 10px; /* 위쪽 여백 추가 */
+      }
+
+      .riding-course {
+          white-space: pre-line;
+      }
+
+      .manner-form {
+          padding: 20px;
+          background-color: #f8f8f8;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      textarea {
+          width: calc(100% - 22px);
+          padding: 10px;
+      }
+
+      .toggle-button, .submit-button {
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          margin: 4px 2px;
+          transition-duration: 0.4s;
+          cursor: pointer;
+          border-radius: 4px;
+      }
+
+      .toggle-button:hover, .submit-button:hover {
+          background-color: #45a049;
+      }
+
+
+      .star-rating input[type="radio"] {
+          display: none;
+      }
+
+      .star-rating label {
+          display: inline-block;
+          font-size: 30px; /* 별 크기 설정 */
+          color: #ddd; /* 비활성 별의 색상 */
+          cursor: pointer;
+      }
+
+      .star-rating label:before {
+          content: '\2605'; /* 별 모양 */
+      }
+
+      .star-rating input[type="radio"]:checked ~ label:before,
+      .star-rating input[type="radio"]:checked ~ label ~ label:before {
+          color: #ddd; /* 비활성 별의 색상 */
+      }
+
+      .star-rating input[type="radio"]:checked ~ label:before,
+      .star-rating input[type="radio"]:checked ~ label:before {
+          color: #ffd700; /* 활성 별의 색상 */
+      }
+      .review {
+          width: 100%; /* 매칭 상세 조회 영역을 전체 너비로 설정 */
+          margin-top: 20px; /* 위쪽 여백 추가 */
+      }
+
+      #applicationsList table img {
+          max-width: 80px; /* 이미지의 최대 너비를 조정합니다. */
+          max-height: 80px; /* 이미지의 최대 높이를 조정합니다. */
+          display: block;
+          margin: 0 auto; /* 이미지를 가운데 정렬합니다. */
+      }
+      .cancel-button {
+          padding: 8px 16px; /* 버튼의 내부 여백을 조정합니다. */
+          font-size: 14px; /* 버튼의 글꼴 크기를 줄입니다. */
+      }
+      .application-form {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+          background-color: #f8f8f8;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          margin: 20px;
+      }
+
+      .application-form.hidden {
+          display: none;
+      }
+
+      .matching-form {
+          width: 100%;
+          max-width: 500px; /* 폼의 최대 너비를 제한 */
+      }
+
+      .form-group {
+          margin-bottom: 20px;
+      }
+
+      .form-control {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          resize: none; /* 텍스트 영역의 크기 조절 기능 비활성화 */
+      }
+
+      .submit-button {
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          border-radius: 5px;
+          cursor: pointer;
+      }
+
+      .submit-button:hover {
+          background-color: #45a049;
+      }
+  </style>
+</head>
+
+<body>
+<div class="wrapper">
+  <th:block th:replace="~{common/sidebar :: sidebarFragment}"></th:block>
+  <div class="main">
+    <th:block th:replace="~{common/navbar :: navbarFragment}"></th:block>
+    <main class="content">
+      <div class="review" th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).END}">
+        <div class="image-container">
+          <img src="/img/endMatching.jpg" alt="" style="max-width: 90%; max-height: 90%; object-fit: cover; border-radius: 10px;">
+        </div>
+        <h4>라이딩 종료</h4>
+        <button id="toggleMannerFormButton" class="toggle-button">매너 후기 작성</button>
+        <div id="mannerForm" class="manner-form hidden">
+          <form th:action="@{'/matching/' + ${matching.id} + '/manner'}" method="post">
+            <div class="star-rating">
+              <input type="radio" id="star1" name="score" value="1">
+              <label for="star1" title="1 star"></label>
+              <input type="radio" id="star2" name="score" value="2">
+              <label for="star2" title="2 stars"></label>
+              <input type="radio" id="star3" name="score" value="3">
+              <label for="star3" title="3 stars"></label>
+              <input type="radio" id="star4" name="score" value="4">
+              <label for="star4" title="4 stars"></label>
+              <input type="radio" id="star5" name="score" value="5">
+              <label for="star5" title="5 stars"></label>
+            </div>
+            <label for="comment">매너 후기:</label>
+            <textarea id="comment" name="comment" rows="4" cols="50"></textarea><br>
+            <button type="submit" class="submit-button">작성 완료</button>
+          </form>
+        </div>
+      </div>
+      <!--👇여기에 내용 넣어주시면 됩니다👇-->
+      <div class="container mt-4">
+        <div class="post-details">
+          <div>
+            <div class="rounded-image image-container">
+              <img src="/img/bicycle.png" alt="" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+            </div>
+            <div style="text-align: center;">
+              <span class="nickname" th:text="${matching.member.nickname}"></span> <br>
+            </div>
+            <div class="rider-info" style="margin-top: 20px; background-color: #f8f8f8; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+              <p class="location">
+                <strong>라이딩 지역:</strong>
+                <span th:text="${metropolitanCity}"></span> - <span th:text="${city}"></span>
+              </p>
+              <p class="riding-time">
+                <strong>라이딩 시간:</strong>
+                <span th:text="${#temporals.format(matching.ridingTime, 'MM월 dd일 EEEE HH:mm')}"></span>
+              </p>
+              <p class="riding-course">
+                <strong>라이딩 코스 소개:</strong> <br>
+                <span th:text="${matching.comment}" style="word-wrap: break-word;"></span>
+              </p>
+              <p class="estimated-distance">
+                <strong>예상 거리:</strong>
+                <span th:text="${matching.kilometer}"></span>
+              </p>
+            </div>
+          </div>
+          <div style="text-align: center;" th:if="${matching.member.id == currentUser.id}">
+            <a th:href="@{'/matching/' + ${matching.id} + '/edit'}" class="edit-button" style="margin-right: 3px; text-decoration: none;">수정</a>
+            <form th:action="@{'/matching/' + ${matching.id} + '/delete'}" method="post" id="deleteForm" style="display: inline-block;">
+              <button type="submit" onclick="confirmDelete()" class="delete-button" style="margin-right: 10px;">삭제</button>
+            </form>
+          </div>
+        </div>
+        <a href="/matching/list" style="display: block; margin-top: 10px; text-align: left; color: #333; text-decoration: none; font-size: 16px; font-weight: bold;">뒤로가기</a>
+        <div class="creation-date">
+          <span>작성일자: <span th:text="${#dates.format(matching.createTime, 'yyyy-MM-dd HH:mm')}"></span></span> <br>
+        </div>
+        <div th:if="${matching.member.id == currentUser.id and matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
+          <form th:action="@{'/matching/' + ${matching.id} + '/end'}" method="post" style="display: inline-block;">
+            <button type="submit" style="background-color: #ff4500; color: white; border: none; padding: 10px 20px; border-radius: 4px;">라이딩 종료</button>
+          </form>
+        </div>
+      </div>
+      <div class="matching">
+        <div class="post-details">
+          <div>
+            <div class="rounded-image image-container">
+              <img src="/img/findUser.png" alt="" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+            </div>
+            <br>
+          </div>
+        </div>
+
+        <!-- 매칭 상태가 ACCEPTED일 경우 매칭이 성사되었다는 메시지 표시 -->
+        <div th:if="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}" style="text-align: center; margin-top: 20px;">
+          <h4 style="color: #007bff; font-weight: bold;">매칭 성사</h4>
+          <p style="margin-top: 10px; font-size: 18px;">함께 달릴 라이더 매칭이 완료되었습니다^^</p>
+        </div>
+
+
+
+        <!-- 매칭 상태가 ACCEPTED가 아닌 경우에 매칭 신청 관련 요소들을 표시 -->
+        <div th:unless="${matching.status == T(com.example.safe_ride.matching.entity.MatchingStatus).ACCEPTED}">
+          <span>라이더 찾는 중...</span> <br>
+          <button id="applyButton" class="apply-button">매칭 신청</button>
+          <!-- 매칭 신청 폼 -->
+          <div id="applicationForm" class="application-form hidden">
+            <form th:action="@{'/matching/' + ${matching.id} + '/apply'}" method="post" class="matching-form">
+              <input type="hidden" name="matchingId" th:value="${matching.id}">
+              <div class="form-group">
+                <label for="message">신청 메시지:</label>
+                <textarea id="message" name="message" rows="4" cols="50" class="form-control"></textarea>
+              </div>
+              <button type="submit" class="submit-button" style="float: right; background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">신청하기</button>
+            </form>
+          </div>
+          <!-- 매칭 신청 목록 토글 버튼 -->
+          <button id="toggleApplicationsButton" class="submit-button">매칭 신청 목록</button>
+          <!-- 매칭 신청 목록 -->
+          <div id="applicationsList" class="hidden">
+            <table>
+              <thead>
+              <tr>
+                <th>신청자</th>
+                <th>신청 메시지</th>
+                <th>등급</th>
+                <th> </th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="apply : ${applications}">
+                <td th:text="${apply.applicant.nickname}"></td>
+                <td th:text="${apply.message}"></td>
+                <td>
+                  <div class="badge-image-container">
+                    <span th:if="${#strings.equals(badges.getGrade(), 'QUICK_BOARD')}">
+                        <img class="badge-grade" src="/img/badge/kickboard.png" style="max-width: 50px; max-height: 50px;">
+                    </span>
+                    <span th:if="${#strings.equals(badges.getGrade(), 'BYCICLE')}">
+                        <img class="badge-grade" src="/img/badge/bicycle.png" style="max-width: 50px; max-height: 50px;">
+                    </span>
+                    <span th:if="${#strings.equals(badges.getGrade(), 'SCOOTER')}">
+                        <img class="badge-grade" src="/img/badge/scooter.png" style="max-width: 50px; max-height: 50px;">
+                    </span>
+                    <span th:if="${#strings.equals(badges.getGrade(), 'MOTOR_CYCLE')}">
+                        <img class="badge-grade" src="/img/badge/motorcycle.png" style="max-width: 50px; max-height: 50px;">
+                    </span>
+                    <span th:if="${badges.getGrade() == null}">
+                        <img class="badge-grade" src="/img/badge/default.png" style="max-width: 50px; max-height: 50px;">
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div th:if="${matching.member.id == currentUser.id}">
+                    <form th:action="@{'/matching/' + ${matching.id} + '/accept/' + ${apply.id}}" method="post">
+                      <button type="submit" class="accept-button">수락</button>
+                    </form>
+                    <form th:action="@{'/matching/' + ${matching.id} + '/reject/' + ${apply.id}}" method="post">
+                      <button type="submit" class="reject-button">거절</button>
+                    </form>
+                  </div>
+                  <div th:if="${apply.applicant.id == currentUser.id}">
+                    <form th:action="@{'/matching/' + ${matching.id} + '/cancel-application'}" method="post">
+                      <input type="hidden" name="applicationId" th:value="${apply.id}">
+                      <button type="submit" class="cancel-button">신청 취소</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 알림창 -->
+      <div id="notification" class="hidden"></div>
+
+      <!-- 👆 여기에 내용 넣어주시면 됩니다 👆-->
+    </main>
+
+    <th:block th:replace="~{common/footer :: footerFragment}"></th:block>
+
+  </div>
+</div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script src="/js/app.js"></script> <!-- template -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> <!-- jQuery -->
+<!--👇여기에 사용하는 script 넣어주시면 됩니다👇-->
+<script>
+    // 게시글 삭제 시 확인창
+    function confirmDelete() {
+        // 사용자에게 확인을 받기 위한 알림창 표시
+        if (confirm("정말로 삭제하시겠습니까?")) {
+            // '확인' 버튼이 클릭된 경우 폼 제출
+            document.getElementById("deleteForm").submit();
+        } else {
+            // '취소' 버튼이 클릭된 경우 아무 작업도 하지 않음
+            return false;
+        }
+    }
+
+    // 알림창 표시 함수
+    function showNotification(message) {
+        var notification = document.getElementById("notification");
+        notification.innerHTML = message;
+        notification.classList.remove("hidden");
+        // 3초 후에 알림창 숨김
+        setTimeout(function () {
+            notification.classList.add("hidden");
+        }, 3000);
+    }
+
+    // 매칭 신청 폼을 토글하는 함수
+    function toggleApplicationForm() {
+        var form = document.getElementById("applicationForm");
+        form.classList.toggle("hidden");
+    }
+
+    // 매칭 신청 버튼 클릭 시 매칭 신청 폼을 토글 및 알림창 표시
+    document.getElementById("applyButton").addEventListener("click", function (event) {
+        toggleApplicationForm();
+        // 여기서 매칭 신청이 성공했는지 여부를 확인하고 알림창을 표시합니다.
+        // 아래의 코드를 사용자가 요청한 응답 결과에 맞게 수정하십시오.
+        // 예를 들어, 자신의 매칭글에 매칭 신청을 할 수 없는 경우와 중복 매칭 신청이 불가능한 경우에도 알림창이 표시되어야 합니다.
+        showNotification(""); // 매칭 신청 성공 메시지
+        event.preventDefault(); // 폼 제출 방지
+    });
+
+    // 매칭 신청 목록 토글 함수
+    function toggleApplicationsList() {
+        var list = document.getElementById("applicationsList");
+        list.classList.toggle("hidden");
+    }
+
+    // 매칭 신청 목록 버튼에 이벤트 리스너 추가
+    document.getElementById("toggleApplicationsButton").addEventListener("click", toggleApplicationsList);
+
+    // 매너 후기 작성 폼을 토글하는 함수
+    function toggleMannerForm() {
+        var form = document.getElementById("mannerForm");
+        form.classList.toggle("hidden");
+    }
+
+    // 매너 후기 작성 버튼 클릭 시 매너 후기 작성 폼을 토글
+    document.getElementById("toggleMannerFormButton").addEventListener("click", toggleMannerForm);
+
+
+    // 별점 클릭 시 이벤트 처리
+    document.querySelectorAll('.star-rating input[type="radio"]').forEach(function(star) {
+        star.addEventListener('click', function() {
+            // 선택한 별의 값을 가져와서 활성화
+            var score = this.value;
+            for (var i = 1; i <= 5; i++) {
+                var starElement = document.getElementById('star' + i);
+                // 현재 별의 값보다 작은 별들을 모두 노란색으로 채웁니다.
+                if (i <= score) {
+                    starElement.checked = true;
+                    starElement.nextElementSibling.style.color = '#ffd700'; // 다음 형제 요소(라벨)의 색상을 변경합니다.
+                } else {
+                    starElement.checked = false;
+                    starElement.nextElementSibling.style.color = '#ddd'; // 다음 형제 요소(라벨)의 색상을 변경합니다.
+                }
+            }
+        });
+    });
+</script>
+<!--👆여기에 사용하는 script 넣어주시면 됩니다👆-->
+</html>
