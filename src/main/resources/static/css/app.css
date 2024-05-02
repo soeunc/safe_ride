@@ -14298,7 +14298,7 @@ span.flatpickr-weekday {
 
 [data-simplebar] {
     left: 0;
-    position: -webkit-sticky;
+    position: -webkit- sticky;
     position: sticky;
     top: 0;
     width: 260px
@@ -14589,6 +14589,56 @@ span.flatpickr-weekday {
     background-color: #e9ecef;
     border-color: #dee2e6;
 }
+
+/* 동의팝업 새로운 css 적용*/
+.p-4-newCst {
+    padding: 40px;
+}
+
+.container-newCst {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.mb-4-newCst {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.text-center-newCst {
+    text-align: center;
+}
+
+.btn-success-newCst {
+    background-color: #f3dc32;
+    border-color: #fdf8b9;
+}
+
+.btn-danger-newCst {
+    background-color: #adb5bd;
+    border-color: #adb5bd;
+}
+
+.btn-lg-newCst {
+    padding: 10px 16px;
+    font-size: 16px;
+    line-height: 1.33;
+    border-radius: 6px;
+    width: 100px;
+}
+
+.me-2-newCst {
+    margin-right: 8px;
+}
+
+.align-content-center-newCst {
+    text-align: center;
+    width: 100%;
+}
+
 .spinner {
     display: none;
     width: 1rem;
