@@ -30,6 +30,7 @@ public class LocationRestController {
             String roadAddrPart1,
             HttpSession session
     ) throws IOException {
+        log.info("On getAddressPostion");
         LocationInfoResponseDto infoResponse = apiService.getLocationInfo(roadAddrPart1);
 
         locationInfoService.processData(infoResponse.getSearchedPoint());
