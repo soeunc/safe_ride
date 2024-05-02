@@ -44,7 +44,7 @@ public class    ArticleController {
         List<String> cityNames = cities.stream().map(Region::getCity).collect(Collectors.toList());
         model.addAttribute("city", cityNames);
         model.addAttribute("metropolitanCities", metropolitanCities);
-        return "/article/create";
+        return "article/create";
     }
 
     // 게시글 생성
@@ -65,7 +65,7 @@ public class    ArticleController {
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("article", article);
         model.addAttribute("comment", commentService.commentByArticle(id));
-        return "/article/view";
+        return "article/view";
     }
 
     private Member getUserEntity() {
@@ -129,7 +129,7 @@ public class    ArticleController {
         List<String> cityNames = cities.stream().map(Region::getCity).collect(Collectors.toList());
         model.addAttribute("cities", cityNames);
         model.addAttribute("metropolitanCities", metropolitanCities);
-        return "/article/edit";
+        return "article/edit";
     }
 
     // 게시글 수정 처리

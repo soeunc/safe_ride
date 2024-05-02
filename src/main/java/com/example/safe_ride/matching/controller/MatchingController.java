@@ -147,7 +147,7 @@ public class MatchingController {
         List<String> cityNames = cities.stream().map(Region::getCity).collect(Collectors.toList());
         model.addAttribute("cities", cityNames);
         model.addAttribute("metropolitanCities", metropolitanCities);
-        return "/matching/edit";
+        return "matching/edit";
     }
 
     // 게시글 수정 처리
