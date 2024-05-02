@@ -9,7 +9,9 @@ import com.example.safe_ride.myPage.dto.MyPageDto;
 import com.example.safe_ride.myPage.dto.TodayRecordDto;
 import com.example.safe_ride.myPage.service.MyPageService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -78,16 +80,24 @@ public class MyPageController {
     public int deleteMember(
             @RequestParam("memberId")
             Long memberId,
-            HttpServletResponse response
+            HttpServletResponse response,
+            HttpServletRequest request
     ){
+        //세션 삭제
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return 0;
+        }
+        session.invalidate();
+
         // + 쿠키 삭제
         // 같은 쿠키가 이미 존재하면 덮어쓰기 된다.
         Cookie cookie = new Cookie("JSESSIONID", "");
         cookie.setMaxAge(0); // 0초 생존 -> 삭제
         cookie.setPath("/"); // 쿠키의 경로 설정
-        cookie.setDomain("localhost");
-        cookie.setSecure(false);
-        cookie.setHttpOnly(true);
+        //cookie.setDomain("localhost");
+        //cookie.setSecure(false);
+        //cookie.setHttpOnly(true);
         response.addCookie(cookie); // 요청 객체를 통해서 클라이언트에게 전달
         return memberService.deleteMember(memberId);
 
