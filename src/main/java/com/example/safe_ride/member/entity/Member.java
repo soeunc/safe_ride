@@ -3,6 +3,7 @@ package com.example.safe_ride.member.entity;
 import com.example.safe_ride.article.entity.Article;
 import com.example.safe_ride.matching.entity.Manner;
 import com.example.safe_ride.matching.entity.Matching;
+import com.example.safe_ride.matching.entity.MatchingApplication;
 import com.example.safe_ride.myPage.entity.MyPage;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,9 +42,14 @@ public class Member {
     private List<Matching> matchings;
     //매너
     @OneToMany(mappedBy = "raterMember", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Manner> manners;
+    private List<Manner> raterMembers;
+    //매너
+    @OneToMany(mappedBy = "ratedMember", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Manner> ratedMembers;
     //게시글
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Article> articles;
-
+    //매칭어플
+    @OneToMany(mappedBy = "applicant", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<MatchingApplication> applicants;
 }
