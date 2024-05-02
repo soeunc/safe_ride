@@ -14571,7 +14571,7 @@ span.flatpickr-weekday {
     background: #f8f9fa;
     color: #007bff;
 }
-.pagination-cst .page-item-cst.disabled a, .pagination .page-item-cst.active a {
+.pagination-cst .page-item-cst.disabled a, .pagination-cst .page-item-cst.active a {
     background: #007bff;
     color: #fff;
 }
@@ -14588,6 +14588,20 @@ span.flatpickr-weekday {
     color: #0056b3;
     background-color: #e9ecef;
     border-color: #dee2e6;
+}
+.spinner {
+    display: none;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid transparent;
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /*# sourceMappingURL=app.css.map*/
