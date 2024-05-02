@@ -126,21 +126,21 @@
             <!-- 페이지네이션 링크 -->
             <div th:if="${isSearched and not page.isEmpty()}" class="mt-4">
               <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
-                  <li th:classappend="${page.first ? 'disabled' : ''}" class="page-item">
+                <ul class="pagination-cst justify-content-center">
+                  <li th:classappend="${page.first ? 'disabled' : ''}" class="page-item-cst">
                     <a th:href="@{/public-bicycle(page=${page.number - 1}, sort=${sort != null ? sort : 'distance'}, direction=${sort == 'distance' ? 'asc' : 'desc'})}"
                        th:unless="${page.first}"
-                       class="page-link">Previous</a>
+                       class="page-link-cst">Previous</a>
                   </li>
                   <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
-                      th:classappend="${i == page.number ? 'active' : ''}" class="page-item">
+                      th:classappend="${i == page.number ? 'active' : ''}" class="page-item-cst">
                     <!-- 현재 정렬 상태를 유지하면서 페이지 번호를 클릭할 수 있는 링크 -->
                     <a th:href="@{/public-bicycle(page=${i}, sort=${sort != null ? sort : 'distance'}, direction=${sort == 'distance' ? 'asc' : 'desc'})}"
-                       th:text="${i + 1}" class="page-link"></a>
+                       th:text="${i + 1}" class="page-link-cst"></a>
                   </li>
-                  <li th:classappend="${page.last ? 'disabled' : ''}" class="page-item">
+                  <li th:classappend="${page.last ? 'disabled' : ''}" class="page-item-cst">
                     <a th:href="@{/public-bicycle(page=${page.number + 1}, sort=${sort != null ? sort : 'distance'}, direction=${sort == 'distance' ? 'asc' : 'desc'})}"
-                       th:unless="${page.last}" class="page-link">Next</a>
+                       th:unless="${page.last}" class="page-link-cst">Next</a>
                   </li>
                 </ul>
               </nav>

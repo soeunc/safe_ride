@@ -14556,4 +14556,38 @@ span.flatpickr-weekday {
     transform: translateY(-50%);
 }
 
+.pagination-cst {
+    display: flex;
+    list-style: none;
+    padding: 0;
+}
+.pagination-cst .page-item-cst {
+    margin: 0 5px;
+}
+.pagination-cst .page-item-cst a {
+    display: block;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background: #f8f9fa;
+    color: #007bff;
+}
+.pagination-cst .page-item-cst.disabled a, .pagination .page-item-cst.active a {
+    background: #007bff;
+    color: #fff;
+}
+
+.pagination-cst .page-link-cst {
+    text-decoration: none;
+    color: #007bff;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem 0.75rem;
+}
+
+.pagination-cst .page-link-cst:hover {
+    color: #0056b3;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
 /*# sourceMappingURL=app.css.map*/
