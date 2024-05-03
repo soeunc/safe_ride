@@ -112,7 +112,7 @@
 <details>
 <summary><strong>ERD</strong></summary>
 
-![ERD]()
+![ERD](https://github.com/soeunc/safe_ride/blob/main/Weekly_Log/assets/ERD%2B.png)
 
 
 </details>
@@ -130,7 +130,7 @@
 <details>
 <summary><strong>구조도</strong></summary>
 
-![event]()
+![event](https://github.com/soeunc/safe_ride/blob/main/Weekly_Log/assets/%EA%B5%AC%EC%A1%B0%EB%8F%84.png)
 
 </details>
 
