@@ -79,7 +79,8 @@
 ### ✨ 프로젝트 소개
 
 
-- **세이프 라이드 (Safe-Ride)**: 안전한 라이딩을 위한 커뮤니티 서비스
+- **세이프 라이드 (Safe-Ride)**
+  - 안전한 라이딩을 위한 커뮤니티 서비스
 - 지역별 공영 자전거 이용 정보와 안전한 라이딩을 위한 다양한 서비스를 제공하는 자전거 커뮤니티 및 건강 관리 플랫폼
 
 
@@ -91,16 +92,27 @@
 
 #### &nbsp;　[ Backend ]
 
-&nbsp;&nbsp;&nbsp; <img src="https://img.shields.io/badge/Java 17-FF160B?style=flat-square&logo=java&logoColor=white"/>&nbsp;&nbsp;&nbsp; <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat-square&logo=springboot&logoColor=white"/>&nbsp;&nbsp;&nbsp; <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat&logo=springsecurity&logoColor=white&color=darkgreen"/>&nbsp;&nbsp;&nbsp;<img src="https://img.shields.io/badge/JsonWebToken-000000?style=flat-square&logo=JSON Web Tokens&logoColor=white"/>&nbsp;&nbsp;&nbsp;<img src="https://img.shields.io/badge/JPA-088142?style=flat-square&logo=jpa&logoColor=white"/><img src="https://img.shields.io/badge/Querydsl-white?style=flat-square&logo=querydsl&logoColor=white"/>
+&nbsp;&nbsp;&nbsp; <img src="https://img.shields.io/badge/Java 17-FF160B?style=flat-square&logo=java&logoColor=white"/>
+<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat-square&logo=springboot&logoColor=white"/>
+<img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat&logo=springsecurity&logoColor=white&color=darkgreen"/>
+<img src="https://img.shields.io/badge/JPA-088142?style=flat-square&logo=jpa&logoColor=white"/>
+<img src="https://img.shields.io/badge/Querydsl-black?style=flat-square&logo=querydsl&logoColor=white"/>
 
 #### &nbsp;　[ Frontend ]
 
-&nbsp;&nbsp;&nbsp;&nbsp; <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=HTML5&logoColor=white">&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://img.shields.io/badge/CSS-1572B6?style=flat&logo=CSS3&logoColor=white&color=darkblue">&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=JavaScript&logoColor=black">&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://img.shields.io/badge/Thymeleaf-005F0F?style=flat-square&logo=thymeleaf&logoColor=white"/>    <img src="https://img.shields.io/badge/BootStrap-7952B3?style=flat-square&logo=bootstrap&logoColor=white"/>    <img src="https://img.shields.io/badge/jQuery-0769AD?style=flat-square&logo=jquery&logoColor=white"/>
+&nbsp;&nbsp;&nbsp;&nbsp; <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=HTML5&logoColor=white">
+<img src="https://img.shields.io/badge/CSS-1572B6?style=flat&logo=CSS3&logoColor=white&color=darkblue">
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=JavaScript&logoColor=black">
+<img src="https://img.shields.io/badge/Thymeleaf-005F0F?style=flat-square&logo=thymeleaf&logoColor=white"/>
+<img src="https://img.shields.io/badge/BootStrap-7952B3?style=flat-square&logo=bootstrap&logoColor=white"/>
+<img src="https://img.shields.io/badge/jQuery-0769AD?style=flat-square&logo=jquery&logoColor=white"/>
 
 
 #### &nbsp;　[ Etc... ]
 
-&nbsp;&nbsp;&nbsp;&nbsp; <img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/>&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://img.shields.io/badge/Notion-000000?style=flat-square&logo=notion&logoColor=white"/>  <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white"/>
+&nbsp;&nbsp;&nbsp;&nbsp; <img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/>
+<img src="https://img.shields.io/badge/Notion-000000?style=flat-square&logo=notion&logoColor=white"/>
+<img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white"/>
 
 
 
@@ -138,3 +150,42 @@
 ---
 
 ### 🌼 기능 설명
+
+#### 👤 사용자 계정 관리
+- 회원가입 및 로그인
+- 사용자 정보 수정, 삭제
+- 마이페이지 '오늘의 기록' 입력 
+- 그래프를 활용한 라이딩 기록 시각화
+
+#### 🌤 날씨 정보 안내
+- 공공 데이터 기상청 Open API를 사용
+- 한국환경공단 에어코리아 Open API 사용
+- UI를 통한 날씨 및 미세먼지 정보 제공
+
+#### ️🚲 공영 자전거 사용 정보 안내
+- 주소 / 현재 위치 기반 검색
+- 주소 팝업 Open API, 공공데이터 Open API 사용
+- 공영 대여소 위치 및 상세 정보 제공
+- 대여소 별 자전거 보유 수량 정보 제공
+
+#### 🚩 안전한 자전거 길 안내
+- 공공데이터 Open API 사용
+- 사용자 탐색 위치 검색
+- 근처 위험 구역(자전거, 스쿨존 사고다발지역) 정보 제공
+
+#### 🗣️ 자전거 이용자 커뮤니티
+- 게시판을 통한 커뮤니티 공간 제공
+- 지역별 검색 필터 기능 제공
+- 게시글 내부 댓글 기능 제공
+
+#### ️👊 라이딩 매칭
+- 지역 라이더 매칭 신청
+- 매칭 신청글 작성
+- 해당 매칭글에 매칭 신청
+- 매칭글 작성자는 신청자 목록을 확인 후 수락 및 거절 가능
+- 라이딩 종료 후 매칭 매너 리뷰 작성 
+
+#### 📝 라이딩 기록
+- 목적지 목록 및 지도 제공
+- 실시간 사용자 자전거 이용 기록 수집
+- 당일 라이딩 기록에 수집 정보 누적
